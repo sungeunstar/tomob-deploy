@@ -1,0 +1,855 @@
+{
+  "sessions": {
+    "시작의섬 카브": {
+      "grid": 25,
+      "name": "시작의섬 카브",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
+          "x": 200,
+          "y": -4.78690064330766e-14,
+          "z": 225,
+          "rotY": 0,
+          "scale": 1.5019390107937132
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_14.fbx",
+          "x": 400,
+          "y": 12.802610561580666,
+          "z": 225,
+          "rotY": 0,
+          "scale": 2.4903585024906376
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "x": -750,
+          "y": -1.2377622336214305e-13,
+          "z": 550,
+          "rotY": 0,
+          "scale": 1.0962962165675656
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Bonus_Assets/Meshes/Clouds/Cloud_03.fbx",
+          "x": -750,
+          "y": 15.03673923827066,
+          "z": 600,
+          "rotY": 0,
+          "scale": 3.2770819981016657
+        }
+      ]
+    },
+    "소형섬1": {
+      "grid": 25,
+      "name": "소형섬1",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
+          "x": 200,
+          "y": -4.8143879488571825e-14,
+          "z": 225,
+          "rotY": 0,
+          "scale": 1.1033963337746584
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_02.fbx",
+          "x": 150,
+          "y": -2.349176791043715e-13,
+          "z": 550,
+          "rotY": 0.7853981633974483,
+          "scale": 1.7509513100975531
+        }
+      ]
+    },
+    "소형섬2": {
+      "grid": 25,
+      "name": "소형섬2",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "x": 250,
+          "y": -5.3618119990785487e-14,
+          "z": 250,
+          "rotY": 0,
+          "scale": 1.0675170533897334
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_04.fbx",
+          "x": 275,
+          "y": 9.277712227537625,
+          "z": 300,
+          "rotY": 0,
+          "scale": 1.5823662342582159
+        }
+      ]
+    },
+    "소형섬3": {
+      "grid": 25,
+      "name": "소형섬3",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_02.fbx",
+          "x": 100,
+          "y": -6.765892554421493e-14,
+          "z": 300,
+          "rotY": 0,
+          "scale": 2.3870746939321767
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_01.fbx",
+          "x": 300,
+          "y": 8.157675427154469e-14,
+          "z": 150,
+          "rotY": 0,
+          "scale": 2.3870746939321767
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_07.fbx",
+          "x": 325,
+          "y": 9.401848263618913,
+          "z": 150,
+          "rotY": 2.356194490192345,
+          "scale": 2.3870746939321767
+        }
+      ]
+    },
+    "소형섬5": {
+      "grid": 25,
+      "name": "소형섬5",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_03.fbx",
+          "x": 200,
+          "y": 9.789735803765156e-15,
+          "z": 200,
+          "rotY": 0,
+          "scale": 3.183643482582762
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_04.fbx",
+          "x": 150,
+          "y": -4.8931351636605616e-14,
+          "z": 475,
+          "rotY": 3.9269908169872414,
+          "scale": 2.0597860808324353
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "x": 175,
+          "y": 11.086496123074534,
+          "z": 225,
+          "rotY": 0,
+          "scale": 1.7815089813119735
+        }
+      ]
+    },
+    "중형섬1": {
+      "grid": 25,
+      "name": "중형섬1",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "x": 250,
+          "y": 4.792686697424158e-15,
+          "z": 225,
+          "rotY": 0,
+          "scale": 1.3503300189383272
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "x": -25,
+          "y": -1.197354273144793e-13,
+          "z": 550,
+          "rotY": 0,
+          "scale": 0.9560519275156043
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_06.fbx",
+          "x": -25,
+          "y": 13.035092419887636,
+          "z": 625,
+          "rotY": 0,
+          "scale": 1.417142970685516
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_31.fbx",
+          "x": 275,
+          "y": 11.767812914552817,
+          "z": 275,
+          "rotY": 0,
+          "scale": 1.6748707188772367
+        }
+      ]
+    },
+    "중형섬2": {
+      "grid": 25,
+      "name": "중형섬2",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_13.fbx",
+          "x": 175,
+          "y": 5.104583331489437e-15,
+          "z": 225,
+          "rotY": 0,
+          "scale": 7.9448045194735135
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_37.fbx",
+          "x": 150,
+          "y": 28.62664818739091,
+          "z": 275,
+          "rotY": 0,
+          "scale": 4.134564324111042
+        }
+      ]
+    },
+    "중형섬3": {
+      "grid": 25,
+      "name": "중형섬3",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "x": 275,
+          "y": 1.5829921113482806e-17,
+          "z": 250,
+          "rotY": 0,
+          "scale": 2.09086637718068
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_e_05.fbx",
+          "x": 0,
+          "y": -1.989655841381603e-14,
+          "z": 600,
+          "rotY": 0.7853981633974483,
+          "scale": 2.65711868512952
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_04.fbx",
+          "x": 325,
+          "y": 18.828876459867733,
+          "z": 350,
+          "rotY": 0,
+          "scale": 2.298141950768522
+        }
+      ]
+    },
+    "중형섬4": {
+      "grid": 25,
+      "name": "중형섬4",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_14.fbx",
+          "x": 225,
+          "y": 3.884015740285761e-15,
+          "z": 250,
+          "rotY": 0,
+          "scale": 8.84587972651667
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/M/CPT_Island_M_c_03.fbx",
+          "x": -100,
+          "y": -5.927957596298894e-14,
+          "z": 525,
+          "rotY": 0,
+          "scale": 4.603493848462446
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/M/CPT_Island_M_c_03.fbx",
+          "x": -100,
+          "y": 6.3461982721689e-14,
+          "z": -25,
+          "rotY": 0,
+          "scale": 4.603493848462446
+        }
+      ]
+    },
+    "소형섬4": {
+      "grid": 25,
+      "name": "소형섬4",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
+          "x": 275,
+          "y": 3.3682415108886347e-15,
+          "z": 250,
+          "rotY": 0,
+          "scale": 1.0783172139765143
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "x": 225,
+          "y": -5.96290674727121e-14,
+          "z": 525,
+          "rotY": 0,
+          "scale": 1.5844017581924463
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_b_20.fbx",
+          "x": 275,
+          "y": 9.184348698849332,
+          "z": 250,
+          "rotY": 0,
+          "scale": 3.1672264458190997
+        }
+      ]
+    },
+    "대형섬1": {
+      "grid": 25,
+      "name": "대형섬1",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "x": -75,
+          "y": -3.172358609987008e-14,
+          "z": 150,
+          "rotY": 0,
+          "scale": 7.889117763863799
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_43.fbx",
+          "x": -200,
+          "y": 46.175982603059985,
+          "z": 25,
+          "rotY": 0,
+          "scale": 17.298000000000002
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": -175,
+          "y": 49.75216512696854,
+          "z": 1075,
+          "rotY": 0,
+          "scale": 12.939803668980003
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": 525,
+          "y": 45.54013794966989,
+          "z": -925,
+          "rotY": 1.5707963267948966,
+          "scale": 12.939803668980003
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": -700,
+          "y": 48.59846255648809,
+          "z": -900,
+          "rotY": 6.283185307179586,
+          "scale": 10.40822165976975
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": -1150,
+          "y": 45.61076474050695,
+          "z": -250,
+          "rotY": 6.283185307179586,
+          "scale": 7.785891133116299
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_c_20.fbx",
+          "x": 925,
+          "y": 47.20369660791942,
+          "z": 250,
+          "rotY": 0,
+          "scale": 18.153887392795678
+        }
+      ]
+    },
+    "대형섬2": {
+      "grid": 25,
+      "name": "대형섬2",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_01.fbx",
+          "x": -50,
+          "y": -4.849419029170331e-13,
+          "z": 125,
+          "rotY": 0,
+          "scale": 8.010238891525592
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
+          "x": 75,
+          "y": 68.85842391749948,
+          "z": 125,
+          "rotY": 0.7853981633974483,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_b_04.fbx",
+          "x": -775,
+          "y": 69.288034460393,
+          "z": -900,
+          "rotY": 0,
+          "scale": 14.098238412335348
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_b_05.fbx",
+          "x": -100,
+          "y": 64.48184000366801,
+          "z": 1250,
+          "rotY": 0,
+          "scale": 14.098238412335348
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": 975,
+          "y": 62.792554996820044,
+          "z": 450,
+          "rotY": 0,
+          "scale": 8.482922326735268
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": 875,
+          "y": 67.60853283610241,
+          "z": -525,
+          "rotY": 0,
+          "scale": 8.482922326735268
+        }
+      ]
+    },
+    "대형섬3": {
+      "grid": 25,
+      "name": "대형섬3",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "x": -50,
+          "y": 2.082688773520972e-13,
+          "z": 1100,
+          "rotY": 0.7853981633974483,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "x": 575,
+          "y": -2.9099124288950893e-13,
+          "z": -725,
+          "rotY": 4.71238898038469,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "x": -1000,
+          "y": 2.7778927642923317e-14,
+          "z": -125,
+          "rotY": 6.283185307179586,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_02.fbx",
+          "x": 1750,
+          "y": -6.67840311893673e-13,
+          "z": 950,
+          "rotY": 1.5707963267948966,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
+          "x": 2150,
+          "y": 45.63979423091739,
+          "z": 1300,
+          "rotY": 0,
+          "scale": 9.679646143585867
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": 825,
+          "y": 97.73428843327937,
+          "z": -200,
+          "rotY": 0,
+          "scale": 5.416553905945009
+        }
+      ]
+    },
+    "대형섬4": {
+      "grid": 25,
+      "name": "대형섬4",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "x": 0,
+          "y": 4.1881777238501153e-13,
+          "z": 150,
+          "rotY": 0,
+          "scale": 17.75972010687979
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "x": 275,
+          "y": 117.62734187216213,
+          "z": 1075,
+          "rotY": 11.780972450961727,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "x": 975,
+          "y": 107.87703792158781,
+          "z": -725,
+          "rotY": 14.922565104551524,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_02.fbx",
+          "x": 2175,
+          "y": 103.84546598601129,
+          "z": 625,
+          "rotY": 0,
+          "scale": 14.961040200000003
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "x": -1925,
+          "y": 107.12812349048176,
+          "z": 325,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "x": -1125,
+          "y": 105.56364461642721,
+          "z": -2400,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "x": 1400,
+          "y": 106.86421355741433,
+          "z": -2550,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_07.fbx",
+          "x": 50,
+          "y": 103.51450664188627,
+          "z": 2525,
+          "rotY": 0,
+          "scale": 13.913767386000004
+        }
+      ]
+    },
+    "대형섬5": {
+      "grid": 25,
+      "name": "대형섬5",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "x": 325,
+          "y": -1.2050742723743182e-12,
+          "z": 1325,
+          "rotY": 0,
+          "scale": 12.08696708876487
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
+          "x": 2150,
+          "y": 3.9109846370057206e-14,
+          "z": -175,
+          "rotY": 0.7853981633974483,
+          "scale": 5.440386743131167
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_10.fbx",
+          "x": 2150,
+          "y": -9.006756572254967e-13,
+          "z": -50,
+          "rotY": 0,
+          "scale": 5.059559671111986
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
+          "x": 1775,
+          "y": 165.72262351635914,
+          "z": 2100,
+          "rotY": 0,
+          "scale": 13.913767386000004
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
+          "x": -100,
+          "y": 165.0688830984122,
+          "z": 2250,
+          "rotY": 1.5707963267948966,
+          "scale": 13.913767386000004
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_06.fbx",
+          "x": -175,
+          "y": 165.3362832908996,
+          "z": 450,
+          "rotY": 0.7853981633974483,
+          "scale": 20
+        }
+      ]
+    },
+    "얼음섬1": {
+      "grid": 25,
+      "name": "얼음섬1",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_H_01.fbx",
+          "x": -200,
+          "y": -14.36693255113022,
+          "z": -200,
+          "rotY": 0,
+          "scale": 9.851135605240954
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/With_Bottoms/Ice_L_BT_11.fbx",
+          "x": -750,
+          "y": 6.526483046722264e-13,
+          "z": -2950,
+          "rotY": 0,
+          "scale": 11.591702231626718
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/With_Bottoms/Ice_S_BT_08.fbx",
+          "x": 975,
+          "y": 3.6748144653260003e-13,
+          "z": -1650,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/With_Bottoms/Ice_Pile_S_BT_02.fbx",
+          "x": 700,
+          "y": -4.867681211210404e-13,
+          "z": 2200,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/With_Bottoms/Ice_Pile_S_BT_01.fbx",
+          "x": -350,
+          "y": 3.891924300526443e-13,
+          "z": 2350,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/With_Bottoms/Ice_Pile_S_BT_01.fbx",
+          "x": -2425,
+          "y": -3.5752543208306325e-13,
+          "z": 1600,
+          "rotY": 0,
+          "scale": 20
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_M_07.fbx",
+          "x": 2325,
+          "y": -1.271112419897282e-13,
+          "z": 575,
+          "rotY": 1.5707963267948966,
+          "scale": 20
+        }
+      ]
+    },
+    "얼음섬2": {
+      "grid": 25,
+      "name": "얼음섬2",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_H_03.fbx",
+          "x": 400,
+          "y": -1.5729404680440765e-14,
+          "z": 75,
+          "rotY": 0,
+          "scale": 9.002070913534856
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_04.fbx",
+          "x": -675,
+          "y": -4.671886691228091e-13,
+          "z": 2100,
+          "rotY": 1.5707963267948966,
+          "scale": 11.340016754630824
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_11.fbx",
+          "x": 225,
+          "y": 1.5500300559630328e-12,
+          "z": -2875,
+          "rotY": 1.5707963267948966,
+          "scale": 11.340016754630824
+        }
+      ]
+    },
+    "얼음섬3": {
+      "grid": 25,
+      "name": "얼음섬3",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_H_02.fbx",
+          "x": 400,
+          "y": -2.1956151243174774e-14,
+          "z": 100,
+          "rotY": 0,
+          "scale": 7.9238298820248
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_02.fbx",
+          "x": -600,
+          "y": -5.468409781275162e-13,
+          "z": 2475,
+          "rotY": 0,
+          "scale": 7.9238298820248
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_11.fbx",
+          "x": -100,
+          "y": 5.617391314916336e-13,
+          "z": -2525,
+          "rotY": 0.7853981633974483,
+          "scale": 7.9238298820248
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_09.fbx",
+          "x": 2200,
+          "y": 5.302712758147573e-13,
+          "z": -2400,
+          "rotY": 0,
+          "scale": 7.9238298820248
+        }
+      ]
+    },
+    "테스트섬 절벽항구": {
+      "grid": 25,
+      "name": "테스트섬 절벽항구",
+      "spawn": {
+        "x": 0,
+        "z": -575
+      },
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rotY": 3.141592653589793,
+          "scale": 2.65
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "x": -410,
+          "y": 0,
+          "z": 145,
+          "rotY": 0.7853981633974483,
+          "scale": 1.15
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
+          "x": 15,
+          "y": 23,
+          "z": 315,
+          "rotY": 0.7853981633974483,
+          "scale": 5.8
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_b_04.fbx",
+          "x": -360,
+          "y": 17,
+          "z": 105,
+          "rotY": 5.497787143782138,
+          "scale": 4.15
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/M/CPT_Mountain_M_b_05.fbx",
+          "x": 365,
+          "y": 17,
+          "z": 120,
+          "rotY": 0.7853981633974483,
+          "scale": 4.05
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "x": -500,
+          "y": 13,
+          "z": -180,
+          "rotY": 4.71238898038469,
+          "scale": 2.65
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
+          "x": 510,
+          "y": 13,
+          "z": -135,
+          "rotY": 1.5707963267948966,
+          "scale": 2.55
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "x": 930,
+          "y": 0,
+          "z": -245,
+          "rotY": 2.356194490192345,
+          "scale": 0.92
+        },
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "x": 930,
+          "y": 11,
+          "z": -230,
+          "rotY": 1.5707963267948966,
+          "scale": 1.55
+        }
+      ]
+    },
+    "테스트섬 Sea Keep": {
+      "grid": 25,
+      "name": "테스트섬 Sea Keep",
+      "objs": [
+        {
+          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rotY": 0,
+          "scale": 2.2
+        }
+      ]
+    }
+  },
+  "last": {
+    "grid": 25,
+    "name": "얼음섬3",
+    "objs": [
+      {
+        "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_H_02.fbx",
+        "x": 400,
+        "y": -2.1956151243174774e-14,
+        "z": 100,
+        "rotY": 0,
+        "scale": 7.9238298820248
+      },
+      {
+        "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_02.fbx",
+        "x": -600,
+        "y": -5.468409781275162e-13,
+        "z": 2475,
+        "rotY": 0,
+        "scale": 7.9238298820248
+      },
+      {
+        "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_11.fbx",
+        "x": -100,
+        "y": 5.617391314916336e-13,
+        "z": -2525,
+        "rotY": 0.7853981633974483,
+        "scale": 7.9238298820248
+      },
+      {
+        "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Ice/No_Bottoms/Ice_L_09.fbx",
+        "x": 2200,
+        "y": 5.302712758147573e-13,
+        "z": -2400,
+        "rotY": 0,
+        "scale": 7.9238298820248
+      }
+    ]
+  },
+  "ts": "2026-06-23T05:14:18.215Z"
+}

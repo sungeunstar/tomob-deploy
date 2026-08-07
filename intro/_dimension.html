@@ -1,0 +1,192 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAS — 차원문 연출(검증)</title>
+<!--
+  intro 랜딩 클라이맥스 연출(검증 1단계): 게임 모듈을 연출용으로만 로드 →
+  밤 시작섬(시작의섬 카브 복사본) + 차원문 게이트 + 몬스터 스폰. player·게임플레이 없음.
+  ★game.html은 안 건드림. 같은 모듈을 일부만 init.
+-->
+<style>
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/static/pretendard.min.css");
+  @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+  *{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:#060c14;font-family:'Montserrat','Pretendard',system-ui,sans-serif}
+  #load{position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;background:#060c14;color:#ffe07a;font:15px system-ui,'Malgun Gothic';text-align:center;line-height:1.7}
+  #dbg{display:none;position:fixed;left:10px;top:8px;z-index:6;font:11px/1.5 'Montserrat','Pretendard',sans-serif;color:#9fe;background:rgba(0,0,0,.5);padding:6px 10px;border-radius:5px;pointer-events:none;white-space:pre}   /* 데모: 디버그 HUD 숨김 */
+  /* ★시네마틱 레터박스(튜토리얼 시네마틱 스타일): 상하 11vh 검은 띠 + 비네트 그레이딩 */
+  #cinFrame{position:fixed;inset:0;z-index:8;pointer-events:none}
+  #cinFrame .vig{position:absolute;inset:0;box-shadow:inset 0 0 240px 40px rgba(0,0,0,.55)}
+  #cinFrame .bar{position:absolute;left:0;right:0;height:11vh;background:#000}
+  #cinFrame .bar.t{top:0}#cinFrame .bar.b{bottom:0}
+  /* ★도착 후 랜딩: MAS 로고 + CTA */
+  #landing{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;opacity:0;transition:opacity 1.8s ease;pointer-events:none}
+  #landing.on{opacity:1;pointer-events:auto}
+  #landing img.logo{width:min(46vw,440px);filter:drop-shadow(0 6px 36px rgba(0,0,0,.85))}
+  #landing .cta{display:flex;justify-content:center}
+  /* ★엘든링 타이틀 스타일(ref/스타트화면): 발광 텍스트 + 아래 광원(버튼 박스 없음) */
+  #landing .startbtn{position:relative;background:none;border:0;cursor:pointer;padding:20px 60px;
+    font:17px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.42em;font-weight:700;color:#f4eede;
+    text-shadow:0 0 26px rgba(255,214,140,.6);animation:startpulse 2.8s ease-in-out infinite;transition:color .25s,text-shadow .25s,letter-spacing .25s}
+  #landing .startbtn::after{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:360px;height:96px;pointer-events:none;z-index:-1;
+    background:radial-gradient(ellipse 56% 20% at 50% 50%, rgba(255,208,128,.58), rgba(255,208,128,0) 70%)}   /* ★인트로처럼 글자 가운데 관통 후광(밑 깔림 X) */
+  #landing .startbtn:hover{color:#fff;text-shadow:0 0 34px rgba(255,232,175,.9);letter-spacing:.56em}
+  @keyframes startpulse{0%,100%{opacity:.68}50%{opacity:1}}
+  /* ★차원문 색(초록) 안개 — 시작 시 화면 덮음 → 하강하며 빠짐 = "차원문에서 나옴"(intro 수면통과 veil 방식) */
+  #portalVeil{position:fixed;inset:0;z-index:7;pointer-events:none;opacity:1;mix-blend-mode:screen;
+    background:
+      radial-gradient(ellipse 165% 125% at 50% 42%, rgba(228,255,240,.98), rgba(130,248,182,.82) 40%, rgba(46,178,102,.52) 70%, rgba(14,60,32,.18) 100%),
+      linear-gradient(180deg, rgba(210,255,228,.62), rgba(108,224,156,.32) 48%, rgba(26,104,58,.1) 82%)}
+</style>
+<script type="importmap">{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "three-pinata":"https://esm.sh/@dgreenheck/three-pinata@2.0.1?external=three",
+  "three.quarks":"https://esm.sh/three.quarks@0.15.3?external=three",
+  "three-mesh-bvh":"https://esm.sh/three-mesh-bvh@0.7.0?external=three",
+  "three-bvh-csg":"https://esm.sh/three-bvh-csg@0.0.16?external=three,three-mesh-bvh"
+}}</script>
+</head>
+<body>
+<div id="load">연출 씬 로드 중…</div>
+<div id="dbg"></div>
+<div id="portalVeil"></div>
+<div id="cinFrame"><div class="vig"></div><div class="bar t"></div><div class="bar b"></div></div>
+<div id="landing"><img class="logo" src="/intro/logo.png" alt="tomob"><div class="cta"><button class="startbtn">PRESS ANY BUTTON</button></div></div>
+<script type="module">
+import { initCore }      from '../modules/core.js';
+import { initPhysics }   from '../modules/physics.js';
+import { initWater }     from '../modules/water.js';
+import { initSky }       from '../modules/sky.js';
+import { initNightSky }  from '../modules/nightsky.js';
+import { initWind }      from '../modules/wind.js';
+import { initTerrain }   from '../modules/terrain.js';
+import { initEnvironment } from '../modules/environment.js';
+import { initMonsters }  from '../modules/monsters.js';
+import { initGate }      from '../modules/gate.js';
+
+const L=document.getElementById('load'), DBG=document.getElementById('dbg');
+try{
+  const ctx = initCore();
+  L.textContent='물리(Rapier) 로드 중…';      await initPhysics(ctx);
+  L.textContent='바다 생성 중…';               initWater(ctx);
+  L.textContent='하늘 생성 중…';               initSky(ctx);
+  L.textContent='밤하늘 생성 중…';             initNightSky(ctx);
+  L.textContent='바람/날씨 생성 중…';          initWind(ctx);
+  document.getElementById('windHud')?.remove();   // ★게임 HUD(WIND 나침반) 제거 — 실제 랜딩이라 게임 UI 끔
+  L.textContent='시작섬(연출 복사본) 불러오는 중…';
+  const island = await fetch('./_island_intro.json').then(r=>r.json());
+  const terrain = await initTerrain(ctx, { session: island });
+  L.textContent='식생(나무·풀·광석) 산포 중…';  await initEnvironment(ctx);
+  // ★연출용 더미 player — monsters.spawn()은 !ctx.player면 즉시 return(스폰 안 함). 최소 객체만 주입(조작 없음).
+  const _isp = terrain.spawn || { x:0, y:30, z:0 };
+  ctx.player = { pos:new ctx.THREE.Vector3(_isp.x, 7, _isp.z), col:null, keysSet:new Set() };
+  // ★groundAt 폴백 — 이 섬(시작의섬 카브)은 섬 메시 raycast가 안 맞음(game.html도 동일 확인: boundingSphere 깨짐).
+  //   collide bbox 안이면 섬 표면 추정 높이 반환 → 몬스터 스폰 위치 확보. (game.html 원본은 안 건드림)
+  { const _o=terrain.groundAt, _bb=terrain.collide.map(m=>new ctx.THREE.Box3().setFromObject(m));
+    terrain.groundAt=(x,z,fy)=>{ const g=_o(x,z,fy); if(g>0.8) return g;
+      for(let i=0;i<_bb.length;i++){ const b=_bb[i]; if(x>=b.min.x&&x<=b.max.x&&z>=b.min.z&&z<=b.max.z) return 12; } return 0; }; }
+  L.textContent='몬스터 시스템 로드 중…';       initMonsters(ctx);   // gate가 ctx.spawnMonster 호출 → gate 전에
+  // ★물리 스텝 등록 + 1회 워밍 — castRay(섬 충돌체) 작동 위해(game.html처럼). 없으면 broad-phase 미등록 → 레이캐스트 전부 null.
+  ctx.onUpdate(()=> ctx.stepPhysics());
+  ctx.stepPhysics();   // 1회 즉시 step → 충돌체 79개 broad-phase 등록 → 아래 gate 섬 내륙 탐색 정상
+  L.textContent='차원문 게이트 여는 중…';        initGate(ctx);       // 자동 open('skeleton') → 섬 내륙에 차원문 + 몬스터 스폰
+
+  // ★차원문 위치 = 섬 안쪽(해안 걸침 수정). gate 재오픈으로 좌표 명시. (캡처 보며 조정)
+  const GX=241, GZ=475, GY=12;   // ★사령관 pick(평지) — 차원문 위치. GY=섬 표면(11.9) 위로(마법진 안 묻히게)
+  // ★차원문 색 초록(0x46e88a) 강제 + 로딩중 스폰 억제 — open 전에 설정해야 U/beam/rune/입자 전부 초록으로 세팅됨
+  if(ctx.gate.themes.grade1){ ctx.gate.themes.grade1.color = 0x46e88a; ctx.gate.themes.grade1.count = 0; }
+  ctx.gate.open('grade1', GX, GZ, GY);   // (색/카운트 설정 후 open → warp 소용돌이와 동일 초록)
+  ctx.player.pos.set(GX, GY, GZ);       // 차원문 중심 — player 거리 0이라 DESPAWN(90) 안 걸림(안 사라짐)
+  ctx.player.stealthed = true;          // ★stealth=몬스터 인식 불가 → aggro 안 됨 → 차원문 주변 wander(배회). 안 몰림.
+  // ★밤 고정
+  if(ctx.sky && ctx.sky.setTime) ctx.sky.setTime(0.75);
+  if(ctx.sky && 'timeScale' in ctx.sky) ctx.sky.timeScale=0;
+  const { camera } = ctx;
+  const PICK = new URLSearchParams(location.search).has('pick');
+  if(PICK){
+    // ★좌표 잡기 모드(?pick=1): 부감 고정 + 클릭으로 차원문 위치 지정 → 좌표 화면 표시(사령관이 잡아줌).
+    const cf=document.getElementById('cinFrame'); if(cf) cf.style.display='none';
+    const dbg=document.getElementById('dbg'); dbg.style.zIndex='20'; dbg.style.fontSize='15px'; dbg.textContent='섬에서 차원문 둘 곳을 클릭하세요';
+    camera.position.set(GX, 360, GZ+260); camera.lookAt(GX, 0, GZ);
+    addEventListener('click', e=>{ const ndc={x:(e.clientX/innerWidth)*2-1, y:-(e.clientY/innerHeight)*2+1};
+      const rc=new ctx.THREE.Raycaster(); rc.setFromCamera(ndc, camera);
+      const pl=new ctx.THREE.Plane(new ctx.THREE.Vector3(0,1,0), -7), pt=new ctx.THREE.Vector3();
+      if(rc.ray.intersectPlane(pl, pt)){ const px=Math.round(pt.x), pz=Math.round(pt.z);
+        ctx.gate.open('skeleton', px, pz, 7);
+        dbg.textContent='✅ 차원문 위치: '+px+', '+pz+'\n이 좌표를 알려주세요 (GX,GZ로 고정)'; console.log('[gate pick]', px, pz); } });
+  } else if(new URLSearchParams(location.search).has('cam')){
+    // ★카메라 도착 위치 잡기(?cam=1): WASD 자유비행 → C로 좌표 복사(사령관이 잡아줌).
+    const cf2=document.getElementById('cinFrame'); if(cf2) cf2.style.display='none';
+    const dbg2=document.getElementById('dbg'); dbg2.style.zIndex='20'; dbg2.textContent='WASD 이동 · Q/E 위아래 · 방향키 시점 · Shift 빠르게 · C 좌표복사';
+    const V=ctx.THREE.Vector3, _UP=new V(0,1,0);
+    const ff={pos:new V(GX+34,GY+24,GZ+74), yaw:0, pitch:0, keys:new Set(), fwd:new V(0,0,-1)};
+    { const d=new V(GX,GY+8,GZ).sub(ff.pos).normalize(); ff.pitch=Math.asin(Math.max(-1,Math.min(1,d.y))); ff.yaw=Math.atan2(d.x,d.z); }
+    const MV=new Set(['w','a','s','d','q','e','shift','arrowup','arrowdown','arrowleft','arrowright']);
+    addEventListener('keydown',e=>{ const k=e.key.toLowerCase();
+      if(k==='c'){ const P=ff.pos, L=P.clone().add(ff.fwd.clone().multiplyScalar(50));
+        const line='pos:['+Math.round(P.x)+','+Math.round(P.y)+','+Math.round(P.z)+'] look:['+Math.round(L.x)+','+Math.round(L.y)+','+Math.round(L.z)+']';
+        try{navigator.clipboard.writeText(line);}catch(_){}; dbg2.textContent='✅ '+line+'\n(이 좌표 알려주세요)'; console.log('[cam]',line); return; }
+      if(MV.has(k)){ ff.keys.add(k); if(k.startsWith('arrow'))e.preventDefault(); } });
+    addEventListener('keyup',e=>{ ff.keys.delete(e.key.toLowerCase()); });
+    ctx.onUpdate(dt=>{ const K=ff.keys, mv=(K.has('shift')?3:1)*50*dt, rot=1.3*dt;
+      if(K.has('arrowleft'))ff.yaw+=rot; if(K.has('arrowright'))ff.yaw-=rot;
+      if(K.has('arrowup'))ff.pitch+=rot; if(K.has('arrowdown'))ff.pitch-=rot;
+      ff.pitch=Math.max(-1.45,Math.min(1.45,ff.pitch));
+      const cp=Math.cos(ff.pitch); ff.fwd.set(cp*Math.sin(ff.yaw),Math.sin(ff.pitch),cp*Math.cos(ff.yaw));
+      const right=new V().crossVectors(ff.fwd,_UP).normalize();
+      if(K.has('w'))ff.pos.addScaledVector(ff.fwd,mv); if(K.has('s'))ff.pos.addScaledVector(ff.fwd,-mv);
+      if(K.has('d'))ff.pos.addScaledVector(right,mv); if(K.has('a'))ff.pos.addScaledVector(right,-mv);
+      if(K.has('e'))ff.pos.y+=mv; if(K.has('q'))ff.pos.y-=mv;
+      camera.position.copy(ff.pos); camera.lookAt(ff.pos.clone().add(ff.fwd)); });
+  } else {
+    // ★카메라 시네마틱: 차원문 소용돌이 상공 → 빠르게 지상 하강(차원문 뚫고). ease-in 가속 = 훅.
+    // ★큰 선회: 차원문 중심 원궤도로 1.5바퀴 빙 돌며 하강(직선 아님). 도착=사령관 pick(196,46,351).
+    const _cl=new ctx.THREE.Vector3(), _cl0=new ctx.THREE.Vector3(GX, GY, GZ), _cl1=new ctx.THREE.Vector3(267, 33, 462);   // 사령관 pick look
+    const _dgx=282-GX, _dgz=510-GZ, _radE=Math.hypot(_dgx,_dgz), _angE=Math.atan2(_dgz,_dgx);   // 도착=사령관 pick pos(282,*,510)
+    const _angS=_angE-Math.PI*0.9, _radS=70, _hS=GY+640, _hE=31;   // ★하늘서 하강 + 초록 안개로 "차원문에서 나옴"
+    const _pv=document.getElementById('portalVeil');
+    let _ct=0;
+    const _EMB=new URLSearchParams(location.search).has('embed');
+    window.__setP=(v)=>{ _ct=Math.max(0,Math.min(1,v)); };   // ★통합 wrapper 외부 progress 주입(embed)
+    if(_EMB){ addEventListener('wheel', e=>{ try{ e.preventDefault(); const P=window.parent; if(P&&P!==window&&P.__seqWheel) P.__seqWheel(e.deltaY); }catch(_){} }, {passive:false}); }  // ★차원문(pointer-events auto)서도 역재생 휠을 부모로 전달
+    // ★랜딩 마우스 패럴랙스: 마우스 이동 시 시점 살짝 이동(도착 후). 우클릭 아님 — hover 이동.
+    let _mpx=0,_mpy=0,_pxE=0,_pyE=0;
+    addEventListener('mousemove', ev=>{ _mpx=ev.clientX/innerWidth-0.5; _mpy=ev.clientY/innerHeight-0.5; });
+    const _TH=ctx.THREE, _vR=new _TH.Vector3(), _vU=new _TH.Vector3(), _vD=new _TH.Vector3();
+    ctx.onUpdate((dt)=>{
+      if(!_EMB){ if(_ct<1) _ct=Math.min(1, _ct+dt*0.26);
+        else if(!window.__arrived){ window.__arrived=true; window.dispatchEvent(new Event('cinedone')); } }
+      const e=_ct*_ct*(3-2*_ct);
+      const ang=_angS+(_angE-_angS)*e, rad=_radS+(_radE-_radS)*e, h=_hS+(_hE-_hS)*e;
+      camera.position.set(GX+Math.cos(ang)*rad, h, GZ+Math.sin(ang)*rad);
+      _cl.lerpVectors(_cl0,_cl1,e);
+      if(_ct>0.9){                                              // 도착 근처 → 마우스 패럴랙스(살짝 둘러보기)
+        _pxE+=(_mpx-_pxE)*0.06; _pyE+=(_mpy-_pyE)*0.06;
+        _vD.copy(_cl).sub(camera.position).normalize();
+        _vR.copy(_vD).cross(camera.up).normalize();
+        _vU.copy(_vR).cross(_vD).normalize();
+        const amt=7*Math.min(1,(_ct-0.9)/0.1);
+        camera.position.addScaledVector(_vR, _pxE*amt).addScaledVector(_vU, -_pyE*amt);
+      }
+      camera.lookAt(_cl);
+      if(_pv) _pv.style.opacity=Math.max(0, 1-_ct*1.7).toFixed(2);
+      if(_EMB && _ct>=0.999 && !window.__arrived){ window.__arrived=true; window.dispatchEvent(new Event('cinedone')); } });   // ★차원문 안개: 시작 가득 → 하강하며 빠짐
+  }
+
+  ctx.start();
+  L.style.display='none';
+  window.__ctx=ctx; window.__ready=true;
+  // ★카메라 도착(cinedone) → MAS 로고 + CTA 페이드인
+  addEventListener('cinedone', ()=>{ const el=document.getElementById('landing'); if(el) el.classList.add('on');   // ★카메라 하강 끝 → 로고/CTA 페이드인(1.8s)
+    if(ctx.gate.themes.grade1) ctx.gate.themes.grade1.count = 6;                    // ★도착 순간부터 몬스터 스폰 시작(로딩 중 억제됐던 것 해제). 총 6마리 상한.
+    // ⚠️ 이전 setInterval(9초마다 gate.open) 재스폰 제거 — gate.open은 매번 spawned=0 리셋+6마리 ignoreMax 신규 스폰이라,
+    //    despawn 안 되는 이 몬스터들(stealth+player더미)에겐 순수 누적(6→12→18…)이었음. 1회 스폰=안정적 6마리 유지.
+  });
+
+  // 디버그 HUD: 차원문/몬스터 상태
+  ctx.onUpdate(()=>{ const g=ctx.gate, m=ctx.monsters;
+    DBG.textContent = `차원문 (${GX},${GZ})  collide:${terrain.collide.length}\n`
+      + `gate: ${g?(g.active?'OPEN':'closed'):'없음'}  스폰몹:${g?g._spawned:'-'}\n`
+      + `monsters: ${m?m.length:'-'}  time:${ctx.sky&&ctx.sky.getTime?ctx.sky.getTime().toFixed(2):'-'}`;
+  });
+}catch(e){ L.innerHTML='❌ 연출 초기화 실패<br>'+(e&&e.message||e); console.error(e); }
+</script>
+</body></html>

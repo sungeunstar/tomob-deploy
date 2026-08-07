@@ -1,0 +1,249 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAS Voyage — Journey</title>
+<!--
+  통합 랜딩 시네마틱 (intro → warp → dimension) 단일 페이지.
+  ★사령관 비전(2026-07-01):
+    1) intro = 기존 스냅 그대로. 휠 한 번 = 한 섹션(히어로→수면→항해→교역→전투→탐험→진영).
+    2) 진영(마지막) 도달 후 추가 휠 1회 → 알아서 빨려들어가(warp) 차원문 도착(dim) 자동 재생.
+    3) 위로 스크롤 = 역재생(동굴 밖으로 → 진영 복귀).
+  ⇒ 선형 스크롤 아님. 휠 이벤트를 가로채 섹션 스냅 + 진영 후 자동 시퀀스로 구동.
+  같은 출처 → iframe.contentWindow.__setP 직접 호출.
+-->
+<style>
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/static/pretendard.min.css");
+  @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#070f18;height:100%;overflow:hidden;font-family:'Montserrat','Pretendard',system-ui,sans-serif}   /* 페이지 스크롤 없음 — 휠로 제어 */
+  .layer{position:fixed;inset:0;width:100vw;height:100vh;border:0;z-index:2;opacity:0;
+         transition:opacity .12s linear;pointer-events:none;background:#070f18}
+  #lIntro{opacity:1;z-index:2}
+  #lWarp{z-index:3}
+  #lDim{z-index:4}
+  #load{position:fixed;inset:0;z-index:50;background:#070f18;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:20px;transition:opacity .9s ease}
+  #load.off{opacity:0;pointer-events:none}
+  #load .t{font:11px/1.7 'Montserrat','Pretendard',sans-serif;letter-spacing:.42em;color:#5a93a8}
+  #load .bar{width:210px;height:2px;background:rgba(120,200,225,.14);overflow:hidden;border-radius:2px}
+  #load .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#41c6e0,#9bf0f8);transition:width .35s ease}
+  #load .pct{font:10px/1 ui-monospace,monospace;letter-spacing:.3em;color:#41c6e0;opacity:.8}
+  #hint{position:fixed;left:50%;bottom:38px;transform:translateX(-50%);z-index:6;
+        font:10px/1.6 ui-monospace,monospace;letter-spacing:.34em;color:rgba(180,222,233,.6);
+        text-align:center;pointer-events:none;transition:opacity .4s}
+  #hint .c{display:block;margin-top:8px;font-size:15px;color:#41c6e0;animation:bob 1.7s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+  /* 우상단 사운드 ON/OFF 토글 (select.html 캐릭터선택과 동일) */
+  .snd{position:fixed;right:28px;top:22px;z-index:9;display:flex;align-items:center;gap:8px;cursor:pointer;pointer-events:auto;
+    color:#9bd8e6;font:800 12px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.14em;padding:8px 14px 8px 12px;border-radius:9px;
+    border:1px solid rgba(120,200,225,.28);background:rgba(10,20,28,.5);transition:.15s}
+  .snd:hover{color:#fff;border-color:#41c6e0;background:rgba(20,40,52,.66)}
+  .snd svg{width:17px;height:17px;display:block}
+  .snd.off{color:rgba(140,160,170,.6)}
+  .snd.off .wave{opacity:0}
+  .snd .slash{opacity:0}
+  .snd.off .slash{opacity:1}
+  /* 로그인 버튼 (사운드 토글 왼쪽) */
+  .loginBtn{position:fixed;right:126px;top:22px;z-index:9;cursor:pointer;pointer-events:auto;
+    color:#9bd8e6;font:800 12px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.16em;padding:9px 18px;border-radius:9px;
+    border:1px solid rgba(120,200,225,.28);background:rgba(10,20,28,.5);transition:.15s}
+  .loginBtn:hover{color:#fff;border-color:#41c6e0;background:rgba(20,40,52,.66)}
+  /* 로그인 팝업(프론트 UI — 백엔드 추후) */
+  #loginModal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(4,10,16,.72);backdrop-filter:blur(4px)}
+  #loginModal.on{display:flex}
+  .lcard{width:min(90vw,380px);background:linear-gradient(180deg,rgba(16,28,38,.96),rgba(9,17,26,.98));border:1px solid rgba(120,200,225,.3);border-radius:16px;padding:34px 30px 26px;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 40px rgba(65,198,224,.08);color:#dcecf3;font-family:'Montserrat','Pretendard',sans-serif}
+  .lcard h3{margin:0 0 4px;font-size:22px;font-weight:800;letter-spacing:.04em;color:#fff;text-align:center}
+  .lcard .lsub{margin:0 0 20px;font-size:11px;letter-spacing:.1em;color:#6f9aae;text-align:center;line-height:1.5}
+  .lcard label{display:block;font-size:10px;letter-spacing:.16em;color:#7fb0c4;margin:14px 0 6px}
+  .lcard input{width:100%;box-sizing:border-box;background:rgba(6,14,22,.8);border:1px solid rgba(120,200,225,.22);border-radius:9px;padding:11px 13px;color:#eaf5fa;font-size:14px;outline:none;transition:.15s}
+  .lcard input:focus{border-color:#41c6e0;background:rgba(10,22,32,.9)}
+  .lcard .lprimary{width:100%;margin-top:22px;padding:12px;border:0;border-radius:9px;cursor:pointer;background:linear-gradient(90deg,#2f9fc0,#41c6e0);color:#04121c;font-weight:800;font-size:14px;letter-spacing:.06em}
+  .lcard .lprimary:hover{filter:brightness(1.08)}
+  .lcard .lguest{width:100%;margin-top:10px;padding:11px;border:1px solid rgba(120,200,225,.24);border-radius:9px;cursor:pointer;background:none;color:#9bd8e6;font-weight:700;font-size:13px;letter-spacing:.06em}
+  .lcard .lguest:hover{border-color:#41c6e0;color:#fff}
+  .lcard .lclose{position:absolute;right:14px;top:12px;cursor:pointer;color:#5f8598;font-size:22px;line-height:1;background:none;border:0}
+  .lcard .lclose:hover{color:#fff}
+  .lcard .lnote{margin-top:16px;font-size:10px;letter-spacing:.06em;color:#5a7d90;text-align:center;line-height:1.5}
+</style></head>
+<body>
+  <iframe class="layer" id="lIntro" src="index.html?embed=1" title="intro"></iframe>
+  <iframe class="layer" id="lWarp"  src="_infinitetubes/warp.html?embed=1" title="warp"></iframe>
+  <iframe class="layer" id="lDim"   src="_dimension.html?embed=1" title="dimension"></iframe>
+
+  <div id="hint">SCROLL TO BEGIN<span class="c">⌄</span></div>
+
+  <div class="snd on" id="sndBtn" title="배경음 켜기/끄기">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor"/>
+      <path class="wave" d="M16.5 8.6a5 5 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path class="wave" d="M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line class="slash" x1="2.5" y1="2.5" x2="21.5" y2="21.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </svg><span class="lbl" id="sndLbl">ON</span></div>
+
+  <button class="loginBtn" id="loginBtn">LOGIN</button>
+  <div id="loginModal">
+    <div class="lcard">
+      <button class="lclose" id="lClose" title="닫기">×</button>
+      <h3>로그인</h3>
+      <p class="lsub">항해 기록과 캐릭터를 저장하려면 로그인하세요</p>
+      <label for="lEmail">이메일</label>
+      <input id="lEmail" type="email" autocomplete="off" placeholder="you@example.com">
+      <label for="lPw">비밀번호</label>
+      <input id="lPw" type="password" autocomplete="off" placeholder="••••••••">
+      <button class="lprimary" id="lSubmit">로그인</button>
+      <button class="lguest" id="lGuest">게스트로 계속</button>
+      <p class="lnote">계정 기능 준비 중 — 곧 캐릭터 저장을 지원합니다</p>
+    </div>
+  </div>
+
+  <div id="load">
+    <div class="t">T O M O B</div>
+    <div class="bar"><i id="lbar"></i></div>
+    <div class="pct" id="lpct">0%</div>
+  </div>
+
+<script>
+  const fIntro=document.getElementById('lIntro'),
+        fWarp =document.getElementById('lWarp'),
+        fDim  =document.getElementById('lDim'),
+        hint  =document.getElementById('hint');
+  const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+  function setP(f,p){ try{ const w=f.contentWindow; if(w&&w.__setP) w.__setP(p); }catch(e){} }
+
+  // ── 상태 ──────────────────────────────────
+  // intro = 원본 ScrollTrigger 스크럽(묵직함) 그대로 재사용. 부모가 iframe scrollY를 흘려보내 구동.
+  let mode='intro';        // 'intro' = 원본 ScrollTrigger 스크럽 / 'seq' = warp+dim 자동 시퀀스
+  let introY=0;            // 인트로 iframe 가상 스크롤 위치(누적 델타 → 원본 scrub/snap이 무겁게 추종)
+  let introMax=6077;       // 인트로 iframe 스크롤 최대(온로드/휠마다 계산)
+  let seqP=0;              // 시퀀스 progress 0~1 (warp[0~0.55] + dim[0.50~1])
+  let seqDir=1;            // 자동 재생 방향(+빨려듦 / -역재생)
+  const introDims=()=>{ try{ const w=fIntro.contentWindow; return Math.max(1, w.document.documentElement.scrollHeight - w.innerHeight); }catch(e){ return introMax; } };
+  const introProg=()=>{ try{ return fIntro.contentWindow.__introP?.() ?? 1; }catch(e){ return 1; } };
+  // ★진영 → 동굴 앞 카메라 무빙 좌표(사령관: 진영에서 동굴로 무빙 후 동굴 앞 감속 → 빨려듦)
+  const CAMP_JIN=[51,-128,-328], LOOK_JIN=[51,-130,-378];   // 진영(intro 마지막 KF)
+  const CAMP_CAVE=[0,-137,-560], LOOK_CAVE=[0,-141,-640];   // 동굴 앞(감속점)
+  const CAMP_IN=[0,-140,-628],   LOOK_IN=[0,-142,-700];     // 동굴 안 진입(빨려듦 — 초록빛에 잠김)
+
+  // ── 휠 핸들러: 인트로=iframe 스크롤 구동 / 진영 후=시퀀스 ────
+  let _atJin=false;   // 진영(스크롤 끝) 도달 여부 — 이징 대기 없이 "도달 후 추가 휠"로 seq 판정
+  addEventListener('wheel', e=>{
+    e.preventDefault();
+    const dy=e.deltaY, down=dy>0;
+    if(mode==='intro'){
+      const w=fIntro.contentWindow;
+      introMax=introDims();
+      // 델타 누적 → 목표 progress를 __scrollTP로 주입 → intro sc.p가 무겁게 이징(scrub 묵직함). ScrollTrigger scroll감지 우회.
+      introY = clamp(introY + dy, 0, introMax);
+      try{ w.__scrollTP(introY/introMax); }catch(_){}
+      // 진영(스크롤 끝) 도달 → 첫 도달=정착, 그 후 추가 하강 휠 → 시퀀스(warp) 진입. (sc.p 이징 대기 안 함)
+      if(introY>=introMax-1){ if(down){ if(_atJin){ mode='seq'; seqDir=1; } else _atJin=true; } }
+      else _atJin=false;
+    } else {                 // seq
+      seqDir = down ? 1 : -1;                                                 // 아래=전진 / 위=역재생
+    }
+  }, {passive:false});
+
+  // ── 차원문(pointer-events auto)서도 역재생 : dim iframe이 휠을 부모로 위임(__seqWheel) ──
+  window.__seqWheel = (dy)=>{ if(mode==='seq') seqDir = dy>0 ? 1 : -1; };
+
+  // ── GLB 우클릭 회전 전달 : iframe이 pointer-events:none이라 부모가 우클릭 드래그를 intro로 넘김 ──
+  let rdrag=false;
+  const fwdEv=(e,type)=>{ try{ fIntro.contentWindow.dispatchEvent(new PointerEvent(type,{clientX:e.clientX,clientY:e.clientY,button:e.button,buttons:e.buttons,pointerId:e.pointerId||1,bubbles:true,cancelable:true})); }catch(_){} };
+  addEventListener('contextmenu', e=>{ if(mode==='intro') e.preventDefault(); });
+  addEventListener('pointerdown', e=>{ if(mode==='intro'&&e.button===2){ rdrag=true; fwdEv(e,'pointerdown'); } });
+  addEventListener('pointerup',   e=>{ if(e.button===2){ if(rdrag) fwdEv(e,'pointerup'); rdrag=false; } });
+  addEventListener('pointermove', e=>{ if(mode==='intro'&&rdrag) fwdEv(e,'pointermove'); });
+  // ── 호버 전달: intro는 mousemove로 _ptr(호버 좌표) 갱신 → 그물망(ripple)·HUD 정보선 작동. iframe이 pointer-events:none이라 부모가 대신 전달. ──
+  addEventListener('mousemove', e=>{ if(mode!=='intro') return;
+    try{ fIntro.contentWindow.dispatchEvent(new MouseEvent('mousemove',{clientX:e.clientX,clientY:e.clientY,bubbles:true})); }catch(_){} });
+  // ── 좌클릭 전달: intro 메뉴(START GAME/포트폴리오/문의) 클릭 → iframe이 pointer-events:none이라 부모가 좌표 아래 요소를 찾아 대신 클릭.
+  //   START GAME은 index.html에서 window.top.location='/select.html'(캐릭터 선택)로 이동. (사령관: 스타트→캐릭터선택 연결)
+  addEventListener('click', e=>{ if(mode!=='intro' || e.button!==0) return;
+    try{ const doc=fIntro.contentDocument; if(!doc) return; const el=doc.elementFromPoint(e.clientX,e.clientY);
+      if(el && typeof el.click==='function') el.click(); }catch(_){} });
+
+  // ── 프레임 루프 ───────────────────────────
+  function loop(){
+    if(mode==='intro'){
+      // 스크럽/스냅/이징은 전부 인트로 iframe 내부(원본 ScrollTrigger)가 담당 — 여기선 레이어만.
+      fIntro.style.opacity='1'; fWarp.style.opacity='0'; fDim.style.opacity='0';
+      fDim.style.pointerEvents='none';
+      let sy=0; try{ sy=fIntro.contentWindow.scrollY||0; }catch(_){}
+      hint.style.opacity = sy<40 ? '1' : '0';
+    } else {                                                    // 'seq' — 자동 재생
+      // 진영→동굴 접근 → 워프 빨려듦 → 차원문. 한 번 트리거되면 스크롤 없이도 진행. 위로 스크롤=역재생.
+      const speed = seqDir>0 ? 0.0042 : -0.006;                 // ★조금 느리게 = 워프 길게 체감
+      seqP = clamp(seqP + speed);
+      // ── 1) 진영 → 동굴 앞(감속) → 동굴 안으로 계속 진입(가속 빨려듦) : intro __camOverride 애니 (페이드 아님, 실제 카메라 전진) ──
+      if(seqP < 0.34){
+        const L=(a,b,t)=>[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
+        let pos, look;
+        if(seqP < 0.17){                                        // 진영 → 동굴 앞 (감속)
+          const t=clamp(seqP/0.17), e=1-Math.pow(1-t,2.4);      // ease-out = 동굴 앞에서 느려짐
+          pos=L(CAMP_JIN,CAMP_CAVE,e); look=L(LOOK_JIN,LOOK_CAVE,e);
+        } else {                                                // 동굴 앞 → 동굴 안 (가속 진입 = 빨려듦)
+          const t=clamp((seqP-0.17)/0.17), e=t*t;               // ease-in = 다시 빨라지며 쑥 들어감
+          pos=L(CAMP_CAVE,CAMP_IN,e); look=L(LOOK_CAVE,LOOK_IN,e);
+        }
+        try{ fIntro.contentWindow.__camOverride = {pos,look}; }catch(_){}
+      } else { try{ fIntro.contentWindow.__camOverride = null; }catch(_){} }
+      // ── 2) 워프(빨려듦, 길게) + 3) 차원문. 워프 전환은 카메라가 동굴 안 초록빛에 잠긴 순간(seqP~0.28) = 페이드 안 보임 ──
+      const wp = clamp((seqP-0.28)/0.54);                       // 워프 seqP 0.28~0.82 (길게)
+      const dp = clamp((seqP-0.80)/0.20);                       // 차원문 seqP 0.80~1.0
+      setP(fWarp, wp); setP(fDim, dp);
+      // ★페이드아웃 금지(검은배경 비쳐 어두워보임) — 위 레이어(warp>intro, dim>warp)가 덮게 = 빨려듦 연속.
+      fIntro.style.opacity = (seqP<0.34)?'1':'0';                             // 워프가 완전히 덮을 때까지 1 유지
+      fWarp.style.opacity  = clamp((seqP-0.27)/0.035).toFixed(2);             // 동굴 안 진입 순간 빠르게 위로 덮음(페이드인만)
+      fDim.style.opacity   = clamp((seqP-0.80)/0.05).toFixed(2);              // 차원문이 워프 위에서 덮음
+      fDim.style.pointerEvents = seqP>0.97 ? 'auto' : 'none';
+      hint.style.opacity='0';
+      if(seqDir<0 && seqP<=0.001){ mode='intro'; _atJin=false; try{fIntro.contentWindow.__camOverride=null;}catch(_){} introMax=introDims(); introY=introMax; try{fIntro.contentWindow.__scrollTP(1);}catch(_){} }  // 역재생 끝 → 진영 복귀
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // ── 통합 프리로더 ─────────────────────────
+  const bar=document.getElementById('lbar'), pct=document.getElementById('lpct'), load=document.getElementById('load');
+  function rdy(f,flag){ try{ return !!f.contentWindow[flag]; }catch(e){ return false; } }
+  function checkLoad(){
+    const a=rdy(fIntro,'__introReady'), b=rdy(fWarp,'__warpReady'), c=rdy(fDim,'__ready');
+    const n=(a?1:0)+(b?1:0)+(c?1:0), p=Math.round(n/3*100);
+    bar.style.width=p+'%'; pct.textContent=p+'%';
+    if(n>=3){ setP(fIntro,0); setTimeout(()=>load.classList.add('off'), 300); return; }
+    setTimeout(checkLoad, 200);
+  }
+  checkLoad();
+
+  window.__journey={ get mode(){return mode;}, get introY(){return introY;}, get seqP(){return seqP;},
+                     go(p){ mode='intro'; introMax=introDims(); introY=clamp(p||0)*introMax; try{fIntro.contentWindow.__scrollTP(clamp(p||0));}catch(_){} },  // p=0~1 진행도
+                     seq(v){ mode='seq'; seqP=clamp(v); seqDir=1; } };
+
+  // ── BGM (bgm_intro = 캐릭터·추종자·진영 선택 페이지 select.html과 동일 곡) + 우상단 ON/OFF 토글 ──
+  const bgm=new Audio('/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
+  const sndBtn=document.getElementById('sndBtn'), sndLbl=document.getElementById('sndLbl');
+  let sndOn=(localStorage.getItem('mas_bgm')!=='off');   // 기본 ON, 사용자 선택 기억(select.html과 키 공유)
+  function applySnd(){
+    sndBtn.classList.toggle('on',sndOn); sndBtn.classList.toggle('off',!sndOn);
+    sndLbl.textContent=sndOn?'ON':'OFF';
+    if(sndOn){ bgm.play().catch(()=>{}); } else { bgm.pause(); }
+  }
+  sndBtn.onclick=()=>{ sndOn=!sndOn; localStorage.setItem('mas_bgm', sndOn?'on':'off'); applySnd(); };
+  applySnd();
+  // 브라우저 자동재생 정책: 첫 사용자 입력(스크롤/클릭/키) 후 재생 시작
+  function _bgmKick(){ if(sndOn) bgm.play().catch(()=>{}); ['pointerdown','keydown','wheel'].forEach(e=>removeEventListener(e,_bgmKick)); }
+  ['pointerdown','keydown','wheel'].forEach(e=>addEventListener(e,_bgmKick));
+  window.__bgm=bgm;
+
+  // ── 로그인 팝업 (프론트 UI만 — 백엔드/인증은 추후. 계정으로 캐릭터 저장 예정) ──
+  const loginBtn=document.getElementById('loginBtn'), loginModal=document.getElementById('loginModal');
+  const openLogin=()=>loginModal.classList.add('on'), closeLogin=()=>loginModal.classList.remove('on');
+  loginBtn.onclick=openLogin;
+  document.getElementById('lClose').onclick=closeLogin;
+  loginModal.addEventListener('click', e=>{ if(e.target===loginModal) closeLogin(); });   // 바깥 클릭 닫기
+  addEventListener('keydown', e=>{ if(e.key==='Escape') closeLogin(); });
+  document.getElementById('lSubmit').onclick=()=>{ const n=loginModal.querySelector('.lnote');   // TODO: 백엔드 인증 연동
+    if(n){ n.textContent='계정 기능 준비 중입니다 — 백엔드 연동 후 캐릭터 저장 지원.'; n.style.color='#41c6e0'; } };
+  document.getElementById('lGuest').onclick=closeLogin;
+  window.__login={ open:openLogin, close:closeLogin };
+</script>
+</body></html>

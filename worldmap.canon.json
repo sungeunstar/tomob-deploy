@@ -1,0 +1,1448 @@
+{
+ "seed": 1,
+ "players": 12,
+ "homePer": 5,
+ "organic": true,
+ "iceN": 6,
+ "total": 95,
+ "islands": [
+  {
+   "id": "isle0",
+   "x": 0,
+   "z": 0,
+   "r": 320,
+   "tier": "large",
+   "prefab": "대형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle1",
+   "x": -1013,
+   "z": 884,
+   "r": 320,
+   "tier": "large",
+   "prefab": "대형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle2",
+   "x": 944,
+   "z": -956,
+   "r": 320,
+   "tier": "large",
+   "prefab": "대형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle3",
+   "x": -1376,
+   "z": -412,
+   "r": 320,
+   "tier": "large",
+   "prefab": "대형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle4",
+   "x": 2705,
+   "z": -82,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle5",
+   "x": 2182,
+   "z": 1282,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle6",
+   "x": 1107,
+   "z": 1324,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle7",
+   "x": 792,
+   "z": 2161,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle8",
+   "x": -554,
+   "z": 2843,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle9",
+   "x": -1199,
+   "z": 2223,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle10",
+   "x": -1858,
+   "z": 1617,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle11",
+   "x": -2484,
+   "z": -241,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle12",
+   "x": -1553,
+   "z": -1551,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle13",
+   "x": -1170,
+   "z": -2404,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle14",
+   "x": -394,
+   "z": -1958,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle15",
+   "x": 500,
+   "z": -1984,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle16",
+   "x": 1864,
+   "z": -1815,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle17",
+   "x": 1829,
+   "z": -262,
+   "r": 213,
+   "tier": "mid",
+   "prefab": "중형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle18",
+   "x": 5107,
+   "z": 417,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle19",
+   "x": 4376,
+   "z": 426,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle20",
+   "x": 3644,
+   "z": 782,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle21",
+   "x": 3164,
+   "z": 409,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle22",
+   "x": 2712,
+   "z": 595,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle23",
+   "x": 1735,
+   "z": 403,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle24",
+   "x": 882,
+   "z": 160,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle25",
+   "x": 3877,
+   "z": 2822,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle26",
+   "x": 3234,
+   "z": 2339,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle27",
+   "x": 3234,
+   "z": 1515,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle28",
+   "x": 2733,
+   "z": 1666,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle29",
+   "x": 1629,
+   "z": 900,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle30",
+   "x": 1933,
+   "z": 4461,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle31",
+   "x": 1195,
+   "z": 3795,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle32",
+   "x": 957,
+   "z": 3382,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle33",
+   "x": 1078,
+   "z": 2769,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle34",
+   "x": 1493,
+   "z": 2598,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle35",
+   "x": 468,
+   "z": 1542,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle36",
+   "x": -121,
+   "z": 4259,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle37",
+   "x": 225,
+   "z": 3445,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle38",
+   "x": 95,
+   "z": 3015,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle39",
+   "x": 293,
+   "z": 2612,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle40",
+   "x": -17,
+   "z": 2261,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle41",
+   "x": 62,
+   "z": 1733,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle42",
+   "x": -2047,
+   "z": 3833,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle43",
+   "x": -1589,
+   "z": 3172,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle44",
+   "x": -1237,
+   "z": 2894,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle45",
+   "x": -532,
+   "z": 2141,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle46",
+   "x": -679,
+   "z": 1716,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle47",
+   "x": -228,
+   "z": 1321,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle48",
+   "x": -77,
+   "z": 893,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle49",
+   "x": -4071,
+   "z": 2148,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle50",
+   "x": -3336,
+   "z": 1595,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle51",
+   "x": -2872,
+   "z": 1778,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle52",
+   "x": -2520,
+   "z": 1499,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle53",
+   "x": -2420,
+   "z": 1061,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle54",
+   "x": -1908,
+   "z": 844,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle55",
+   "x": -4272,
+   "z": 130,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle56",
+   "x": -3393,
+   "z": -56,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle57",
+   "x": -3083,
+   "z": 396,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle58",
+   "x": -2645,
+   "z": 500,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle59",
+   "x": -2214,
+   "z": 374,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle60",
+   "x": -1765,
+   "z": 396,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle61",
+   "x": -3675,
+   "z": -2151,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle62",
+   "x": -3105,
+   "z": -1722,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle63",
+   "x": -2937,
+   "z": -1058,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle64",
+   "x": -2511,
+   "z": -913,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle65",
+   "x": -2004,
+   "z": -1053,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle66",
+   "x": -972,
+   "z": -1213,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle67",
+   "x": -2770,
+   "z": -3778,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle68",
+   "x": -2340,
+   "z": -3187,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle69",
+   "x": -2268,
+   "z": -2483,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle70",
+   "x": -1839,
+   "z": -2348,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle71",
+   "x": -475,
+   "z": -4305,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle72",
+   "x": -135,
+   "z": -3541,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle73",
+   "x": -111,
+   "z": -2978,
+   "r": 107,
+   "tier": "small",
+   "prefab": "시작의섬 카브",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle74",
+   "x": 53,
+   "z": -2485,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle75",
+   "x": -220,
+   "z": -1309,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle76",
+   "x": 2415,
+   "z": -4372,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle77",
+   "x": 1717,
+   "z": -3910,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle78",
+   "x": 1709,
+   "z": -3321,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬1",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle79",
+   "x": 1758,
+   "z": -2540,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle80",
+   "x": 1201,
+   "z": -2268,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬2",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle81",
+   "x": 1192,
+   "z": -1818,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle82",
+   "x": 4288,
+   "z": -1848,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": true
+  },
+  {
+   "id": "isle83",
+   "x": 3409,
+   "z": -1666,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬3",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle84",
+   "x": 2766,
+   "z": -1791,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle85",
+   "x": 2609,
+   "z": -1371,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle86",
+   "x": 2489,
+   "z": -895,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle87",
+   "x": 2184,
+   "z": -1224,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬4",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle88",
+   "x": 1841,
+   "z": -934,
+   "r": 107,
+   "tier": "small",
+   "prefab": "소형섬5",
+   "hasPort": true,
+   "isSpawn": false
+  },
+  {
+   "id": "isle89",
+   "x": 1875,
+   "z": 7576,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬1",
+   "hasPort": false,
+   "isSpawn": false
+  },
+  {
+   "id": "isle90",
+   "x": -1220,
+   "z": -6897,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬3",
+   "hasPort": false,
+   "isSpawn": false
+  },
+  {
+   "id": "isle91",
+   "x": -1304,
+   "z": 6836,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬1",
+   "hasPort": false,
+   "isSpawn": false
+  },
+  {
+   "id": "isle92",
+   "x": -2959,
+   "z": 7159,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬1",
+   "hasPort": false,
+   "isSpawn": false
+  },
+  {
+   "id": "isle93",
+   "x": 2023,
+   "z": -6937,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬1",
+   "hasPort": false,
+   "isSpawn": false
+  },
+  {
+   "id": "isle94",
+   "x": -40,
+   "z": -7655,
+   "r": 320,
+   "tier": "ice",
+   "prefab": "얼음섬2",
+   "hasPort": false,
+   "isSpawn": false
+  }
+ ],
+ "routes": [
+  {
+   "from": "isle0",
+   "to": "isle1"
+  },
+  {
+   "from": "isle0",
+   "to": "isle48"
+  },
+  {
+   "from": "isle1",
+   "to": "isle3"
+  },
+  {
+   "from": "isle2",
+   "to": "isle24"
+  },
+  {
+   "from": "isle2",
+   "to": "isle88"
+  },
+  {
+   "from": "isle3",
+   "to": "isle66"
+  },
+  {
+   "from": "isle4",
+   "to": "isle22"
+  },
+  {
+   "from": "isle4",
+   "to": "isle21"
+  },
+  {
+   "from": "isle5",
+   "to": "isle29"
+  },
+  {
+   "from": "isle5",
+   "to": "isle28"
+  },
+  {
+   "from": "isle6",
+   "to": "isle35"
+  },
+  {
+   "from": "isle6",
+   "to": "isle7"
+  },
+  {
+   "from": "isle7",
+   "to": "isle33"
+  },
+  {
+   "from": "isle7",
+   "to": "isle39"
+  },
+  {
+   "from": "isle8",
+   "to": "isle45"
+  },
+  {
+   "from": "isle8",
+   "to": "isle40"
+  },
+  {
+   "from": "isle9",
+   "to": "isle46"
+  },
+  {
+   "from": "isle9",
+   "to": "isle45"
+  },
+  {
+   "from": "isle10",
+   "to": "isle54"
+  },
+  {
+   "from": "isle10",
+   "to": "isle52"
+  },
+  {
+   "from": "isle11",
+   "to": "isle64"
+  },
+  {
+   "from": "isle11",
+   "to": "isle59"
+  },
+  {
+   "from": "isle12",
+   "to": "isle65"
+  },
+  {
+   "from": "isle12",
+   "to": "isle66"
+  },
+  {
+   "from": "isle13",
+   "to": "isle14"
+  },
+  {
+   "from": "isle13",
+   "to": "isle70"
+  },
+  {
+   "from": "isle14",
+   "to": "isle75"
+  },
+  {
+   "from": "isle15",
+   "to": "isle75"
+  },
+  {
+   "from": "isle15",
+   "to": "isle74"
+  },
+  {
+   "from": "isle16",
+   "to": "isle81"
+  },
+  {
+   "from": "isle16",
+   "to": "isle87"
+  },
+  {
+   "from": "isle17",
+   "to": "isle88"
+  },
+  {
+   "from": "isle17",
+   "to": "isle23"
+  },
+  {
+   "from": "isle18",
+   "to": "isle19"
+  },
+  {
+   "from": "isle18",
+   "to": "isle20"
+  },
+  {
+   "from": "isle19",
+   "to": "isle20"
+  },
+  {
+   "from": "isle20",
+   "to": "isle21"
+  },
+  {
+   "from": "isle21",
+   "to": "isle22"
+  },
+  {
+   "from": "isle23",
+   "to": "isle4"
+  },
+  {
+   "from": "isle24",
+   "to": "isle0"
+  },
+  {
+   "from": "isle25",
+   "to": "isle26"
+  },
+  {
+   "from": "isle25",
+   "to": "isle27"
+  },
+  {
+   "from": "isle26",
+   "to": "isle27"
+  },
+  {
+   "from": "isle27",
+   "to": "isle28"
+  },
+  {
+   "from": "isle29",
+   "to": "isle28"
+  },
+  {
+   "from": "isle30",
+   "to": "isle31"
+  },
+  {
+   "from": "isle30",
+   "to": "isle32"
+  },
+  {
+   "from": "isle31",
+   "to": "isle32"
+  },
+  {
+   "from": "isle32",
+   "to": "isle37"
+  },
+  {
+   "from": "isle33",
+   "to": "isle34"
+  },
+  {
+   "from": "isle34",
+   "to": "isle7"
+  },
+  {
+   "from": "isle35",
+   "to": "isle41"
+  },
+  {
+   "from": "isle36",
+   "to": "isle37"
+  },
+  {
+   "from": "isle36",
+   "to": "isle38"
+  },
+  {
+   "from": "isle37",
+   "to": "isle38"
+  },
+  {
+   "from": "isle38",
+   "to": "isle39"
+  },
+  {
+   "from": "isle39",
+   "to": "isle40"
+  },
+  {
+   "from": "isle40",
+   "to": "isle45"
+  },
+  {
+   "from": "isle41",
+   "to": "isle40"
+  },
+  {
+   "from": "isle42",
+   "to": "isle43"
+  },
+  {
+   "from": "isle42",
+   "to": "isle44"
+  },
+  {
+   "from": "isle43",
+   "to": "isle44"
+  },
+  {
+   "from": "isle44",
+   "to": "isle45"
+  },
+  {
+   "from": "isle46",
+   "to": "isle45"
+  },
+  {
+   "from": "isle47",
+   "to": "isle48"
+  },
+  {
+   "from": "isle47",
+   "to": "isle1"
+  },
+  {
+   "from": "isle49",
+   "to": "isle50"
+  },
+  {
+   "from": "isle49",
+   "to": "isle51"
+  },
+  {
+   "from": "isle50",
+   "to": "isle51"
+  },
+  {
+   "from": "isle51",
+   "to": "isle53"
+  },
+  {
+   "from": "isle52",
+   "to": "isle53"
+  },
+  {
+   "from": "isle52",
+   "to": "isle54"
+  },
+  {
+   "from": "isle53",
+   "to": "isle54"
+  },
+  {
+   "from": "isle55",
+   "to": "isle56"
+  },
+  {
+   "from": "isle55",
+   "to": "isle57"
+  },
+  {
+   "from": "isle56",
+   "to": "isle57"
+  },
+  {
+   "from": "isle57",
+   "to": "isle58"
+  },
+  {
+   "from": "isle58",
+   "to": "isle59"
+  },
+  {
+   "from": "isle59",
+   "to": "isle60"
+  },
+  {
+   "from": "isle60",
+   "to": "isle3"
+  },
+  {
+   "from": "isle61",
+   "to": "isle62"
+  },
+  {
+   "from": "isle61",
+   "to": "isle63"
+  },
+  {
+   "from": "isle62",
+   "to": "isle63"
+  },
+  {
+   "from": "isle63",
+   "to": "isle64"
+  },
+  {
+   "from": "isle65",
+   "to": "isle66"
+  },
+  {
+   "from": "isle67",
+   "to": "isle68"
+  },
+  {
+   "from": "isle67",
+   "to": "isle69"
+  },
+  {
+   "from": "isle68",
+   "to": "isle69"
+  },
+  {
+   "from": "isle69",
+   "to": "isle70"
+  },
+  {
+   "from": "isle71",
+   "to": "isle72"
+  },
+  {
+   "from": "isle71",
+   "to": "isle73"
+  },
+  {
+   "from": "isle72",
+   "to": "isle73"
+  },
+  {
+   "from": "isle73",
+   "to": "isle74"
+  },
+  {
+   "from": "isle74",
+   "to": "isle75"
+  },
+  {
+   "from": "isle76",
+   "to": "isle77"
+  },
+  {
+   "from": "isle76",
+   "to": "isle78"
+  },
+  {
+   "from": "isle77",
+   "to": "isle78"
+  },
+  {
+   "from": "isle78",
+   "to": "isle79"
+  },
+  {
+   "from": "isle79",
+   "to": "isle80"
+  },
+  {
+   "from": "isle80",
+   "to": "isle81"
+  },
+  {
+   "from": "isle80",
+   "to": "isle16"
+  },
+  {
+   "from": "isle82",
+   "to": "isle83"
+  },
+  {
+   "from": "isle82",
+   "to": "isle84"
+  },
+  {
+   "from": "isle83",
+   "to": "isle84"
+  },
+  {
+   "from": "isle84",
+   "to": "isle85"
+  },
+  {
+   "from": "isle84",
+   "to": "isle86"
+  },
+  {
+   "from": "isle85",
+   "to": "isle86"
+  },
+  {
+   "from": "isle87",
+   "to": "isle86"
+  },
+  {
+   "from": "isle88",
+   "to": "isle87"
+  }
+ ],
+ "spawns": [
+  {
+   "slot": 1,
+   "islandId": "isle18"
+  },
+  {
+   "slot": 2,
+   "islandId": "isle25"
+  },
+  {
+   "slot": 3,
+   "islandId": "isle30"
+  },
+  {
+   "slot": 4,
+   "islandId": "isle36"
+  },
+  {
+   "slot": 5,
+   "islandId": "isle42"
+  },
+  {
+   "slot": 6,
+   "islandId": "isle49"
+  },
+  {
+   "slot": 7,
+   "islandId": "isle55"
+  },
+  {
+   "slot": 8,
+   "islandId": "isle61"
+  },
+  {
+   "slot": 9,
+   "islandId": "isle67"
+  },
+  {
+   "slot": 10,
+   "islandId": "isle71"
+  },
+  {
+   "slot": 11,
+   "islandId": "isle76"
+  },
+  {
+   "slot": 12,
+   "islandId": "isle82"
+  }
+ ]
+}

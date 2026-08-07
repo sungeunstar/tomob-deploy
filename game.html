@@ -1,0 +1,423 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAS — 게임</title>
+<style>
+  *{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:#8fc1e3;font:13px system-ui,'Malgun Gothic',sans-serif}
+  #hud{position:fixed;left:14px;top:12px;z-index:5;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7);line-height:1.7;pointer-events:none}
+  #hud b{color:#ffe07a}
+  #cross{position:fixed;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:rgba(255,255,255,.6);z-index:4;pointer-events:none}
+  #fps{position:fixed;right:12px;top:10px;z-index:6;font:12px/1.4 ui-monospace,Consolas,monospace;color:#9fe;background:rgba(0,0,0,.5);padding:5px 9px;border-radius:5px;pointer-events:none;text-shadow:0 1px 2px #000}
+  /* 🏮 로딩 화면 — 실제 내용은 modules/loadscreen.js가 채운다.
+     여기 배경을 미리 깔아두는 건 모듈 로드 전 첫 프레임에 남색 화면이 번쩍이지 않게 하려는 것. */
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+  #hint{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);z-index:5;color:#fff;background:rgba(0,0,0,.45);padding:8px 16px;border-radius:8px}
+</style>
+<script type="importmap">{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "three-pinata":"https://esm.sh/@dgreenheck/three-pinata@2.0.1?external=three",
+  "three.quarks":"https://esm.sh/three.quarks@0.15.3?external=three",
+  "three-mesh-bvh":"https://esm.sh/three-mesh-bvh@0.7.0?external=three",
+  "three-bvh-csg":"https://esm.sh/three-bvh-csg@0.0.16?external=three,three-mesh-bvh"
+}}</script>
+</head>
+<body>
+<div id="load"></div>
+<!-- ⚠️ 이 HUD는 2026-07-22 코드와 전수 대조해 구정보를 걷어냈다. 키를 바꾸면 여기도 같이 고칠 것.
+     걷어낸 것: B 건설(build.js:218 라디얼 폐기→퀵슬롯) · T 교역(trader.js:3 폐기→NPC E키) · 우클릭 대포(사격은 좌클릭)
+                Z 조타륜(→스테이션 진입·이탈) · [ ]시간 · \시간배속 · N밤낮 · P음악(실제는 인사) · K드래곤소환(단독 K 제거됨) -->
+<div id="hud"><b>WASD</b> 이동 · <b>마우스</b> 시점 · <b>Shift</b> 달리기 · <b>Space</b> 점프 · <b>숫자</b> 퀵슬롯 · <b>F</b> 1/3인칭 · <b>V</b> 무기 · <b>M</b> 지도 · <b>G</b> 점령 · <b>N</b> 내 섬 · <b>Y</b> 승하선 · <b>Z</b> 조타/포대 · <b>A D</b> 키 · <b>W S</b> 돛 · <b>T</b> 닻 · <b>Q E</b> 포문 조준 · <b>좌클릭</b> 사격<span id="dbgHud" style="display:none"> · <b>R</b> 비 · <b>Ctrl+Shift+K</b> 테스트모드</span><br><span id="pos"></span> <span id="timeHud"></span></div>
+<div id="cross"></div>
+<div id="fps">FPS --</div>
+<div id="hint">화면을 클릭하면 시점이 잠깁니다 (ESC로 해제)</div>
+<script type="module">
+import { initCore }    from './modules/core.js';
+import { initPhysics } from './modules/physics.js';
+import { initWater }   from './modules/water.js';
+import { initFoamtrail } from './modules/foamtrail.js';   // 🌊 웨이크/물보라 포말 RT(ref/배나가는효과.png) — water.setWake 주입
+import { initSeabed }  from './modules/seabed.js';   // 🏝️ 해저 모래 바닥(수면 아래 굴곡 사구) — water 직후
+import { initFish }    from './modules/fish.js';     // 🐟 lowpoly 어군(InstancedMesh+거리 LOD) — 수중 데코
+import { initSky }     from './modules/sky.js';
+import { initNightSky } from './modules/nightsky.js';
+import { initWind }    from './modules/wind.js';
+import { initInput }   from './modules/input.js';   // ⌨️ 입력 모드 라우터(ctx.input) — 조타/UI/건설/컷신 중 도보키 차단. 전수표=_입력키맵.md
+import { initAI }      from './modules/ai.js';      // 🧠 AI 코어(ctx.ai) — 지각(FOV/발각/기억)·공격토큰·디렉터(전투 게이팅). 수치=BAL.ai
+import { initTerrain } from './modules/terrain.js';
+import { initSeaKeepTest } from './modules/seakeeptest.js?v=20260806f';   // Sea Keep 완성 씬 로드(테스트 교체 또는 ?seaKeep=1 본편 추가)
+import { initGround }  from './modules/ground.js';   // 🗺️ R4 지형 쿼리 SSOT(해안 판정 3벌 통일)
+import { initIslands, WORLD_SCALE } from './modules/islands.js';  // 🏝️ R5-P1 아일랜드 레지스트리 SSOT(세션/스트림/오프닝 섬 단일 장부)
+import { BAL } from './modules/balance.js';   // 🏝️ 홈섬 목표폭(BAL.island.sizeMul) — worldstream과 같은 SSOT
+import { initShip }    from './modules/ship.js';
+import { initCrew }    from './modules/crew.js';   // ⚔️ 1인 크루 해전(§B) — 스테이션(1=조타/2=포) + 안 잡은 쪽 AI 크루
+import { initPlayer, KAY_CHARS }  from './modules/player.js';
+import { initTorch }   from './modules/torch.js';   // 🔥 횃불 불빛(밤 조명 메커닉)
+import { initCampfire } from './modules/campfire.js';   // 🔥 모닥불(제작·설치·밤 온기)
+import { initBuild }   from './modules/build.js';
+import { initEnvironment } from './modules/environment.js';
+import { initAxetree } from './modules/axetree.js';   // 🪓 벌목(environment 나무 대상, 도끼 장착 시)
+import { initMine }    from './modules/mine.js';      // ⛏️ 채광(environment 광석 → Brush 광맥 교체, 곡괭이 장착 시)
+import { initResourceFocus } from './modules/resourcefocus.js';   // 🔎 광물·나무 근접 포커스(이름표+금빛 외곽선)
+import { initFortify } from './modules/fortify.js';   // 🧱 블록 방어 축성(L키 — 성벽·타워, static 인스턴싱+HP파괴)
+import { initSettlement } from './modules/settlement.js';   // 🏛️ 거점 건물(owned 섬 항구에 골드로 건설, 그 섬 패시브 효과)
+import { initOutpost } from './modules/outpost.js';   // 🚩 거점 깃발(제작→설치→반경 경계. 섬당 1개, 레벨업으로 개수 증가)
+import { initMercenary } from './modules/mercenary.js';   // 🗡️ 몬스터 용병(던전 정복 시 최강 1종 굴복 → 거점 수비병 배치)
+import { initEmpire } from './modules/empire.js';   // 🏛️ 내 섬 전체뷰(N키) — 소유 섬 목록 → 원격 건설 진입점(settlement.build 래핑)
+import { initNavMap }  from './modules/navmap.js';
+import { initSound }   from './modules/sound.js';
+import { initSailhud } from './modules/sailhud.js';
+import { compass as ukCompass } from './modules/uikit.js';
+import { initCannon }  from './modules/cannon.js';
+import { initCannonFx } from './modules/cannonfx.js';   // ⚓ 대포 "제대로" VFX(머즐/착탄 먼지·파편·판자·잔불·연기+킥)
+import { initMonsters } from './modules/monsters.js';
+import { initTribes }  from './modules/tribes.js';    // 🏴 12부족·2진영 데이터(SSOT) — raiders/claim 앞
+import { initRaiders } from './modules/raiders.js';   // 🏴 부족 습격병 스폰(ctx.spawnMonster 재활용) — monsters·tribes 뒤
+import { initHitfx }   from './modules/hitfx.js';   // 💥 타격 임팩트(흰 휘도 플래시+스파크 버스트) — combat 단일통로에서 ctx.flashHit 호출
+import { initClaim }   from './modules/claim.js';
+import { initSiegeFort } from './modules/siegefort.js';   // 🏰 첫 섬 요새 공성전(Hexagon 성+투석기탑, 함포 직격/스플래시/연쇄)
+import { initCapture } from './modules/capture.js';   // 🏴 깃발 점령 게이지(방어타워 무력화→상륙→점령, 공/수 대칭) — claim·raiders 뒤
+import { initRaidship } from './modules/raidship.js'; // 🚢 습격선 접근 연출(해적 갤리온이 해안으로) — raid 앞
+import { initRaid }    from './modules/raid.js';      // ⚔️ 습격 이벤트(점령 섬 위협) — capture·raiders·claim 뒤
+import { initGarrison } from './modules/garrison.js'; // 🛡️ 그롬 주둔(점령 섬 수비대, 습격병 자동방어)
+import { initTrade }   from './modules/trade.js';
+import { initCombat }  from './modules/combat.js';
+import { initCombatTuto } from './modules/combattuto.js';   // ⚔️ 전투 튜토(첫 전투 발동, 최초 1회)
+import { initTemperature } from './modules/temperature.js';
+import { initMagic }   from './modules/magic.js';
+import { initGrade }   from './modules/grade.js';   // 🎨 컬러 그레이딩 포스트 패스(화면 전체 색감) — magic 블룸 override를 감쌈. 반드시 magic 뒤.
+import { initReputation } from './modules/reputation.js';
+import { initFaction }  from './modules/faction.js';   // ⚑ 축5 세력 선언(ctx.faction) — reputation·crew·claimed 뒤(5조건 참조)
+import { initNpc }     from './modules/npc.js';
+import { initTrader }  from './modules/trader.js';
+import { initSeaevents } from './modules/seaevents.js';   // 🌊 해적 랜덤 조우(중심가중) + 상선 약탈([E])
+import { initContract }  from './modules/contract.js';    // 📜 항구 배송 계약(데스 스트랜딩식 위험 해역 보상)
+import { initInventory } from './modules/inventory.js';
+import { initPickup }   from './modules/pickup.js';   // 공용 드롭+마그넷 픽업(벌목·채광·전리품)
+import { initInvui }   from './modules/invui.js';
+import { initForge }   from './modules/forge.js';
+import { initHarbor }  from './modules/harbor.js';
+import { initWharf }   from './modules/wharf.js';
+import { initSave }    from './modules/save.js';   // 💾 로컬 세이브(스냅샷/복원) — ?load=1 시 오프닝 스킵하고 저장 지점 재개
+import { restoreAndStartAutosave } from './modules/save-boot.js';
+import { initNetcode } from './modules/netcode.js';   // 🌐 멀티 위치 릴레이 클라 — 타 플레이어 고스트 + 서버 시간 동기(Phase 3)
+import { initMenu }    from './modules/menu.js';   // ⎋ 인게임 메뉴(ESC) — 계속/근처섬복귀/캐릭터선택
+import { initTutoSlot } from './modules/tutoslot.js';   // 🎯 중앙 튜토 팝업 단일 슬롯(gather/combat/raid 동시노출 방지)
+import { initGatherTuto } from './modules/gathertuto.js';   // 🪓⛏️ 채집 튜토(벌목·채광) — 전투튜토 패턴
+import { initRaidTuto } from './modules/raidtuto.js';   // 🛡️ 방어 튜토(첫 습격 시 자동, ctx.raid.status 폴링) — raid 뒤
+import { initQuestline } from './modules/questline.js';   // 🧭 1차 퀘스트라인(?quest=1) — 깨어남→채집→제작→항구→배
+import { initWorldstream } from './modules/worldstream.js';   // 🌊 오픈월드 섬 스트리밍(?stream=1) — 근처 섬만 3D 로딩·페이드
+import { initOpening } from './modules/opening.js';   // ⚓ P4-B: 오프닝 골든패스(?opening=1) — 오세베르그 없이 caravel 전투→난파→표류→깨어남→그 자리서 게임 시작
+import { initShipyard } from './modules/shipyard.js';   // 🔨 조선소(K) — 부두 옆 바다에 배 건조(목재+골드 차감). 퀘스트라인 Q5(ctx.onShipBuilt) 완료 훅.
+import { initGate }    from './modules/gate.js';   // 🌙 차원문 게이트 — 자정(sky dayTime 0.75) 근처 섬 개방·등급별 몹 웨이브+보스 토벌
+import { initDungeonRun } from './modules/dungeonrun.js';   // ⛏️ 광산 던전 — empire 광산 패널 "던전 입장"(ctx.dungeon.enter)
+import { initPerfProbe } from './modules/perfprobe.js';   // 📊 프레임 드랍 계측 — 콘솔 __perf() (헤드리스로는 전투 재현이 안 돼 실기기 측정용)
+import { initNavalTuto } from './modules/navaltuto.js';   // ⚓ 해전/항해 튜토(첫 배 탑승 시 Shift→Q→E 안내, 최초 1회)
+import { initQuestFx } from './modules/questfx.js';   // 🗼 퀘스트 시각효과 — 동료 머리 위 ! 빌보드 + 첫 목표 하늘 빛기둥
+import { initLoadScreen } from './modules/loadscreen.js';   // 🏮 공용 로딩 화면(석판 배경+tomob 로고+세계관 문구+등불 진행률)
+
+// 🏮 로딩 화면. expect = stage 갱신 횟수 = 진행률 분모.
+//    기본 14 + 스트리밍 1 + 오프닝 4(opening.js가 setLoad를 4번 부른다) + 세이브 복원 1.
+const _q0 = new URLSearchParams(location.search);
+const LS = initLoadScreen({ expect: 14 + (_q0.get('stream')==='1'?1:0)
+                                     + (_q0.get('opening')==='1'?4:0)
+                                     + (_q0.get('load')==='1'?1:0) });
+//   ★L을 stage 엘리먼트로 잡는다 → 아래 `L.textContent='…'` 17곳이 그대로 살아 있고, 대입할 때마다 등불이 차오른다.
+const L = LS.stage;
+try{
+  // 세션 정리: ?keepOnly=세션명 → 그 세션만 남기고 나머지 삭제
+  const _ko=new URLSearchParams(location.search).get('keepOnly');
+  if(_ko){ try{ const ss=JSON.parse(localStorage.getItem('voyageSessions')||'{}'); const k={}; if(ss[_ko]){ k[_ko]=ss[_ko]; localStorage.setItem('voyageMapV2',JSON.stringify(ss[_ko])); } localStorage.setItem('voyageSessions',JSON.stringify(k)); }catch(e){} }
+  const ctx = initCore();
+  // ★2026-07-10(사령관 "전투도 잠깐 키고" — 튜토리얼 재점검엔 진짜 해상전투가 필요) — 전투 기본 ON으로 복구.
+  //    임시로 다시 끄고 싶으면 ?combat=0. 중앙 튜토 팝업(tutoslot) 토글은 그대로 유지(?tuto=1).
+  { const _tq = new URLSearchParams(location.search);
+    window.__noNaval = _tq.get('combat') === '0';   // 적선 조우·상선약탈(seaevents) + 오프닝 전투(opening) — 기본 ON
+    window.__noTuto  = _tq.get('tuto')   !== '1';   // 중앙 튜토 팝업(tutoslot: gather/combat/raid) 차단
+    if(window.__noNaval) console.log('[test] ⚔️ 전투/적선 OFF (?combat=0 지정됨)');
+    if(window.__noTuto)  console.log('[test] 🎯 튜토리얼 OFF (복구: ?tuto=1)');
+  }
+  initInput(ctx);      // ⌨️ 입력 모드 라우터 최선두 등록 — 이후 모듈 핸들러가 ctx.input.blocks()로 게이트(lazy 참조라 순서 무관)
+  initAI(ctx);         // 🧠 AI 코어(ctx.ai) — monsters/seaevents가 소비. lazy 참조라 최선두 등록만 하면 됨
+  initIslands(ctx);    // 🏝️ R5-P1 아일랜드 레지스트리 — terrain/worldstream보다 먼저(등록 받을 준비)
+  initSave(ctx);       // 💾 세이브 모듈 등록(ctx.save) — 복원/자동저장은 초기화 말미
+  initTutoSlot(ctx);   // 🎯 중앙 튜토 팝업 단일 슬롯 — 팝업들이 show 전에 참조하므로 최선두 등록
+  const _load = new URLSearchParams(location.search).get('load')==='1';   // 💾 이어하기(오프닝/정착 스킵, 저장 지점 복원)
+  L.textContent='물리엔진(Rapier) 로드 중…';   await initPhysics(ctx);
+  L.textContent='바다 생성 중…';               initWater(ctx);
+  initFoamtrail(ctx);   // 🌊 웨이크/물보라 포말 RT — water 직후(setWake 주입), renderer 필요(core 이후)
+  initSeabed(ctx);   // 🏝️ 해저 바닥 — 수면 아래 잠수 시 모래 바닥이 보이게(먼 곳은 수중 안개로 페이드=깊이감)
+  L.textContent='하늘 생성 중…';               initSky(ctx);
+  L.textContent='볼류메트릭 밤하늘 생성 중…';   initNightSky(ctx);   // Shadertoy 별밤+달빛 구름 (밤에만 씬 배경 quad 합성)
+  L.textContent='바람/날씨 생성 중…';           initWind(ctx);
+  L.textContent='내 섬(에디터) 불러오는 중…';
+  const _opening = new URLSearchParams(location.search).get('opening')==='1';   // ⚓ P4-B: 오프닝 골든패스 단일 진입(오세베르그 없이 시작 → 깨어남 뒤 게임 시작)
+  const _sn=new URLSearchParams(location.search).get('s'); let _sd=null;   // ?s=세션명 → 자동 로드
+  if(_sn){ const _name=decodeURIComponent(_sn);
+    try{ _sd=(JSON.parse(localStorage.getItem('voyageSessions')||'{}'))[_name]; }catch(e){}
+    // ★localStorage에 없으면 backup.json(에디터 Ctrl+E 백업 = 사령관이 만든 시드섬 풀)에서 로드.
+    //   → 세션 소실·새 브라우저·다른 시드섬 시작에도 항상 지형 보장(멀티플레이 전제: 시작섬=시드섬 데이터 파일 기반).
+    if(!_sd){ try{ const _bk=await fetch('/voyage_islands_backup.json').then(r=>r.json());
+      _sd=_bk.sessions && _bk.sessions[_name];
+      if(_sd) console.log('[game] 시작 섬 세션 backup.json에서 로드:', _name); }
+      catch(e){ console.warn('[game] backup.json 시작섬 로드 실패', e&&e.message); } }
+  }
+  // ★홈섬 캐논 오프셋(2026-07-10, 카브 특수취급 폐지) — ?home=<canon isle.id>면 그 섬의 캐논 좌표(×WORLD_SCALE)로
+  //   로컬 지형 전체를 밀어 넣는다. worldstream과 좌표계 통일 → 홈섬도 다른 섬과 동일한 글로벌 프레임에 존재.
+  const _homeId = new URLSearchParams(location.search).get('home') || '';
+  let _homeOffset = null;
+  let _homeTargetSpan = null;
+  if(_homeId){ try{
+    const canon = await fetch('/worldmap.canon.json').then(r=>r.json());
+    const isle = canon.islands && canon.islands.find(i=>i.id===_homeId);
+    // 🏝️ 홈섬 목표폭 = BAL.island SSOT(worldstream 스트리밍 섬과 같은 손잡이). sizeMul 1.0 = 구 동작(너무 작음).
+    // 🏝️ 홈섬도 canon 반경에 맞춘다(2026-08-07 맵 재생성 — canon r = 실제 목표 반경). worldstream 스트리밍 섬과 동일 규칙.
+    if(isle){ _homeOffset = { x: isle.x*WORLD_SCALE, z: isle.z*WORLD_SCALE };
+      const _IS = (BAL.island || { fitToCanon:true });
+      _homeTargetSpan = _IS.fitToCanon ? (isle.r||120)*WORLD_SCALE*2 : null; }
+    else console.warn('[game] home 섬 id를 canon에서 못 찾음(구맵 재생성?):', _homeId);
+  } catch(e){ console.warn('[game] canon 홈섬 오프셋 조회 실패', e&&e.message); } }
+  ctx.homeIslandId = _homeId || null;   // worldstream이 이 id로 "홈=중복로딩 스킵" 판정
+  const terrain = await initTerrain(ctx, { ..._sd?{session:_sd}:{}, offset:_homeOffset, targetSpan:_homeTargetSpan });
+  const _testMap = new URLSearchParams(location.search).get('testMap') || '';
+  if(_testMap === 'sea-keep'){
+    L.textContent='Sea Keep 테스트 섬 배치 중…';
+    try{ await initSeaKeepTest(ctx); }
+    catch(e){ console.warn('[sea-keep] 로드 실패 — 기본 테스트 지형 유지', e&&e.message); }
+  }
+  // 본편 그대로 + Sea Keep만 동쪽 해역에 추가. 지형·스폰·하늘·색감·스트리밍은 교체하지 않는다.
+  const _seaKeepInMain = new URLSearchParams(location.search).get('seaKeep') === '1';
+  if(_seaKeepInMain && _testMap !== 'sea-keep'){
+    L.textContent='본편 해역에 Sea Keep 배치 중…';
+    try{ await initSeaKeepTest(ctx, { replaceBase:false, position:{ x:1559, z:900 } }); }
+    catch(e){ console.warn('[sea-keep] 본편 추가 로드 실패', e&&e.message); }
+  }
+  initGround(ctx);     // 🗺️ R4 지형 쿼리 SSOT — isLand/seaDir/isOpenSea 단일 구현(wharf·wave가 위임)
+  // ★오세베르그(무료 시작배) 완전 제거 — 어떤 진입에서도 시작 배 없음. 배는 오직 조선소(K) 건조로만 획득(사령관).
+  //   플레이어는 섬(terrain.spawn) 위에서 시작. 오프닝(?opening=1)은 아래 initOpening이 caravel 갑판→깨어남 해안(누운 자리)으로 재배치.
+  let ship=null;
+  L.textContent='캐릭터 스폰 중…';
+  const _charQ=(new URLSearchParams(location.search).get('char')||'').toLowerCase();   // ★?char= 로 캐릭터 모델 선택(룬마스터=Mage 등). 없으면 Knight.
+  const _pSpawn = { x:terrain.spawn.x, y:(terrain.spawn.y!=null?terrain.spawn.y+2:8), z:terrain.spawn.z };   // 섬 위 시작(배 없음)
+  initPlayer(ctx, { spawn:_pSpawn, charUrl: KAY_CHARS[_charQ]||KAY_CHARS.knight });
+  initTorch(ctx);   // 🔥 횃불 불빛(currentTool==='torch' 시 점화) — player 뒤(ctx.player 필요)
+  L.textContent='건설 시스템 로드 중…';          await initBuild(ctx);
+  L.textContent='환경 자원(나무·잔디·광석) 산포 중…';  await initEnvironment(ctx);
+  await initCampfire(ctx);   // 🔥 모닥불(환경 groundMeshes 필요) — 제작→퀵슬롯→지면 설치, 밤 온기
+  L.textContent='어군 생성 중…';                 await initFish(ctx);   // 🐟 수중 어군(seabed 뒤 — 깊이 band 참조)
+  L.textContent='평판 시스템 로드 중…';           initReputation(ctx);
+  L.textContent='NPC 상선·경제 가동 중…';         await initNpc(ctx);    // ★navmap 전에 — navmap이 init시 ctx.npc.merchants 바인딩(2D맵 동기화)
+  L.textContent='항해 지도 로드 중…';            initNavMap(ctx);
+  L.textContent='사운드 로드 중…';               initSound(ctx);
+  initSailhud(ctx);
+  initCannon(ctx);
+  initCannonFx(ctx);  // ⚓ 대포 VFX(cannonfx) — cannon 뒤(포탄·머즐 재사용). navalcombat이 muzzle/impact 호출
+  initCrew(ctx);      // ⚔️ 1인 크루 스테이션(ctx.crew) — lazy 참조라 배 스폰 전 등록 OK
+  initTribes(ctx);    // 🏴 12부족·2진영 데이터
+  initMonsters(ctx);
+  // 🧠 지각 테스트 스폰(?mobtest=1 또는 ?mobtest=N) — 사령관 실측용: 플레이어 주변 22~40m '육지'에 근접몹 배회 스폰.
+  //   등뒤접근·발각0.5s 멈칫·기억(목격지점 수색)·공격토큰(동시2+링 배회) 체감. 지형/플레이어 준비 폴링 후 1회.
+  {
+    const _mtq = new URLSearchParams(location.search).get('mobtest');
+    if(_mtq){
+      const _mtN = Math.max(1, Math.min(8, parseInt(_mtq)||4));
+      const _mtKinds = ['zombie','skeleton','sk_warrior','mummy','vampire','sk_rogue'];
+      let _mtTry = 0;
+      const _mtT = setInterval(()=>{
+        const pp = ctx.player && ctx.player.pos;
+        if(!pp || !ctx.terrain || !ctx.spawnMonster){ if(++_mtTry>900) clearInterval(_mtT); return; }
+        const onLand = ctx.terrain.groundAt(pp.x, pp.z, (pp.y||0)+50) > 0.5;
+        if(!onLand && ++_mtTry < 20) return;   // ~14s 육지 대기 → 이후 강제 진행(groundAt 미스여도 스폰 보장)
+        clearInterval(_mtT);
+        const spots=[];
+        for(const d of [34,28,40,22]){ if(spots.length>=_mtN) break;
+          for(let j=0;j<28 && spots.length<_mtN;j++){ const a=j/28*Math.PI*2;
+            const x=pp.x+Math.cos(a)*d, z=pp.z+Math.sin(a)*d;
+            const gy=ctx.terrain.groundAt(x,z,600);
+            if(gy<=1.5 || Math.abs(gy-pp.y)>14) continue;               // 바다·절벽 위 제외
+            if(spots.some(s=>Math.hypot(s.x-x,s.z-z)<8)) continue;
+            spots.push({x,z}); } }
+        if(!spots.length){ for(let i=0;i<_mtN;i++){ const a=i/_mtN*6.283;   // ★육지 샘플 0곳(레이캐스트 미스) → 플레이어 높이로 강제 링
+          spots.push({ x:pp.x+Math.cos(a)*26, z:pp.z+Math.sin(a)*26, fy:pp.y }); } }
+        spots.forEach((s,i)=> ctx.spawnMonster({ at:s, atY:s.fy, k:_mtKinds[i%_mtKinds.length], wander:true, home:{x:s.x,z:s.z,r:10}, ignoreMax:true }));
+        console.log(`[mobtest] 🧠 지각 테스트 몹 ${spots.length}/${_mtN} 스폰 — ${spots[0]&&spots[0].fy!=null?'강제 링(플레이어 높이)':'22~40m 육지 링'}·배회`);
+      }, 700);
+    }
+  }
+  initRaiders(ctx);   // 🏴 부족 습격병(ctx.spawnMonster 재활용) — monsters·tribes 뒤
+  initHitfx(ctx);   // 💥 타격 임팩트 라이브러리(ctx.flashHit 등록) — monsters 뒤·combat 앞(combat이 런타임에 ctx.flashHit 호출)
+  // 🎮 캐릭터 전투/스킬 (combat=근접·활·스태미나·스킬바 / magic=마법사 속성·강스킬). skillbar는 combat 내부 import. player.js use()가 디스패처.
+  initCombat(ctx);
+  initCombatTuto(ctx);   // ⚔️ 첫 몬스터 aggro 시 전투 튜토 팝업(최초 1회, localStorage)
+  initTemperature(ctx);   // 🌡️ 체감온도 생존(위험존 데미지) — combat 뒤(envHurt 위임), environment 뒤(바이옴)
+  initMagic(ctx);
+  initGrade(ctx);   // 🎨 컬러 그레이딩 — magic의 렌더 오버라이드를 감싸 화면 전체에 색감 적용(반드시 initMagic 직후). __grade(0)로 원본 대조.
+  // 🎒 인벤토리/제작 (inventory=화물칸·금화 / invui=인벤UI). trade가 ctx.inventory 참조 → trade 전에.
+  initInventory(ctx);
+  initGate(ctx);   // 🌙 차원문 게이트 — 자정 근처섬 개방(휴면 시작·트리거는 내부 onUpdate). monsters/combat/inventory 뒤(spawnMonster·addSoul·addGold 필요).
+  const _questMode = new URLSearchParams(location.search).get('quest')==='1';   // 🧭 1차 퀘스트라인 모드
+  // ★2026-07-10(사령관 "시작할때 퀵슬롯에 이미 곡괭이도끼횃불 있음") 버그수정 — 이 else가 원래 바로 위 `if(!_load)`에
+  //   붙어있었음(퀘스트모드 분기인데 이어하기 여부로 게이팅됨) → 신규 캐릭터(quest=1이지만 load=1 아님)는 이 블록이
+  //   전혀 안 돌아서 기본 퀵슬롯(pickaxe/axe/torch, player.js:827)이 그대로 남아있었음. _questMode에 직접 붙임.
+  if(!_questMode){ ctx.inventory.add('timber',16); ctx.inventory.add('stone',10); }   // ★튜토 스킵(비퀘스트) 시 테스트 재료 지급 — 퀘스트 모드는 직접 채집(Q2).
+  else {   // 🧭 퀘스트 모드 = 난파 후 맨몸 시작: 잔해 조각으로 도구부터 제작
+    ctx.inventory.add('timber',4); ctx.inventory.add('stone',2);   // 난파 잔해 조각(도끼2+1·곡괭이2+1 = timber4·stone2 딱 소진)
+    if(ctx.quickslots){ ctx.quickslots[0]=null; ctx.quickslots[1]=null; ctx.quickslots[2]=null; }   // 도끼·곡괭이·횃불 = 기본템 제거 → 전부 제작으로 획득(사령관)
+    if(ctx.selectSlot) ctx.selectSlot(9); else if(ctx.updHotbar) ctx.updHotbar();   // 빈손(none) 시작
+  }
+  if(!_load){ ctx.inventory.addGold(600); }   // ★첫 배(캐러벨=600) 건조비 — 모든 신규 시작 지급(스킵·튜토 공통, 사령관). 튜토 보상 250뿐이라 못 사던 문제 해결. 이어하기(load=1)는 234행 restore가 덮음.
+  window.__give=(id,n=10)=>{ ctx.inventory.add(id,n); if(ctx.updHotbar)ctx.updHotbar(); return ctx.inventory.count(id); };   // 콘솔 재료 지급 헬퍼: __give('timber',20)
+  initPickup(ctx);           // 드롭+마그넷 (벌목·채광 통합 시 자동 작동)
+  await initAxetree(ctx, { external:true });   // 🪓 본편 벌목 = environment 나무 대상(도끼 장착 시). 드롭→픽업 흡수.
+  await initMine(ctx, { external:true });       // ⛏️ 본편 채광 = environment 광석 → Brush 광맥 교체(곡괭이 장착 시). 드롭→픽업 흡수.
+  initResourceFocus(ctx);                       // 🔎 광물·나무 근접 시 이름표+금빛 외곽선(mine 교체 후 = ORE_NODES 최신)
+  initInvui(ctx);
+  initClaim(ctx);
+  await initFortify(ctx);   // 🧱 블록 방어 축성(terrain·world·inventory 뒤)
+  await initSettlement(ctx);   // 🏛️ 거점 건물(claim·inventory·terrain 뒤 — ctx.claimed/dockPoint 필요)
+  await initOutpost(ctx);   // 🚩 거점 깃발(settlement 뒤 — ctx.claimed에 거점 엔트리를 넣고 settlement가 그 위에 건물을 얹는다)
+  initSiegeFort(ctx);   // 🏰 요새 공성(terrain·water·sound 뒤 — worldstream이 온보딩 섬서 build 호출)
+  initCapture(ctx);   // 🏴 깃발 점령 게이지(claim·raiders 뒤 — ctx.claimed/monsters 필요)
+  initEmpire(ctx);    // 🏛️ 내 섬 전체뷰(N키) — settlement·capture·claim 뒤(ctx.settlement/claimed 필요)
+  initDungeonRun(ctx);   // ⛏️ 광산 던전 — monsters·combat·inventory·raid·input 뒤(스폰/보상/키 등록 소비)
+  initPerfProbe(ctx);   // 📊 __perf() — 전투 중 프레임 튐의 원인(셰이더 컴파일/광원 변동/드로우콜) 분리
+  initFaction(ctx);   // ⚑ 축5 세력 선언(reputation·crew·claimed·settlement 뒤 — 5조건 참조. 세이브 restore 전에 등록)
+  initRaidship(ctx);  // 🚢 습격선 접근 연출 (raid 앞 — ctx.raidship 필요)
+  initRaid(ctx);      // ⚔️ 습격 이벤트(capture·raiders·claim·inventory 뒤)
+  initGarrison(ctx);  // 🛡️ 그롬 주둔(claim·monsters 뒤)
+  initMercenary(ctx);   // 🗡️ 몬스터 용병(garrison 뒤 — 배치가 garrison.placeDef 경로를 쓴다. 영입은 dungeonrun.doClear가 호출)
+  initRaidTuto(ctx);  // 🛡️ 방어 튜토(첫 습격 시 자동, ctx.raid.status 폴링) — raid 뒤
+  initTrade(ctx);
+  await initTrader(ctx);   // 항구 교역 NPC(육지) — ctx.claimed·ctx.trade 필요(claim/trade 뒤)
+  const _sea = initSeaevents(ctx);              // 🌊 해적 조우 + 상선 약탈 (npc·reputation·navalencounter 뒤)
+  initContract(ctx, { riskAt: _sea.riskAt });   // 📜 배송 계약 — 위험도 축(중심 근접도)을 seaevents와 공유
+  initNavalTuto(ctx);   // ⚓ 해전/항해 튜토 — 첫 배 탑승(조타) 시 Shift→Q→E 안내(seaevents/ship 뒤, ctx.ship 폴링)
+  // ⚒️ 제작/항구 (forge=제련·제작 / harbor=항구허브 / wharf=선착장). terrain·claimed·trade·inventory 필요.
+  //   ※ 구 smithy(대장간 고스트 건설)는 폐지됨(2026-07-04 개편 이후 도달 불가) → 2026-07-12 모듈·잔재 제거.
+  initForge(ctx);
+  initHarbor(ctx);
+  initWharf(ctx);
+  initShipyard(ctx);   // 🔨 조선소(K 건조) — wharf 뒤(ctx.wharf.pos 필요). 건조 완료 시 ctx.onShipBuilt → 퀘스트라인 Q5 완료.
+  initGatherTuto(ctx);   // 🪓⛏️ 채집 튜토 — questline 앞(ctx.gatherTuto 등록 후 Q2가 호출).
+  if(!_opening) initQuestline(ctx);   // 🧭 1차 퀘스트라인 — 비오프닝은 즉시. 오프닝 모드는 깨어난 뒤 시작(아래 initOpening onComplete).
+  initQuestFx(ctx);   // 🗼 퀘스트 시각효과(동료 머리 위 ! + 목표 빛기둥) — window.__questStep/ctx.questBeam 폴링(퀘스트 시작 시점 무관, 1회 등록). crew·scene 뒤.
+  // ★비오프닝(튜토 스킵/멀티/이어하기) 추종자 — 오프닝 깨어남서만 ctx.follower가 생기던 것 → 스킵/이어하기 시에도 필요(항구 교역NPC가 씀).
+  //   2026-07-10(사령관 "추종자가 2명이 생김" — 재발): 예전엔 여기서 별도 GLTF를 또 로드해 독립된 추종자를 만들었는데,
+  //   initCrew(ctx)가 이미 "진짜" 추종자(ctx.crew 피규어)를 로딩해두므로 그 둘이 각자 따로 존재해 캐릭터가 2명으로 보였음
+  //   (opening.js 경로는 이미 이렇게 고쳐져 있었으나, 비오프닝 경로는 누락됨). crew 피규어를 그대로 재사용해 하나로 통합.
+  if(!_opening && !ctx.follower){ (async()=>{ try{
+    let figGroup=null, figMixer=null;
+    if(ctx.crew && ctx.crew.figureGroup){
+      for(let i=0; i<30 && !figGroup; i++){ figGroup=ctx.crew.figureGroup(); if(!figGroup) await new Promise(r=>setTimeout(r,100)); }
+      figMixer = ctx.crew.figureMixer ? ctx.crew.figureMixer() : null;
+    }
+    if(figGroup){
+      console.log('[game] 비오프닝 추종자 = crew 피규어 재사용');
+    } else {
+      console.warn('[game] crew 피규어 로드 실패 — 추종자(ctx.follower) 없이 진행');
+    }
+  }catch(e){ console.warn('[game] 추종자 연결 실패',e&&e.message); } })(); }
+  if(new URLSearchParams(location.search).get('stream')==='1'){ L.textContent='월드 스트리밍 준비 중…'; await initWorldstream(ctx); }   // 🌊 오픈월드 섬 스트리밍(PoC) — 근처 섬만 3D 로딩
+
+  // ⚓ P4-B: 오프닝 골든패스 — 오세베르그 없이 이 페이지에서 caravel 전투→난파→표류→깨어남 재생.
+  //   깨어남 대사 뒤 '클릭하여 일어나기' 클릭 = 그 자리(카브 해안)에서 1인칭 복귀 + 퀘스트라인 시작(페이지 이동 없음).
+  if(_opening){
+    await initOpening(ctx, { mode:'game', setLoad:t=>{ L.textContent=t; },
+      onComplete:()=>{
+        // 💾 깨어남 = 실제 게임 시작 → 자동저장 활성화 + 첫 저장(cid 확정) + URL을 이어하기(?load=1&cid) 형태로 교체.
+        //    F5 새로고침해도 오프닝을 처음부터 재생하지 않고 저장 지점에서 재개. 오프닝 중엔 저장 안 함(먼바다 위치 저장 방지).
+        //    ★버그③(2026-07-13): questline LS_KEY가 cid 기준이 되도록 — 오프닝 URL엔 cid가 없어 save.write()로
+        //    먼저 cid를 확정한 뒤 그 cid를 initQuestline에 주입한다(cid 없으면 이름으로 폴백 → 동명이인 재캐릭터 완료
+        //    스킵 버그). 두 번째 write()는 방금 시작된 퀘스트 1단계(intro)까지 반영해 재저장(첫 저장에 quest=null로
+        //    남지 않게).
+        let s = null;
+        try{ ctx.save && ctx.save.markLive && ctx.save.markLive();
+          s = ctx.save && ctx.save.write && ctx.save.write(); }catch(_){}
+        try{ initQuestline(ctx, { cid: s && s.cid }); }catch(e){ console.warn('[game] questline 시작 실패', e&&e.message); }
+        try{ const s2=ctx.save && ctx.save.write && ctx.save.write(); const cid=(s2&&s2.cid)||(s&&s.cid);
+          if(cid){ const u=new URL(location.href); u.searchParams.delete('opening'); u.searchParams.set('load','1'); u.searchParams.set('cid', cid); history.replaceState(null,'',u.toString()); } }catch(_){}
+      } });
+  }
+
+  // 💾 이어하기: 저장 지점 복원(위치·레벨·인벤·평판·영토·함대·퀘스트). 오프닝/정착 없이 그 지점부터.
+  if(_load) L.textContent='세이브 불러오는 중…';
+  const _saveBoot=await restoreAndStartAutosave(ctx.save,_load);
+  if(_saveBoot?.redirecting){ const e=new Error('직업 정본 URL로 재시작'); e.redirecting=true; throw e; }
+  if(_saveBoot?.ok===false){ location.replace('select.html'); const e=new Error('세이브 없음 — 캐릭터 선택으로 이동'); e.redirecting=true; throw e; }
+  initMenu(ctx);   // ⎋ 인게임 메뉴(ESC) — 계속/근처섬복귀/캐릭터선택
+
+  // ⚔️ 해적선 전투(navalcombat/destruct/shipwreck) = 골든패스 [3] 단계 전용 → 본체 부팅 시 로드 안 함.
+  //   적 해적선이 시작부터 떠 있는 건 게임 흐름과 무관 → 제거. 격리 하네스 _navalcombat.html서 검증 유지.
+  //   ※ [3] 조우 시점에 동적 로드(import('./modules/navalcombat.js'))로 켜는 게 맞음 (흐름 기반 로딩, 후속).
+
+  // 물리 스텝은 항상 마지막(캐릭터 이동 계산 뒤)
+  ctx.onUpdate(()=> ctx.stepPhysics());
+  // HUD 좌표 + 시간
+  const _timeLbl=t=>{ const h=((t*24)+6)%24; const hh=String(Math.floor(h)).padStart(2,'0'); const mm=String(Math.floor((h%1)*60)).padStart(2,'0'); return `${hh}:${mm}`; };   // dayTime 0=일출(06시) 기준 대략 표기
+  ctx.onUpdate(()=>{ const p=ctx.player.pos; document.getElementById('pos').textContent=`위치 (${p.x.toFixed(0)}, ${p.z.toFixed(0)}) · 높이 ${p.y.toFixed(0)}m`;
+    if(ctx.sky&&ctx.sky.getTime){ const th=document.getElementById('timeHud'); if(th) th.textContent=`· ${_timeLbl(ctx.sky.getTime())} (t=${ctx.sky.getTime().toFixed(2)}${ctx.sky.timeScale>1?' ×'+ctx.sky.timeScale:''})`; } });
+  // 시간 디버그 키: [ ] 시간 ∓0.02, \ 빠른배속 토글, N 밤낮 — ⚙️ 샌드박스/테스트(__testMode)에서만. 일반 게임은 [ ]=스펠사이클(magic.js).
+  addEventListener('keydown',e=>{ if(!window.__testMode) return; if(!ctx.sky||!ctx.sky.setTime) return;
+    if(e.code==='BracketLeft')  ctx.sky.setTime(ctx.sky.getTime()-0.02);
+    else if(e.code==='BracketRight') ctx.sky.setTime(ctx.sky.getTime()+0.02);
+    else if(e.code==='Backslash') ctx.sky.timeScale = (ctx.sky.timeScale>1?1:60);
+    else if(e.code==='KeyN'){ const t=ctx.sky.getTime(); const isNight = (t>0.5&&t<1.0);
+      // ★ N = 낮↔밤 부드러운 전환(석양/여명을 거쳐 ~14초, 아주 서서히). 즉시 점프(setTime) 폐지.
+      //   밤=0.75(자정). tween은 sky.js가 항상 시간 전진(일몰/일출 경유)으로 보간 → 밤→낮은 동이 트며 밝아진다.
+      if(ctx.sky.tweenTime) ctx.sky.tweenTime(isNight?0.25:0.75, 14.0);
+      else ctx.sky.setTime(isNight?0.25:0.72); } });   // N = 낮↔밤 전환(석양 경유)
+
+  // 🎵 P = "I am MAS" 배경음악 토글 (재생↔정지). 파일은 mas 루트 → game.html(/)과 무관하게 절대경로 사용.
+  { let masBgm=null;
+    addEventListener('keydown',e=>{ if(e.code!=='KeyP') return; if(!window.__testMode) return;   // ⚙️ 음악 토글=샌드박스/테스트 전용(일반 게임은 P=이모트)
+      if(!masBgm){ masBgm=new Audio('/i%20am%20mas.mp3'); masBgm.loop=true; masBgm.volume=0.5; }
+      if(masBgm.paused){ masBgm.play().catch(err=>console.error('[bgm]',err)); }
+      else { masBgm.pause(); } }); }
+
+  // 🐉 Shift+K = 드래곤 보스 소환(테스트용) — ★K는 조선소(건조)로 이관됨 → 드래곤 테스트는 Shift+K로 분리(충돌 방지)
+  addEventListener('keydown',e=>{ if(e.code!=='KeyK'||!e.shiftKey||!ctx.spawnMonster) return; if(!window.__testMode) return;   // ⚙️ 드래곤 소환=샌드박스/테스트 전용
+    const p=ctx.player.pos, g=ctx.terrain.groundAt.bind(ctx.terrain);
+    ctx.terrain.groundAt=(x,z,d)=>{ const v=g(x,z,d); return v>0.8?v:(p.y||6.8); };   // 배 위 등 바닥 못찾는 위치 보정
+    ctx.spawnMonster({k:'dragon', at:{x:p.x+60, z:p.z+60}, ignoreMax:true});
+    setTimeout(()=>{ ctx.terrain.groundAt=g; }, 3000);
+    console.log('드래곤 보스 소환 — 하늘에서 선회 등장'); });
+
+  // ⚙️ 디버그 HUD(비·시간배속·밤낮·음악·드래곤)는 샌드박스/테스트(__testMode)에서만 표시. Ctrl+Shift+K 토글 후 동기화.
+  const _syncDbgHud=()=>{ const dh=document.getElementById('dbgHud'); if(dh) dh.style.display = window.__testMode ? '' : 'none'; };
+  _syncDbgHud();
+  addEventListener('keydown',e=>{ if(e.code==='KeyK'&&e.ctrlKey&&e.shiftKey) setTimeout(_syncDbgHud,0); });
+
+  // ⏱ FPS 카운터 (0.5초 평균) — 사령관 실화면 성능 확인용. 밤하늘 볼류 패스 부하 모니터.
+  { const fpsEl=document.getElementById('fps'); let acc=0,cnt=0,lt=performance.now();
+    ctx.onUpdate((dt)=>{ acc+=dt; cnt++; const now=performance.now();
+      if(now-lt>=500){ const f=cnt/acc; const n=(ctx.nightsky?ctx.nightsky.night:0);
+        fpsEl.textContent=`FPS ${f.toFixed(0)}  ${n>0.01?'밤하늘 ON('+(n).toFixed(2)+')':'주간'}`;
+        acc=0;cnt=0;lt=now; } }); }
+
+  // ⚡ 히트fx 셰이더 프리워밍 — 첫 타격/첫 그로기 GLSL 컴파일 히칫을 로드 시점으로 이동(shockwaveVFX 패턴 확장).
+  //   풀 슬롯을 화면 밖(y=-990)에서 1회 점화 → renderer.compile로 프로그램 캐시에 등재 → clear()로 소등(풀 유지).
+  try{
+    const _wp=new ctx.THREE.Vector3(0,-990,0);
+    ctx.hitfx?.spawnBurst?.(_wp,1); ctx.hitfx?.spawnEmbers?.(_wp,1); ctx.hitfx?.spawnCore?.(_wp,1);
+    ctx.hitfx?.groggyImpact?.(_wp,1);
+    ctx.renderer.compile(ctx.scene, ctx.camera);
+    ctx.hitfx?.clear?.();
+  }catch(e){ console.warn('[game] hitfx 프리워밍 스킵', e&&e.message); }
+  ctx.start();
+  // ── 상단 나침반(uikit, 발할라형) — 카메라 월드방위 + 내 배 마커(gold) ──
+  //   ★combat.js가 이미 마운트하면(sandbox/tutorial 공용) 스킵 — 중복 방지.
+  if(!ctx.compass){ const _cv=new ctx.THREE.Vector3();
+    ctx.compass = ukCompass({
+      getHeading:()=>{ ctx.camera.getWorldDirection(_cv); return (Math.atan2(_cv.x,-_cv.z)*180/Math.PI+360)%360; },
+      getMarkers:()=>{ const s=ctx.ship, pl=ctx.player&&ctx.player.pos; if(!s||!pl) return [];
+        const sx=(s.x??s.pos?.x), sz=(s.z??s.pos?.z); if(sx==null||sz==null) return [];
+        const dx=sx-pl.x, dz=sz-pl.z, d=Math.hypot(dx,dz);
+        if(!isFinite(d)||d<8) return [];   // 배 위/근처면 숨김
+        const bearing=(Math.atan2(dx,-dz)*180/Math.PI+360)%360;
+        return [{ bearing, dist:d<1000?Math.round(d)+'m':(d/1000).toFixed(1)+'km', accent:'gold' }]; }
+    });
+  }
+  window.__ctx=ctx; window.__ready=true;
+  try { initNetcode(ctx); } catch(e){ console.warn('[net] 초기화 실패(게임엔 무해)', e&&e.message); }   // 🌐 멀티(Phase 3) — 실패해도 싱글 진행
+  if(terrain.collide.length){ LS.hide(); }
+  else { LS.fail('섬 데이터 없음<br>맵에디터(editor.html)에서 섬 만들고 Ctrl+S 저장 →<br>같은 주소로 이 페이지 새로고침'); }
+}catch(e){ if(!e?.redirecting){ LS.fail('초기화 실패<br>'+(e&&e.message||e)); console.error(e); } }
+</script>
+</body></html>

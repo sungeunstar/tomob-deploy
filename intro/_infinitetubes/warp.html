@@ -1,0 +1,248 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>워프 → 토모브 동굴 도착</title>
+<!--
+  ★전체 재작성: 카메라가 어두운 동굴 튜브를 따라 실제로 앞으로 날아 들어가(빨려듦) → 끝의 토모브 제단(the-cave-of-eternity)에 도착.
+  한 씬(three 0.160). 스크롤=발동(prog 재생), 가만히=정지. 어두운 튜브 통과 → 끝에 빛나는 제단 = "어두워졌다 밝아짐".
+  - 빨려듦 = 카메라가 곡선(CatmullRom) 따라 전진(텍스처 스트레치 아님, 진짜 이동).
+  - 검증: window.__setP(prog) / window.__ctx.
+-->
+<style>
+  html,body{margin:0;height:100%;background:#04070b;overflow:hidden}
+  #c{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+  #hint{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:3;
+        font:11px ui-monospace,monospace;letter-spacing:.26em;color:rgba(190,225,235,.7);pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="importmap">{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(2,devicePixelRatio));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=2.1;
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x06121e);
+scene.fog=new THREE.Fog(0x06121e, 40, 520);   // 푸른 물 안개(공간이 물)
+const camera=new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 6000);
+const pmrem=new THREE.PMREMGenerator(renderer); const envTex=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
+scene.environment=envTex;
+// ★블룸(크리스탈 발광 번짐) — 도착 순간에만 사용(워프 중엔 안 켜서 프리즈 방지).
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(innerWidth*0.6, innerHeight*0.6), 1.5, 0.7, 0.22);   // 크리스탈 발광 확 번지게
+composer.addPass(bloom);
+addEventListener('resize', ()=>composer.setSize(innerWidth,innerHeight));
+
+// ── 동굴 튜브 경로(굽이치는 곡선) — 카메라가 이걸 따라 전진(빨려듦) ──
+const PTS=[]; let z=0;
+for(let i=0;i<16;i++){ z-=60;
+  const w = i<1?0 : 1;                 // 시작은 직선(입구), 이후 굽이
+  PTS.push(new THREE.Vector3(Math.sin(i*0.6)*26*w, Math.cos(i*0.5)*20*w, z)); }
+const curve=new THREE.CatmullRomCurve3(PTS, false, 'catmullrom', 0.4);
+const CURVE_END=PTS[PTS.length-1].clone();   // 제단 놓을 곳 부근
+
+// ★벽 = 동굴 바위(BackSide). 카메라가 통과.
+const caveTex=new THREE.TextureLoader().load('caveTexture.jpg');
+caveTex.colorSpace=THREE.SRGBColorSpace; caveTex.wrapS=caveTex.wrapT=THREE.RepeatWrapping; caveTex.repeat.set(6, 80);
+const tubeGeo=new THREE.TubeGeometry(curve, 700, 16, 32, false);
+const tubeMat=new THREE.MeshStandardMaterial({ map:caveTex, side:THREE.BackSide, roughness:1.0, metalness:0.0, color:0x8f8678, envMapIntensity:0.4 });
+const tube=new THREE.Mesh(tubeGeo, tubeMat); scene.add(tube);
+const headLight=new THREE.PointLight(0xcfe6f4, 90, 220, 1.5); scene.add(headLight);
+const headLight2=new THREE.PointLight(0xbfdcec, 45, 150, 1.7); scene.add(headLight2);
+scene.add(new THREE.AmbientLight(0x32485c, 1.0));
+
+// ── ★공간을 물로 채움: 푸른 물 안개(fog) + 품질 거품(Fresnel 테두리+하이라이트) + caustics 물빛. ──
+// ★진짜 Fresnel 구 거품(threex.bubble 실제 셰이더) — 큐브맵 반사/굴절 = 비눗방울. 평면 스프라이트 아님.
+function waterCube(){ const faces=[]; for(let i=0;i<6;i++){ const cv=document.createElement('canvas'); cv.width=cv.height=128; const x=cv.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,128); g.addColorStop(0,'#cdeef8'); g.addColorStop(0.45,'#4a98ba'); g.addColorStop(1,'#082c44');
+  x.fillStyle=g; x.fillRect(0,0,128,128);
+  for(let k=0;k<10;k++){ x.fillStyle='rgba(200,238,248,'+(0.18+Math.random()*0.25)+')'; x.beginPath(); x.arc(Math.random()*128,Math.random()*128,6+Math.random()*18,0,7); x.fill(); } faces.push(cv); }
+  const t=new THREE.CubeTexture(faces); t.needsUpdate=true; t.colorSpace=THREE.SRGBColorSpace; return t; }
+const bubbleMat=new THREE.ShaderMaterial({ transparent:true, depthWrite:false,
+  uniforms:{ mRefractionRatio:{value:0.988}, mFresnelBias:{value:0.9}, mFresnelPower:{value:2.0}, mFresnelScale:{value:1.0}, tCube:{value:waterCube()}, uOpacity:{value:1.0} },
+  vertexShader:`uniform float mRefractionRatio,mFresnelBias,mFresnelScale,mFresnelPower;
+    varying vec3 vReflect; varying vec3 vRefract[3]; varying float vReflectionFactor;
+    void main(){ vec4 mvPosition=modelViewMatrix*vec4(position,1.0); vec4 worldPosition=modelMatrix*vec4(position,1.0);
+      vec3 worldNormal=normalize(mat3(modelMatrix[0].xyz,modelMatrix[1].xyz,modelMatrix[2].xyz)*normal);
+      vec3 I=worldPosition.xyz-cameraPosition;
+      vReflect=reflect(I,worldNormal);
+      vRefract[0]=refract(normalize(I),worldNormal,mRefractionRatio*0.986);
+      vRefract[1]=refract(normalize(I),worldNormal,mRefractionRatio*0.987);
+      vRefract[2]=refract(normalize(I),worldNormal,mRefractionRatio*0.988);
+      vReflectionFactor=mFresnelBias+mFresnelScale*pow(1.0+dot(normalize(I),worldNormal),mFresnelPower);
+      gl_Position=projectionMatrix*mvPosition; }`,
+  fragmentShader:`uniform samplerCube tCube; uniform float uOpacity;
+    varying vec3 vReflect; varying vec3 vRefract[3]; varying float vReflectionFactor;
+    void main(){ vec4 reflectedColor=textureCube(tCube,vec3(-vReflect.x,-vReflect.yz));
+      vec4 refractedColor=vec4(0.97);
+      refractedColor.r=textureCube(tCube,vec3(vRefract[0].x,vRefract[0].yz)).r;
+      refractedColor.g=textureCube(tCube,vec3(vRefract[1].x,vRefract[1].yz)).g;
+      refractedColor.b=textureCube(tCube,vec3(vRefract[2].x,vRefract[2].yz)).b;
+      vec3 col=mix(refractedColor.rgb*0.94, reflectedColor.rgb, clamp(vReflectionFactor,0.15,0.5));
+      float a=(0.06 + clamp(vReflectionFactor,0.0,1.0)*0.72) * uOpacity;   // ★투명하되 테두리는 또렷
+      gl_FragColor=vec4(col, a); }`
+});
+const bubbleGeo=new THREE.SphereGeometry(1, 24, 16);
+const bubbleGroup=new THREE.Group();
+for(let k=0;k<24;k++){ const m=new THREE.Mesh(bubbleGeo, bubbleMat); const tt=Math.random(); const cp=curve.getPointAt(tt);
+  const a=Math.random()*6.28, rr=Math.random()*12;
+  m.position.set(cp.x+Math.cos(a)*rr, cp.y+Math.sin(a)*rr, cp.z+(Math.random()-0.5)*52);
+  m.scale.setScalar(0.25 + Math.pow(Math.random(),2.0)*2.0);   // ★작게 + 크기 다양(작은 거 위주, 가끔 조금 큰 거)
+  bubbleGroup.add(m); }
+scene.add(bubbleGroup);
+
+// caustics 물빛 — 풀스크린 additive로 공간에 물빛.
+const causScene=new THREE.Scene(); const causCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+const causMat=new THREE.ShaderMaterial({ transparent:true, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending,
+  uniforms:{ uTime:{value:0}, uInt:{value:0.3}, uRes:{value:new THREE.Vector2(innerWidth,innerHeight)} },
+  vertexShader:'void main(){gl_Position=vec4(position.xy,0.0,1.0);}',
+  fragmentShader:`precision highp float; uniform float uTime,uInt; uniform vec2 uRes;
+    #define TAU 6.28318530718
+    void main(){ vec2 uv=gl_FragCoord.xy/uRes; float time=uTime*0.5+23.0;
+      vec2 p=mod(uv*TAU,TAU)-250.0; vec2 i=vec2(p); float c=1.0; float inten=0.005;
+      for(int n=0;n<5;n++){ float t=time*(1.0-3.5/float(n+1));
+        i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+        c+=1.0/length(vec2(p.x/(sin(i.x+t)/inten),p.y/(cos(i.y+t)/inten))); }
+      c/=5.0; c=1.17-pow(c,1.4); vec3 col=vec3(pow(abs(c),12.0));
+      col=clamp(col,0.0,1.0); gl_FragColor=vec4(col*vec3(0.34,0.62,0.86)*uInt, 1.0); }`
+});
+const causQ=new THREE.Mesh(new THREE.PlaneGeometry(2,2), causMat); causQ.frustumCulled=false; causScene.add(causQ);
+addEventListener('resize', ()=>causMat.uniforms.uRes.value.set(innerWidth,innerHeight));
+
+// ── 끝의 차원문 = 소용돌이(vortex) : 동그란 섬광이 아니라 나선으로 빨려들어 통과(사령관). 검 도착지 폐기. ──
+const GATEC=CURVE_END.clone(); GATEC.z-=90;
+// ★gate.js 실제 차원문 소용돌이(돔 구멍) 그대로 복사 — 하늘 제한(d.y discard) 제거 + uDir=진행방향(수평)으로만 조정.
+const GNOISE=`
+  float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+  float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+   float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+   return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);}
+  float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*vnoise(p);p=p*2.03+11.7;a*=.5;}return v;}`;
+const GU={ uTime:{value:0}, uOpen:{value:0}, uGlow:{value:new THREE.Color(0x46e88a)}, uVor:{value:new THREE.Color(0x1a8a4a)},
+  uDir:{value:new THREE.Vector3(0,0,-1)}, uRight:{value:new THREE.Vector3(1,0,0)}, uUp:{value:new THREE.Vector3(0,1,0)},
+  uCone:{value:Math.cos(THREE.MathUtils.degToRad(30))}, uConeSin:{value:Math.sin(THREE.MathUtils.degToRad(30))}, uHole:{value:0.42} };
+const dome=new THREE.Mesh(new THREE.SphereGeometry(1400,56,36), new THREE.ShaderMaterial({
+  uniforms:GU, transparent:true, depthWrite:false, depthTest:false, side:THREE.BackSide, fog:false,
+  vertexShader:`varying vec3 vD; void main(){ vD=normalize(position); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:GNOISE+`
+    varying vec3 vD; uniform float uTime,uOpen,uCone,uConeSin,uHole; uniform vec3 uGlow,uVor,uDir,uRight,uUp;
+    void main(){
+      vec3 d=normalize(vD); float a=0.0; vec3 col=vec3(0.0);
+      if(dot(d,uDir) > uCone){                                      // 진행방향 콘 안에만 소용돌이(하늘 제한 대체)
+        vec2 q=vec2(dot(d,uRight), dot(d,uUp)); float r=length(q)/uConeSin;
+        if(r<1.0){
+          float ang=atan(q.y,q.x);
+          float sw=ang + uTime*0.30 - 2.4/(r+0.16);                 // gate.js 나선(원본 파라미터)
+          vec2 nq=vec2(cos(sw),sin(sw))*r;
+          float cn=fbm(nq*3.0+uTime*0.04)*0.65 + fbm(nq*6.0-uTime*0.03)*0.35;
+          float hole0=uHole;
+          float inHole=1.0-smoothstep(hole0-0.01,hole0+0.05,r);
+          float deep=smoothstep(0.0,hole0+0.001,r);
+          float vbands=fbm(vec2(sw/6.2831*7.0, r*3.0 - uTime*1.4));
+          float fine=fbm(vec2(sw/6.2831*14.0+uTime, r*7.0-uTime*2.0));
+          vec3 dimCol=mix(vec3(0.02,0.05,0.04),uVor,deep)
+                    + mix(uVor,uGlow,clamp(vbands*1.3,0.,1.))*pow(vbands,1.6)*deep*0.9
+                    + vec3(0.6,0.85,0.72)*pow(fine,3.0)*deep*0.28;   // ★흰 코어 밝기↓
+          float rim=smoothstep(hole0+0.16,hole0,r)*smoothstep(hole0-0.12,hole0+0.02,r);
+          col = (dimCol + uGlow*rim*1.3) * 0.55;                     // ★전체 밝기 대폭↓(흰 코어 눈부심 완화)
+          a = (inHole*0.6 + rim*0.8) * uOpen;
+        }
+      }
+      gl_FragColor=vec4(col, clamp(a,0.0,1.0));
+    }`}));
+dome.frustumCulled=false; dome.renderOrder=5; scene.add(dome);
+// 차원문 초록 발광(halo) + 라이트 — 소용돌이 뒤 발광, dim 전환색 연결
+const gateHalo=new THREE.Mesh(new THREE.SphereGeometry(70,32,24),
+  new THREE.MeshBasicMaterial({color:0x46e88a, transparent:true, opacity:0, blending:THREE.AdditiveBlending, depthWrite:false, fog:false}));
+gateHalo.position.copy(GATEC); scene.add(gateHalo);
+const gateLight=new THREE.PointLight(0x46e88a, 0, 700, 1.5); gateLight.position.copy(GATEC); scene.add(gateLight);   // gate.js GLOW색 통일
+scene.add(new THREE.HemisphereLight(0x1e3a30, 0x0a1014, 0.4));   // 약한 환경광(동굴)
+window.__altarReady=true;
+
+// ── 진행도(prog) = 발동 재생. 휠 내림=전진 재생, 올림=역재생. 가만히=정지. ──
+let target=0, prog=0;
+addEventListener('wheel', e=>{ if(e.deltaY>0) target=1; else if(e.deltaY<0) target=0; }, {passive:true});
+window.__setP=(v)=>{ prog=target=Math.max(0,Math.min(1,v)); };
+const mouse={x:.5,y:.5,tx:.5,ty:.5};
+addEventListener('mousemove',e=>{ mouse.tx=e.clientX/innerWidth; mouse.ty=e.clientY/innerHeight; });
+
+function smooth(a,b,t){ t=Math.max(0,Math.min(1,(t-a)/(b-a))); return t*t*(3-2*t); }
+
+const _p1=new THREE.Vector3(), _p2=new THREE.Vector3(), _fogC=new THREE.Color();
+const _fwd=new THREE.Vector3(), _right=new THREE.Vector3(), _up=new THREE.Vector3(), _RX=new THREE.Vector3(1,0,0), _RY=new THREE.Vector3(0,1,0);
+let lastT=null;
+function frame(now){
+  if(lastT===null) lastT=now;
+  const dt=Math.min(0.05,(now-lastT)/1000); lastT=now;
+  const dir=Math.sign(target-prog);
+  if(dir!==0) prog=Math.max(0,Math.min(1, prog + dir*dt*0.33));   // ~3초 재생
+  mouse.x+=(mouse.tx-mouse.x)*0.05; mouse.y+=(mouse.ty-mouse.y)*0.05;
+
+  // ★카메라가 곡선(동굴 튜브) 끝까지 계속 전진(빨려듦) — prog 0~1 전 구간. 도착지(검) 없음.
+  const tcam=Math.min(0.999, prog);
+  curve.getPointAt(tcam, _p1);
+  curve.getPointAt(Math.min(0.9999, tcam+0.012), _p2);
+  const mx=(mouse.x-.5), my=(mouse.y-.5);
+  const suck = smooth(0.03,0.30,prog);              // 빨려듦 FOV 펀치(초반부터)
+  const glow = smooth(0.05,0.85,prog);              // ★멀리서부터 서서히 초록 소용돌이 보이며 다가감(갑툭 방지)
+  camera.position.copy(_p1);
+  camera.position.x += mx*8;  camera.position.y += -my*5;
+  camera.fov = 66 + suck*40; camera.updateProjectionMatrix();
+  camera.lookAt(_p2);
+
+  headLight.position.copy(_p1);
+  headLight2.position.copy(_p2);
+  // ★gate.js 돔 소용돌이(진행방향) — glow>0일 때만 렌더(평소 프레임드랍 방지).
+  dome.visible = glow>0.01;
+  if(dome.visible){
+    dome.position.copy(camera.position);
+    _fwd.subVectors(_p2,_p1).normalize(); GU.uDir.value.copy(_fwd);
+    const ref=Math.abs(_fwd.y)>0.95?_RX:_RY;
+    _right.crossVectors(ref,_fwd).normalize(); _up.crossVectors(_fwd,_right).normalize();
+    GU.uRight.value.copy(_right); GU.uUp.value.copy(_up);
+    GU.uOpen.value=glow; GU.uTime.value=now*0.001;
+    // ★마지막(prog 0.7~1)에 소용돌이가 화면을 채우며 통과 = 콘 넓힘(30°→64°)
+    const gc=(30 + smooth(0.7,1.0,prog)*34)*Math.PI/180;
+    GU.uCone.value=Math.cos(gc); GU.uConeSin.value=Math.sin(gc);
+  }
+  // 초록 발광(halo) — 소용돌이 뒤 은은한 배경빛 → dim 전환색 연결.
+  gateHalo.material.opacity = glow*0.1; gateHalo.scale.setScalar(1 + glow*1.8);   // ★발광 대폭↓
+  gateLight.intensity = glow*180;
+  // 안개/배경도 끝으로 갈수록 초록끼(빨간 동굴 → 차원문색)
+  _fogC.setRGB(0.024 + glow*0.14, 0.07 + glow*0.60, 0.12 + glow*0.34);
+  scene.fog.color.copy(_fogC); scene.background.copy(_fogC);
+  // 바위벽 휙휙(빨려듦) + 물빛 caustics(빨려들수록 강, 초록빛 도착하면 줄임)
+  caveTex.offset.y -= dt*(1.4 + suck*5.0);
+  causMat.uniforms.uTime.value = now*0.001;
+  causMat.uniforms.uInt.value = (0.22 + suck*0.55) * (1-glow*0.7);
+  // 거품: 빨려들 때만 보임 + 천천히 떠오름
+  bubbleMat.uniforms.uOpacity.value = suck*(1-glow*0.6);
+  bubbleGroup.visible = bubbleMat.uniforms.uOpacity.value>0.02;
+  if(bubbleGroup.visible){ bubbleGroup.children.forEach(m=>{ m.position.y += dt*3.0; }); }
+  // 어둠: 튜브 중반 어두워지고 게이트 다가오면 초록으로 밝아짐
+  scene.fog.far = 480 - smooth(0.25,0.62,prog)*200 + glow*420;
+  if(glow>0.2){
+    composer.render();   // ★초록 게이트빛 = 블룸(발광 번짐)
+  } else {
+    renderer.render(scene, camera);
+    renderer.autoClear=false; renderer.render(causScene, causCam); renderer.autoClear=true;   // 물빛 공간 오버레이
+  }
+  requestAnimationFrame(frame);
+}
+addEventListener('resize', ()=>{ renderer.setSize(innerWidth,innerHeight); camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); });
+window.__ctx={scene,camera,renderer}; window.__warpReady=true;
+requestAnimationFrame(frame);
+</script>
+</body></html>

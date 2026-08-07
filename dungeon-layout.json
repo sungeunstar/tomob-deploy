@@ -1,0 +1,51 @@
+{
+  "cell": 14,
+  "ceiling": 5,
+  "levelDrop": 5,
+  "rooms": [
+    {"id":"r0","gx":0,"gz":0,"level":0,"w":1,"d":1,"entrance":true},
+    {"id":"r1","gx":0,"gz":2,"level":0,"w":2,"d":2,"big":true},
+    {"id":"r2","gx":2,"gz":4,"level":0,"w":1,"d":1},
+    {"id":"r3","gx":2,"gz":5,"level":1,"w":1,"d":1},
+    {"id":"r4","gx":4,"gz":5,"level":1,"w":2,"d":2,"big":true},
+    {"id":"r5","gx":5,"gz":8,"level":1,"w":1,"d":1},
+    {"id":"r6","gx":5,"gz":9,"level":2,"w":1,"d":1},
+    {"id":"r7","gx":3,"gz":10,"level":2,"w":2,"d":2,"big":true},
+    {"id":"r8","gx":1,"gz":11,"level":2,"w":1,"d":1},
+    {"id":"r9","gx":0,"gz":12,"level":3,"w":1,"d":1},
+    {"id":"r10","gx":-2,"gz":12,"level":3,"w":1,"d":1},
+    {"id":"r11","gx":-2,"gz":14,"level":3,"w":2,"d":2,"big":true},
+    {"id":"r12","gx":-1,"gz":16,"level":4,"w":1,"d":1},
+    {"id":"r13","gx":1,"gz":17,"level":4,"w":2,"d":2,"big":true},
+    {"id":"r14","gx":2,"gz":20,"level":4,"w":1,"d":1},
+    {"id":"b1","gx":-2,"gz":3,"level":0,"w":1,"d":1},
+    {"id":"b2","gx":7,"gz":5,"level":1,"w":1,"d":1},
+    {"id":"b3","gx":4,"gz":13,"level":2,"w":1,"d":1},
+    {"id":"clear","gx":1,"gz":22,"level":5,"w":3,"d":3,"big":true,"clear":true}
+  ],
+  "corridors": [
+    ["r0","r1"],
+    ["r1","r2"],
+    {"from":"r2","to":"r3","descend":true},
+    ["r3","r4"],
+    ["r4","r5"],
+    {"from":"r5","to":"r6","descend":true},
+    ["r6","r7"],
+    ["r7","r8"],
+    {"from":"r8","to":"r9","descend":true},
+    ["r9","r10"],
+    ["r10","r11"],
+    {"from":"r11","to":"r12","descend":true},
+    ["r12","r13"],
+    ["r13","r14"],
+    {"from":"r14","to":"clear","descend":true},
+    ["r1","b1"],
+    ["r4","b2"],
+    ["r7","b3"]
+  ],
+  "ore": [
+    {"room":"b1","type":"iron"},
+    {"room":"b2","type":"crystal"},
+    {"room":"b3","type":"gold"}
+  ]
+}

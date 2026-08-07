@@ -1,0 +1,764 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAS voyage — 출항 준비 (캐릭터·추종자 선택)</title>
+<link rel="icon" href="data:,">
+<!--
+  select.html — 오프닝 골든패스 [1] GAME START 직후.
+  흐름: intro START GAME → 캐릭터 선택 → 추종자 선택 → tutorial.html?char=&follower=&name=
+  레이아웃(레퍼런스: ref/화면/캐릭터선택레퍼2.jpg = Lost Ark 클래스 선택): 검정+금색 고급 톤.
+    좌측 세로 리스트(엠블럼+한글명+영문명, 선택 금색강조) · 가운데 대형 3D 캐릭터(선택 직업, 콤보→궁극기 모션·VFX)
+    · 우측 정보 패널(큰 엠블럼 + 직업명 한/영 + 난이도◆ + 설명 + 레이더 + 캐릭터명 입력 + 클래스 선택 버튼) · 좌상단 BACK.
+  검증 계약: window.__sel / __selectIndex(i) / __confirm() / __back() / __selReady / __playFx(key) / __clipNames.
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+  :root{ --gold:#41c6e0; --gold-bright:#7ad9ee; --line:rgba(65,198,224,.32); }   /* 디자인시스템 악센트 = 청록(cyan) */
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;overflow:hidden;font-family:Pretendard,system-ui,'Malgun Gothic',sans-serif;
+    color:#eef1f6;cursor:default;user-select:none;background:#070707}
+  /* ── 어두운 + 은은한 금빛 배경 ── */
+  #bg{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(48% 62% at 50% 42%, rgba(74,118,168,.42) 0%, rgba(38,58,92,.24) 32%, rgba(20,30,52,.1) 58%, transparent 78%),
+      radial-gradient(120% 80% at 50% 118%, rgba(56,92,140,.22) 0%, rgba(26,40,64,.1) 44%, transparent 70%),
+      radial-gradient(82% 60% at 50% -8%, rgba(60,150,180,.13) 0%, transparent 60%),
+      linear-gradient(180deg,#070a12 0%,#0a0f1e 50%,#0c1224 100%);}
+  #bg::before{content:'';position:absolute;left:50%;top:8%;width:42%;height:84%;transform:translateX(-50%);pointer-events:none;opacity:.55;
+    background:radial-gradient(50% 60% at 50% 40%, rgba(96,184,214,.16) 0%, transparent 70%)}   /* 캐릭터 뒤 청록 빛기둥 */
+  #bg::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 320px 130px rgba(0,0,0,.58)}
+  #stage{position:fixed;inset:0;z-index:1}
+  #ui{position:fixed;inset:0;z-index:5;pointer-events:none}
+  /* 🏮 내용은 modules/loadscreen.js가 채운다. 여기 배경은 모듈 로드 전 첫 프레임용. */
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+
+  .logo{position:fixed;left:34px;top:24px;z-index:7;font-size:19px;letter-spacing:.16em;font-weight:300;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+  .logo b{font-weight:800;color:#41c6e0;letter-spacing:.07em}
+  .logo .tab{display:inline-block;width:8px;height:15px;margin-right:9px;vertical-align:-2px;background:#41c6e0;clip-path:polygon(0 0,100% 25%,100% 75%,0 100%);box-shadow:0 0 10px #41c6e0}
+  .back{position:fixed;left:32px;top:118px;z-index:7;display:flex;align-items:center;gap:7px;cursor:pointer;pointer-events:auto;
+    color:#d8c79e;font-size:13px;font-weight:700;letter-spacing:.14em;padding:7px 15px 7px 11px;border-radius:8px;
+    border:1px solid var(--line);background:rgba(20,16,10,.5);transition:.15s}
+  .back:hover{color:#fff;border-color:var(--gold);background:rgba(40,30,16,.66)}
+
+  /* 우상단 사운드 ON/OFF 토글 */
+  .snd{position:fixed;right:34px;top:24px;z-index:8;display:flex;align-items:center;gap:8px;cursor:pointer;pointer-events:auto;
+    color:#d8c79e;font-size:12px;font-weight:800;letter-spacing:.14em;padding:8px 14px 8px 12px;border-radius:9px;
+    border:1px solid var(--line);background:rgba(20,16,10,.5);transition:.15s}
+  .snd:hover{color:#fff;border-color:var(--gold);background:rgba(40,30,16,.66)}
+  .snd svg{width:17px;height:17px;display:block}
+  .snd.off{color:rgba(150,140,120,.6)}
+  .snd.off .wave{opacity:0}
+  .snd .slash{opacity:0}
+  .snd.off .slash{opacity:1}
+
+  /* 상단 타이틀 (금색 장식) */
+  .ti{position:fixed;left:50%;top:30px;transform:translateX(-50%);z-index:7;text-align:center}
+  .ti .deco{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--gold);font-size:13px;letter-spacing:.2em}
+  .ti .deco::before,.ti .deco::after{content:'';width:46px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .ti .deco::after{background:linear-gradient(90deg,var(--gold),transparent)}
+  .ti b{display:block;font-size:22px;font-weight:800;letter-spacing:.06em;color:#fff;margin-top:5px;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+  .ti small{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;color:rgba(200,180,140,.55);margin-top:4px}
+
+  /* ════ 좌측 세로 리스트 ════ */
+  #roster{position:fixed;left:max(28px,calc(50% - 575px));top:50%;transform:translateY(-50%);width:264px;z-index:6;pointer-events:auto;display:flex;flex-direction:column;gap:8px}
+  .ritem{display:flex;align-items:center;gap:14px;padding:9px 12px 9px 9px;border-radius:12px;cursor:pointer;
+    background:linear-gradient(100deg,rgba(28,23,14,.5),rgba(14,12,9,.35));border:1px solid rgba(65,198,224,.14);
+    transition:transform .14s,border-color .14s,background .14s}
+  .ritem:hover{transform:translateX(3px);border-color:rgba(65,198,224,.4)}
+  .ritem.on{border-color:var(--gold);background:linear-gradient(100deg,rgba(80,62,30,.6),rgba(40,30,14,.4));box-shadow:0 6px 22px rgba(180,140,60,.2)}
+  .ritem .em{width:54px;height:54px;flex:none;display:flex;align-items:center;justify-content:center;
+    filter:saturate(.6) brightness(.7);transition:filter .14s}
+  .ritem.on .em{filter:none;transform:scale(1.06)}
+  .ritem .em img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 5px rgba(0,0,0,.6))}
+  .ritem .tx .nm{font-size:18px;font-weight:800;color:#efe6d2;line-height:1.05}
+  .ritem.on .tx .nm{color:#fff}
+  .ritem .tx .en{font-size:11px;font-weight:600;letter-spacing:.12em;color:rgba(190,170,130,.6);margin-top:3px;text-transform:uppercase}
+
+  /* ════ 우측 정보 패널 ════ */
+  #detail{position:fixed;right:max(28px,calc(50% - 575px));top:50%;transform:translateY(-50%);width:300px;z-index:6;pointer-events:auto;text-align:center}
+  #detail .bem{width:108px;height:108px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center}
+  #detail .bem img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(65,198,224,.4))}
+  #detail .nm{font-size:42px;font-weight:900;line-height:.95;color:#fff;letter-spacing:.01em;text-shadow:0 2px 16px rgba(0,0,0,.6)}
+  #detail .en{font-size:13px;font-weight:600;letter-spacing:.22em;color:var(--gold-bright);text-transform:uppercase;margin-top:6px}
+  #detail .rule{width:160px;height:1px;margin:14px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent);position:relative}
+  #detail .rule::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:var(--gold);font-size:9px}   /* ◆ 뒤 검정박스(#0b0908) 제거 — 네이비 배경에 검정 박스로 떠보이던 옛 테마 잔재 */
+  #detail .diff{font-size:12px;color:rgba(200,182,146,.75);letter-spacing:.04em}
+  #detail .diff .d{margin-left:8px;font-size:13px;letter-spacing:3px}
+  #detail .diff .d b{color:var(--gold-bright)}#detail .diff .d i{color:rgba(140,120,80,.4);font-style:normal}
+  #detail .ds{font-size:12.5px;line-height:1.7;color:rgba(214,206,188,.78);margin-top:13px}
+  #stats{display:flex;justify-content:center;margin-top:14px}
+  #stats svg{display:block}
+  #detail .nameinp{width:100%;font:600 14px Pretendard;letter-spacing:.01em;padding:12px 16px;border-radius:10px;margin-top:16px;
+    background:rgba(18,14,9,.7);border:1px solid var(--line);color:#fff;outline:none;text-align:center;transition:.15s}
+  #detail .nameinp::placeholder{color:rgba(180,162,128,.5)}
+  #detail .nameinp:focus{border-color:var(--gold)}
+  #detail .nameinp.invalid{border-color:#e0705a;background:rgba(60,24,18,.55)}
+  #detail .nameinp.invalid::placeholder{color:rgba(232,150,128,.92)}
+  @keyframes nshake{10%,90%{transform:translateX(-2px)}30%,70%{transform:translateX(4px)}50%{transform:translateX(-5px)}}
+  #detail .nameinp.shake{animation:nshake .35s}
+  /* 클래스 선택 버튼 (빨강+금테, 레퍼런스 톤) */
+  #detail .pick{margin-top:13px;width:100%;padding:14px 0;border-radius:11px;cursor:pointer;pointer-events:auto;
+    font:800 16px Pretendard;letter-spacing:.08em;color:#fff;
+    background:linear-gradient(180deg,rgba(65,198,224,.32),rgba(38,140,170,.18));border:1px solid var(--gold);
+    box-shadow:0 8px 26px rgba(65,198,224,.32),inset 0 1px 0 rgba(180,235,255,.2);transition:.15s}
+  #detail .pick:hover{filter:brightness(1.14);background:linear-gradient(180deg,rgba(80,212,236,.42),rgba(48,160,190,.24));box-shadow:0 10px 32px rgba(65,198,224,.46),inset 0 1px 0 rgba(180,235,255,.28)}
+
+  .hint{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:6;font:11px/1.5 ui-monospace,Consolas,monospace;letter-spacing:.06em;color:rgba(170,150,110,.35)}
+
+  /* ════ 추종자 모드(fmode) = 선택화면(원신) 구도 — 좌 2열 그리드 + 우 출신만 ════ */
+  body.fmode #roster{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:300px;left:max(24px,calc(50% - 610px))}
+  body.fmode .ritem{padding:7px 9px 7px 7px}
+  body.fmode .ritem .em{width:44px;height:44px}
+  body.fmode .ritem .tx .nm{font-size:15px}
+  body.fmode .ritem .em img{border-radius:6px}
+  body.fmode #detail .bem,body.fmode #detail .diff,body.fmode #detail #stats{display:none}   /* 이름입력칸은 추종자도 표시(플레이어가 동료 이름 지정) */
+
+  /* ════ 진영 선택(pmode) = 배너 2택 ════ */
+  #factions{position:fixed;inset:0;z-index:6;display:none;align-items:center;justify-content:center;gap:54px;pointer-events:none}
+  body.pmode #factions{display:flex}
+  body.pmode #roster,body.pmode #detail{display:none}
+  .fcard{pointer-events:auto;cursor:pointer;width:312px;border-radius:18px;overflow:hidden;position:relative;
+    background:linear-gradient(180deg,rgba(22,28,44,.55),rgba(9,13,23,.5));border:1px solid rgba(65,198,224,.16);
+    box-shadow:0 12px 40px rgba(0,0,0,.5);transition:transform .2s,border-color .2s,box-shadow .2s}
+  .fcard:hover{transform:translateY(-5px);border-color:rgba(65,198,224,.46)}
+  .fcard.on{border-color:var(--gold);box-shadow:0 18px 56px rgba(65,198,224,.34),inset 0 0 0 1px rgba(122,217,238,.35)}
+  .fcard .ban{width:100%;height:404px;background-size:cover;background-position:50% 16%;
+    filter:saturate(.78) brightness(.74);transition:filter .2s}
+  .fcard.on .ban{filter:saturate(1.05) brightness(1.04)}
+  .fcard .ban::after{content:'';position:absolute;left:0;right:0;top:300px;height:148px;
+    background:linear-gradient(180deg,transparent,rgba(9,13,23,.82) 64%,rgba(9,13,23,.95))}
+  .fcard .cap{position:relative;padding:0 22px 22px;margin-top:-46px;text-align:center}
+  .fcard .tag{font-size:11px;font-weight:700;letter-spacing:.22em;color:var(--gold-bright);text-transform:uppercase}
+  .fcard .fn{font-size:30px;font-weight:900;color:#fff;letter-spacing:.02em;margin-top:6px;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+  .fcard .fe{font-size:11px;font-weight:600;letter-spacing:.2em;color:rgba(190,170,130,.62);text-transform:uppercase;margin-top:3px}
+  .fcard .fl{font-size:13.5px;font-weight:700;color:#dfe7f1;margin-top:12px}
+  .fcard .fd{font-size:12px;line-height:1.72;color:rgba(206,210,224,.7);margin-top:8px}
+  .fcard .chk{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;opacity:0;transform:scale(.7);
+    background:var(--gold);color:#06121a;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 14px rgba(65,198,224,.5);transition:.18s}
+  .fcard.on .chk{opacity:1;transform:scale(1)}
+  /* 진영 확정 버튼(하단 중앙) */
+  #fgo{position:fixed;left:50%;bottom:42px;transform:translateX(-50%);z-index:7;display:none;pointer-events:auto;cursor:pointer;
+    min-width:300px;text-align:center;padding:15px 44px;border-radius:12px;font:800 16px Pretendard;letter-spacing:.08em;color:#fff;
+    background:linear-gradient(180deg,rgba(65,198,224,.34),rgba(38,140,170,.2));border:1px solid var(--gold);
+    box-shadow:0 10px 30px rgba(65,198,224,.34),inset 0 1px 0 rgba(180,235,255,.22);transition:.15s}
+  #fgo:hover{filter:brightness(1.14)}
+  body.pmode #fgo{display:block}
+</style>
+<script type="importmap">{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+}}</script>
+</head>
+<body>
+<div id="bg"></div>
+<div id="stage"></div>
+<div id="ui">
+  <div class="logo"><img src="/intro/logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
+  <div class="back" id="btnBack">‹ BACK</div>
+  <div class="snd on" id="sndBtn" title="배경음 켜기/끄기">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor"/>
+      <path class="wave" d="M16.5 8.6a5 5 0 0 1 0 6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path class="wave" d="M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <line class="slash" x1="2.5" y1="2.5" x2="21.5" y2="21.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/>
+    </svg><span class="lbl" id="sndLbl">ON</span></div>
+  <div class="ti"><span class="deco" id="ttDeco">CLASS SELECT</span><b id="ttTitle">클래스 선택</b><small id="ttStep">STEP 1 / 2 · 함께 항해할 캐릭터를 선택해주세요</small></div>
+
+  <div id="roster"></div>
+
+  <div id="detail">
+    <div class="bem"><img id="shEm" src="" alt=""></div>
+    <div class="nm" id="shName">팔라딘</div>
+    <div class="en" id="shEn">Knight</div>
+    <div class="rule"></div>
+    <div class="diff">난이도<span class="d" id="shDiff"></span></div>
+    <div class="ds" id="shDesc"></div>
+    <div id="stats"></div>
+    <input id="charName" class="nameinp" placeholder="캐릭터 이름을 입력하세요" maxlength="12" autocomplete="off" spellcheck="false">
+    <div class="pick" id="btnNext">클래스 선택</div>
+  </div>
+
+  <div id="factions"></div>
+  <div id="fgo">출항하기</div>
+
+</div>
+<div id="load"></div>
+
+<!-- 🎭 캐릭터 선택 로비(세이브 있으면 진입 시 먼저). 3D 스테이지 재활용 + 하단 캐릭터 리스트. body 직속(#stage 캔버스 클릭 가로채기 회피). -->
+<style>
+  #lobby{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;justify-content:space-between;pointer-events:none;
+    font-family:'Pretendard',system-ui,'Malgun Gothic',sans-serif;color:#e9e2d2}
+  #lobby .lb-top{text-align:center;padding:26px 0 0;pointer-events:none}
+  #lobby .lb-ti{font-size:26px;font-weight:800;letter-spacing:.12em;color:#f0d9a8;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+  #lobby .lb-ti::before,#lobby .lb-ti::after{content:"—";color:#7c6a3e;margin:0 14px;font-weight:400}
+  #lobby .lb-sub{margin-top:6px;font-size:12.5px;letter-spacing:.18em;color:#9a917d;text-transform:uppercase}
+  #lobby .lb-bottom{padding:0 26px 30px;display:flex;flex-direction:column;gap:16px;align-items:center;pointer-events:none}
+  #lobby .lb-list{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;pointer-events:auto;max-width:1200px}
+  #lobby .lb-card{position:relative;width:190px;padding:12px 14px;border-radius:9px;cursor:pointer;
+    background:linear-gradient(180deg,rgba(16,20,27,.86),rgba(10,13,19,.9));border:1px solid rgba(176,148,96,.3);
+    transition:border-color .16s,transform .16s,box-shadow .16s;display:flex;gap:11px;align-items:center}
+  #lobby .lb-card:hover{border-color:rgba(201,168,90,.6);transform:translateY(-2px)}
+  #lobby .lb-card.on{border-color:#e7c878;box-shadow:0 8px 26px rgba(0,0,0,.5),0 0 0 1px rgba(231,200,120,.5),0 0 20px -4px rgba(231,200,120,.5)}
+  #lobby .lb-card .lb-em{width:44px;height:44px;flex:0 0 44px;border-radius:7px;background:rgba(0,0,0,.35) center/72% no-repeat;border:1px solid rgba(176,148,96,.28)}
+  #lobby .lb-card .lb-info{min-width:0;flex:1}
+  #lobby .lb-card .lb-nm{font-size:15px;font-weight:700;color:#f2e6c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #lobby .lb-card .lb-cls{font-size:11.5px;color:#b8a87e;margin-top:1px}
+  #lobby .lb-card .lb-meta{margin-top:5px;display:flex;gap:9px;font-size:11.5px;color:#cdbf9a}
+  #lobby .lb-card .lb-meta b{color:#f0d060;font-weight:700}
+  #lobby .lb-card .lb-crown{position:absolute;top:-8px;right:-6px;font-size:15px;filter:drop-shadow(0 1px 2px #000)}
+  #lobby .lb-actions{display:flex;gap:12px;pointer-events:auto}
+  #lobby .lb-btn{padding:11px 26px;border-radius:24px;border:1px solid rgba(201,168,90,.45);cursor:pointer;
+    font:800 14px 'Pretendard',system-ui;background:linear-gradient(180deg,rgba(22,28,38,.92),rgba(12,17,26,.94));color:#e6dcc2;
+    transition:filter .15s,border-color .15s}
+  #lobby .lb-btn:hover{filter:brightness(1.15);border-color:rgba(201,168,90,.75)}
+  #lobby .lb-start{background:linear-gradient(180deg,#ecc962,#a9842f);color:#2a1d06;border-color:#e7c878}
+  #lobby .lb-del{background:linear-gradient(180deg,rgba(40,20,20,.9),rgba(28,12,12,.92));color:#e0a090;border-color:rgba(196,120,96,.4)}
+  /* 로비 모드 = 생성 흐름 UI 숨김(3D 스테이지+로고+사운드는 유지) */
+  body.lobbymode #roster,body.lobbymode #detail,body.lobbymode #factions,body.lobbymode #fgo,
+  body.lobbymode .ti,body.lobbymode #btnBack{display:none !important}
+</style>
+<div id="lobby">
+  <div class="lb-top"><div class="lb-ti">캐릭터 선택</div><div class="lb-sub">이어서 항해할 캐릭터를 선택하세요</div></div>
+  <div class="lb-bottom">
+    <div class="lb-list" id="lbList"></div>
+    <div class="lb-actions">
+      <button class="lb-btn lb-start" id="lbStart">▸ 게임 시작</button>
+      <button class="lb-btn lb-new" id="lbNew">＋ 신규 캐릭터</button>
+      <button class="lb-btn lb-del" id="lbDel">🗑 삭제</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as skClone } from 'three/addons/utils/SkeletonUtils.js';
+import { initShowcaseFx } from '/modules/showcasefx.js';
+import { initLoadScreen } from '/modules/loadscreen.js';   // 🏮 공용 로딩 화면(game.html과 동일)
+import { CLASSES, normalizeClassId } from '/modules/class-progression.js';
+
+// 여기선 실제 진행도를 알 수 없어 불확정 모드 — 등불이 반복해 차오른다.
+//   #load의 display 토글은 아래 기존 코드가 그대로 담당하므로 LS.hide()는 쓰지 않는다.
+initLoadScreen();
+
+const CHAR_DIR='/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
+const SKEL_DIR='/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';   // 추가 캐릭터(해골단)
+const KEN_MINI='/assets/kenney_mini-characters/Models/GLB format/';
+const KEN_DUN='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
+const KEN_GRV='/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/';
+const KEN_ARN='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';
+const KW='/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
+const SK='/';
+const ANIM_BASE='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+const ANIM_PACKS=['Rig_Medium_General.glb','Rig_Medium_CombatMelee.glb','Rig_Medium_CombatRanged.glb'];
+
+const WCFG = {
+  sword: { url:KW+'sword_1handed.gltf', slot:'r', offhand:KW+'shield_round.gltf', offhandPos:[0,0.039,0.145] },
+  axe2h: { url:KW+'axe_2handed.gltf',   slot:'r', rot:[0,Math.PI,0] },
+  staff: { url:KW+'staff.gltf',         slot:'r' },
+  bow:   { url:KW+'bow_withString.gltf',slot:'l', rot:[0,0,Math.PI] },
+  duals: { url:KW+'dagger.gltf',        slot:'r', offhand:KW+'dagger.gltf', offhandPos:[0,0.02,0.1] },
+};
+const CLASS_ANIM = {
+  knight:       { w:'sword', seq:['Melee_1H_Attack_Chop','Melee_1H_Attack_Slice_Diagonal','Melee_1H_Attack_Slice_Horizontal','Melee_Block_Attack'], fx:[null,null,null,'shock'] },
+  barbarian:    { w:'axe2h', seq:['Melee_2H_Attack_Chop','Melee_2H_Attack_Slice','Melee_2H_Attack_Spinning'], fx:[null,null,'whirl'] },
+  mage:         { w:'staff', seq:['Ranged_Magic_Raise','Ranged_Magic_Shoot','Ranged_Magic_Spellcasting_Long','Ranged_Magic_Spellcasting_Long'], fx:[null,'bolt','nova','novaIce'] },
+  ranger:       { w:'bow',   seq:['Ranged_Bow_Draw','Ranged_Bow_Release','Ranged_Bow_Draw_Up','Ranged_Bow_Release_Up'], fx:[null,'arrow',null,'windVolley'] },
+  rogue_hooded: { w:'duals', seq:['Melee_Dualwield_Attack_Chop','Melee_Dualwield_Attack_Slice','Melee_Dualwield_Attack_Stab'], fx:[null,null,'stealth'] },
+};
+
+const AX=['공격','방어','기동','사거리'];
+const CLASS_ROSTER = [
+  { id:'knight',       file:'Knight',       nm:CLASSES.knight.name, en:CLASSES.knight.en, sub:CLASSES.knight.subtitle, wp:'⚔ 검 + 방패', stat:[3,5,2,1], diff:2, icon:SK+'emblem_knight.png',
+    desc:'검과 방패로 전선을 지키는 균형형 전사. 가드로 막아 게이지를 채우고, 가득 차면 방패 충격파로 반격한다.' },
+  { id:'barbarian',    file:'Barbarian',    nm:CLASSES.barbarian.name, en:CLASSES.barbarian.en, sub:CLASSES.barbarian.subtitle, wp:'🪓 양손도끼',  stat:[5,3,2,1], diff:2, icon:SK+'emblem_barbarian.png',
+    desc:'양손도끼를 휘두르는 야성의 광전사. 회전하는 휠윈드로 둘러싼 적을 한꺼번에 쓸어버린다.' },
+  { id:'mage',         file:'Mage',         nm:CLASSES.mage.name, en:CLASSES.mage.en, sub:CLASSES.mage.subtitle, wp:'🪄 지팡이',  stat:[5,1,3,4], diff:4, icon:SK+'emblem_mage.png',
+    desc:'원소 마법을 다루는 술사. 파이어볼(화상)과 얼음창(둔화)을 전환하며 원거리에서 제압한다.' },
+  { id:'ranger',       file:'Ranger',       nm:CLASSES.ranger.name, en:CLASSES.ranger.en, sub:CLASSES.ranger.subtitle, wp:'🏹 활',        stat:[3,2,4,5], diff:3, icon:SK+'emblem_ranger.png',
+    desc:'활을 든 명사수. 빠른 기동으로 거리를 벌리고, 정조준 사격으로 약점에 치명타를 꽂는다.' },
+  { id:'rogue_hooded', file:'Rogue_Hooded', nm:CLASSES.rogue_hooded.name, en:CLASSES.rogue_hooded.en, sub:CLASSES.rogue_hooded.subtitle, wp:'🗡 쌍단검', stat:[4,2,5,1], diff:4, icon:SK+'emblem_rogue.png',
+    desc:'쌍단검을 다루는 그림자 암살자. 빠른 연격으로 몰아치고, 은신으로 적의 시야에서 사라진다.' },
+];
+// 추종자 = 교역소 NPC. ★KayKit 클래스 캐릭터 6종으로 한정(사령관 지시 2026-07-05 — "추종자는 KayKit 실제 클래스 캐릭터로, 나머지 모델은 NPC/적 전용").
+//   구 10종(keeper·tinyhero·human·male_b·orc·dogknight·soldier·grunt)은 로스터에서만 제거 — 에셋은 NPC/몹 용도로 유지.
+//   구 선택 저장값(?follower=keeper 등)은 소비처(game.html/crew.js)에서 rogue 폴백. 이름은 플레이어가 인게임 입력. desc=출신(세계관 연동).
+const FOLLOWER_ROSTER = [
+  { id:'rogue',        path:CHAR_DIR+'Rogue.glb',        nm:'밧모 밀수꾼',   en:'Patmos Smuggler',  desc:'후드를 벗은 밧모의 밀수꾼. 어둠 속 거래에 능하다.' },
+  { id:'knight',       path:CHAR_DIR+'Knight.glb',       nm:'잠긴 왕국 기사', en:'Sunken Knight',    desc:'바다에 잠긴 봉우리 왕국의 마지막 기사. 갑판의 방패가 된다.' },
+  { id:'barbarian',    path:CHAR_DIR+'Barbarian.glb',    nm:'봉우리 투사',   en:'Peak Brawler',     desc:'먼 봉우리에서 온 거친 전사. 앞장서 적을 들이받는다.' },
+  { id:'mage',         path:CHAR_DIR+'Mage.glb',         nm:'스올 술사',     en:'Sheol Adept',      desc:'스올의 안개 속에서 원소를 다루는 법을 배운 술사.' },
+  { id:'ranger',       path:CHAR_DIR+'Ranger.glb',       nm:'밧모 사냥꾼',   en:'Patmos Hunter',    desc:'밧모 해역의 바람을 읽는 명사수. 망루에서 수평선을 지킨다.' },
+  { id:'rogue_hooded', path:CHAR_DIR+'Rogue_Hooded.glb', nm:'그림자 밀사',   en:'Shadow Envoy',     desc:'후드 속에 얼굴을 감춘 밀사. 어둠 속 거래와 은신에 능하다.' },
+];
+// 진영 = 시작 시 2택(부족과 별개 축). 문양 = MAS-D 배너 에셋(assets/sigils). 세계관: 남은 자=파괴/귀환, 파수꾼=수호/심판.
+const FACTIONS = [
+  { id:'remnant', img:'/assets/sigils/remnant.png', nm:'남은 자', en:'The Remnant', tag:'파괴 · 귀환',
+    line:'별을 부숴 대륙을 되돌린다',
+    desc:'열두 분깃을 모아 별을 깨뜨리고 잠긴 대륙을 되돌리는 쪽. 차오르는 바다와 시간을 다툰다.' },
+  { id:'watch', img:'/assets/sigils/watch.png', nm:'파수꾼', en:'The Watchmen', tag:'수호 · 심판',
+    line:'별을 지켜 심판을 기다린다',
+    desc:'별을 지키고 둘째 별의 심판을 기다리는 쪽. 파괴 장치를 막고 분깃을 흩으며 종말을 받아들인다.' },
+];
+
+// ── 렌더러 ──
+const stageEl=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio));
+renderer.setSize(innerWidth,innerHeight); renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.NoToneMapping;
+stageEl.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xf0e2c4,0x2a2520,1.05));
+const keyL=new THREE.DirectionalLight(0xfff2da,2.5); keyL.position.set(3.5,7,6); scene.add(keyL);
+const rimL=new THREE.DirectionalLight(0xc9a85a,1.4); rimL.position.set(-5,5,-5); scene.add(rimL);   // 금빛 림
+const rimW=new THREE.DirectionalLight(0xffd9a0,0.9); rimW.position.set(6,3,-2); scene.add(rimW);
+const fillL=new THREE.DirectionalLight(0xd8d0c0,0.5); fillL.position.set(-3,2,6); scene.add(fillL);
+
+const FEET_Y=0.0;
+function radialTex(inner,outer){ const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
+  const gr=g.createRadialGradient(64,64,3,64,64,62); gr.addColorStop(0,inner); gr.addColorStop(1,outer);
+  g.fillStyle=gr; g.fillRect(0,0,128,128); const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t; }
+const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1,1),
+  new THREE.MeshBasicMaterial({ map:radialTex('rgba(4,8,15,0.9)','rgba(4,8,15,0)'), transparent:true, depthWrite:false }));
+shadow.rotation.x=-Math.PI/2; shadow.scale.set(1.95,1.25,1); shadow.position.set(0,FEET_Y+0.004,0); shadow.renderOrder=1; scene.add(shadow);   // ★어두운 땅(진한 그림자, 크게)
+// ── 발밑 마법진 디스크(청록 발광 링 + 룬 틱 + 안쪽 글로우) ──
+function discTex(){ const c=document.createElement('canvas'); c.width=c.height=256; const g=c.getContext('2d');
+  const gr=g.createRadialGradient(128,128,8,128,128,128);
+  gr.addColorStop(0,'rgba(86,200,232,0.13)'); gr.addColorStop(0.5,'rgba(56,150,190,0.05)'); gr.addColorStop(0.8,'rgba(65,198,224,0.015)'); gr.addColorStop(1,'rgba(65,198,224,0)');
+  g.fillStyle=gr; g.beginPath(); g.arc(128,128,128,0,7); g.fill();
+  g.strokeStyle='rgba(120,224,248,0.6)'; g.lineWidth=3.5; g.beginPath(); g.arc(128,128,104,0,7); g.stroke();
+  g.strokeStyle='rgba(65,198,224,0.28)'; g.lineWidth=2; g.beginPath(); g.arc(128,128,116,0,7); g.stroke();
+  g.strokeStyle='rgba(130,228,250,0.5)'; g.lineWidth=2.5;
+  for(let i=0;i<36;i++){ const a=i/36*6.2832, r1=(i%3===0?90:96), r2=101;
+    g.beginPath(); g.moveTo(128+Math.cos(a)*r1,128+Math.sin(a)*r1); g.lineTo(128+Math.cos(a)*r2,128+Math.sin(a)*r2); g.stroke(); }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t; }
+const poolMat=new THREE.MeshBasicMaterial({map:discTex(),transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false});
+const pool=new THREE.Mesh(new THREE.CircleGeometry(1.5,64),poolMat); pool.rotation.x=-Math.PI/2; pool.position.y=FEET_Y+0.005; pool.renderOrder=2; scene.add(pool);
+
+const cam=new THREE.PerspectiveCamera(33,innerWidth/innerHeight,0.1,100);
+cam.position.set(0,1.74,7.7); cam.lookAt(0,1.34,0);   // 캐릭터 화면 중앙~약간 아래(머리가 타이틀과 안 겹치게)
+
+let _renderOverride=null;
+const fx = initShowcaseFx({ scene, renderer, camera:cam, FEET_Y,
+  setRenderOverride:(f)=>{ _renderOverride=f; }, getRenderOverride:()=>_renderOverride });
+function spawnFx(key){ fx.play(key); }
+
+const loader=new GLTFLoader();
+const _glbCache=new Map();
+const loadGLB=u=>{ if(_glbCache.has(u)) return Promise.resolve(_glbCache.get(u));
+  return new Promise((res,rej)=>loader.load(encodeURI(u),g=>{_glbCache.set(u,g);res(g);},undefined,rej)); };
+
+let _clipMap=null, _idleClip=null;
+async function getClips(){ if(_clipMap) return _clipMap;
+  _clipMap=new Map();
+  for(const pk of ANIM_PACKS){ try{ const g=await loadGLB(ANIM_BASE+pk);
+    (g.animations||[]).forEach(c=>{ if(!_clipMap.has(c.name)) _clipMap.set(c.name,c); }); }catch(e){} }
+  _idleClip=[..._clipMap.values()].find(c=>/idle/i.test(c.name))||null;
+  window.__clipNames=[..._clipMap.keys()];
+  return _clipMap;
+}
+function normToHeight(m,H){ let bb=new THREE.Box3().setFromObject(m),s=new THREE.Vector3(); bb.getSize(s);
+  m.scale.setScalar(H/(s.y||1)); let b2=new THREE.Box3().setFromObject(m); m.position.y-=b2.min.y; }
+async function attachWeapon(model,wkey){
+  if(!wkey||!WCFG[wkey]) return; const cfg=WCFG[wkey]; const bones={};
+  model.traverse(o=>{ if(o.isBone){ if(o.name==='handslotr')bones.r=o; if(o.name==='handslotl')bones.l=o; } });
+  async function put(url,slot,pos,rot){ try{ const g=await loadGLB(url); const w=skClone(g.scene);
+    w.traverse(o=>{ if(o.isMesh) o.frustumCulled=false; });
+    if(pos) w.position.set(pos[0],pos[1],pos[2]); if(rot) w.rotation.set(rot[0],rot[1],rot[2]);
+    const b=bones[slot]; if(b) b.add(w); else model.add(w); return {w, bone:b}; }catch(e){ return null; } }
+  const main=await put(cfg.url, cfg.slot, cfg.pos, cfg.rot);
+  if(main){ model.userData.weaponMain=main.w; model.userData.weaponBone=main.bone; }
+  if(cfg.offhand) await put(cfg.offhand, 'l', cfg.offhandPos);
+}
+// ── 손에 든 무기 끝(지팡이 촉/활)을 발사 머즐로 — 무기에 reparent해 애니 추종 ──
+function setWeaponMuzzle(m){
+  const w=m.userData.weaponMain, bone=m.userData.weaponBone; if(!w||!bone) return;
+  m.updateMatrixWorld(true);
+  const box=new THREE.Box3().setFromObject(w);
+  const hp=new THREE.Vector3(); bone.getWorldPosition(hp);   // 손(무기 그립)
+  // 무기 AABB 8코너 중 손에서 가장 먼 점 = 무기 끝(지팡이 촉)
+  let tip=null,best=-1;
+  for(const x of [box.min.x,box.max.x]) for(const y of [box.min.y,box.max.y]) for(const z of [box.min.z,box.max.z]){
+    const c=new THREE.Vector3(x,y,z), d=c.distanceTo(hp); if(d>best){best=d;tip=c;} }
+  // ★활은 가운데를 쥐어 '가장 먼 코너'가 활 아래쪽(바닥 근처)이 됨 → 화살이 바닥서 발사되는 버그. 끝이 손보다 낮으면 손(그립) 높이서 발사.
+  const anchor = (tip.y < hp.y - 0.05) ? hp.clone() : tip;
+  const mk=new THREE.Object3D(); mk.position.copy(anchor); scene.add(mk); mk.updateMatrixWorld(true);
+  w.attach(mk);                 // 무기 자식으로 reparent(월드 유지) → 지팡이 따라 움직임
+  fx.setMuzzle(mk);
+}
+
+// ── 스탯 레이더(다이아몬드, 금색) ──
+function buildRadar(stat,diff){
+  const R=56, cx=98, cy=76, ang=[-90,0,90,180].map(d=>d*Math.PI/180);
+  const pt=(i,v)=>[cx+Math.cos(ang[i])*R*v/5, cy+Math.sin(ang[i])*R*v/5];
+  const ring=v=>ang.map((_,i)=>pt(i,v).join(',')).join(' ');
+  const poly=ang.map((_,i)=>pt(i,stat[i]).join(',')).join(' ');
+  let s=`<svg width="196" height="158" viewBox="0 0 196 158">`;
+  s+=`<polygon points="${ring(5)}" fill="none" stroke="rgba(65,198,224,.28)"/>`;
+  s+=`<polygon points="${ring(3.33)}" fill="none" stroke="rgba(65,198,224,.18)"/>`;
+  s+=`<polygon points="${ring(1.66)}" fill="none" stroke="rgba(65,198,224,.12)"/>`;
+  ang.forEach((_,i)=>{ const [x,y]=pt(i,5); s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(65,198,224,.16)"/>`; });
+  s+=`<polygon points="${poly}" fill="rgba(65,198,224,.26)" stroke="#7ad9ee" stroke-width="1.8"/>`;
+  ang.forEach((_,i)=>{ const [x,y]=pt(i,stat[i]); s+=`<circle cx="${x}" cy="${y}" r="2.4" fill="#7ad9ee"/>`; });
+  const lp=[[cx,13,'middle'],[cx+R+13,cy+4,'middle'],[cx,cy+R+16,'middle'],[cx-R-13,cy+4,'middle']];
+  AX.forEach((t,i)=>{ s+=`<text x="${lp[i][0]}" y="${lp[i][1]}" fill="rgba(190,215,235,.82)" font-size="11" font-weight="700" text-anchor="${lp[i][2]}" font-family="Pretendard">${t}</text>`; });
+  s+=`</svg>`; return s;
+}
+
+// ── 상태 ──
+const TARGET_H=1.7;
+const BODY_H=1.35;     // 머리본~발본 통일 높이(전 직업 동일 몸 크기)
+const SOLE_OFF=0.03;   // 발 본 → 밑창 바닥까지 보정(발 본을 살짝 띄워 밑창이 바닥에 닿게)
+// 캐릭터별 키 보정 — 머리장식(투구/모자/후드) 큰 직업은 전체높이를 키워 '몸' 크기를 마법사에 맞춤
+const HADJ={ knight:1.86, barbarian:1.9, mage:1.7, ranger:1.64, rogue_hooded:1.78, rogue:1.78 };
+let roster=CLASS_ROSTER, sel=0, phase=1;
+let showModel=null, showMixer=null, routineToken=0;
+const clock=new THREE.Clock();
+
+const elRoster=document.getElementById('roster');
+const elTitle=document.getElementById('ttTitle'), elStep=document.getElementById('ttStep'), elDeco=document.getElementById('ttDeco'), elStats=document.getElementById('stats');
+const shEm=document.getElementById('shEm'), shName=document.getElementById('shName'), shEn=document.getElementById('shEn'),
+      shDiff=document.getElementById('shDiff'), shDesc=document.getElementById('shDesc');
+const btnNext=document.getElementById('btnNext'), btnBack=document.getElementById('btnBack'), elName=document.getElementById('charName');
+const elFactions=document.getElementById('factions'), elFgo=document.getElementById('fgo');
+let factionSel=0;
+
+function buildFactions(){
+  elFactions.innerHTML='';
+  FACTIONS.forEach((f,i)=>{ const c=document.createElement('div'); c.className='fcard'+(i===factionSel?' on':''); c.dataset.i=i;
+    c.innerHTML=`<div class="chk">✓</div><div class="ban" style="background-image:url('${f.img}')"></div>`+
+      `<div class="cap"><div class="tag">${f.tag}</div><div class="fn">${f.nm}</div><div class="fe">${f.en}</div>`+
+      `<div class="fl">${f.line}</div><div class="fd">${f.desc}</div></div>`;
+    c.onclick=()=>selectFaction(i); elFactions.appendChild(c); });
+}
+function selectFaction(i){
+  const n=FACTIONS.length; factionSel=((i%n)+n)%n;
+  [...elFactions.children].forEach((c,k)=>c.classList.toggle('on',k===factionSel));
+  window.__sel.faction=FACTIONS[factionSel].id;
+}
+
+function buildRoster(){
+  elRoster.innerHTML='';
+  roster.forEach((d,i)=>{ const c=document.createElement('div'); c.className='ritem'+(i===sel?' on':''); c.dataset.i=i;
+    c.innerHTML=`<div class="em"><img src="${d.icon}" alt=""></div><div class="tx"><div class="nm">${d.nm}</div><div class="en">${d.en}</div></div>`;
+    c.onclick=()=>selectIndex(i); elRoster.appendChild(c); });
+}
+function refreshCards(){ [...elRoster.children].forEach((c,i)=>c.classList.toggle('on',i===sel)); }
+
+function refreshInfo(){
+  const d=roster[sel]; if(!d) return;
+  shEm.src=d.icon; shName.textContent=d.nm; shEn.textContent=d.en; shDesc.textContent=d.desc||'';
+  shDiff.innerHTML=[0,1,2,3,4].map(k=>k<(d.diff||0)?'<b>◆</b>':'<i>◆</i>').join('');
+  if(phase===1 && d.stat){ elStats.style.display='flex'; elStats.innerHTML=buildRadar(d.stat,d.diff); }
+  else { elStats.style.display='none'; elStats.innerHTML=''; }
+}
+
+// ── 가운데 대형 캐릭터(선택 직업) ──
+async function setShowcase(d,combat){
+  routineToken++; const myTok=routineToken;
+  fx.reset();
+  if(showModel){ scene.remove(showModel); showModel=null; showMixer=null; fx.setModel(null); }
+  const clips=await getClips(); if(myTok!==routineToken) return;
+  try{
+    const g=await loadGLB(d.path || (CHAR_DIR+d.file+'.glb')); if(myTok!==routineToken) return;
+    const m=skClone(g.scene); m.traverse(o=>{ if(o.isMesh||o.isSkinnedMesh){ o.frustumCulled=false; } });
+    // ★마법사 망토: idle 바인드포즈에서 분홍 안감이 정면으로 펼쳐져 어색 → 쇼케이스에선 숨김(로브/모자/지팡이 유지)
+    if(d.id==='mage') m.traverse(o=>{ if(/cape/i.test(o.name)) o.visible=false; });
+    if(d.id==='tinyhero_m') _stripTiny(m,'m'); else if(d.id==='tinyhero_f') _stripTiny(m,'f');   // ★TinyHero 남/여 분리
+    normToHeight(m, TARGET_H);
+    showMixer=new THREE.AnimationMixer(m);
+    // ★idle: 모델 자체 idle 우선(Polyart/Kenney 등), 없으면 KayKit 공용 idle
+    //   TinyHero는 남/여 idle이 따로(0~22=남, 23~45=여) → 여자는 [23] 명시(generic find는 남자 [0]만 잡음 → 여자 T포즈).
+    const mIdle = d.id==='tinyhero_f' ? ((g.animations||[])[23]||(g.animations||[])[0])
+      : ((g.animations||[]).find(c=>/idle/i.test(c.name))||(g.animations||[])[0]||_idleClip);
+    if(mIdle){ showMixer.clipAction(mIdle).play(); showMixer.update(0.3); }   // idle 포즈에서 본 위치 측정(T포즈 방지)
+    m.updateMatrixWorld(true);
+    // ★본 월드Y 기준 정규화 — SkinnedMesh의 Box3는 '바인드(T)포즈'라 발 위치를 못 잡음(떠있음 원인) → 실제 애니 본 좌표로 측정.
+    //   머리~발 본 거리로 '몸 높이' 통일(투구/모자/후드 무관) + 발 본을 바닥에 접지.
+    const boneY=(re)=>{ let mn=Infinity,mx=-Infinity; const w=new THREE.Vector3();
+      m.traverse(o=>{ if(o.isBone&&re.test(o.name)){ o.getWorldPosition(w); mn=Math.min(mn,w.y); mx=Math.max(mx,w.y); } }); return {mn,mx}; };
+    const head=boneY(/head/i), foot=boneY(/toe|foot/i);
+    if(head.mx>-Infinity && foot.mn<Infinity){
+      const bodyH=head.mx - foot.mn;
+      if(bodyH>0.4){ m.scale.multiplyScalar(BODY_H/bodyH); m.updateMatrixWorld(true); }
+      const f2=boneY(/toe|foot/i);
+      m.position.y -= (f2.mn - FEET_Y - SOLE_OFF);   // 발 본을 바닥에(밑창 두께 SOLE_OFF 보정)
+    }
+    m.rotation.y=-0.16;
+    scene.add(m); showModel=m; fx.setModel(m);
+    if(combat){ await attachWeapon(m, CLASS_ANIM[d.id]?.w);
+      // 투사체 직업(마법사/레인저)은 무기 끝에서 발사
+      if(d.id==='mage'||d.id==='ranger'){ m.updateMatrixWorld(true); if(_idleClip) showMixer.update(0); if(d.id==='mage') setWeaponMuzzle(m); } }   // ★활(ranger)은 가운데 쥐어 muzzle이 활 바닥(바닥발사 버그) → muzzle 미설정 → 가슴 높이 fallback 발사. 지팡이(mage)만 촉 muzzle.
+    if(myTok!==routineToken){ scene.remove(m); if(showModel===m){ showModel=null; showMixer=null; } return; }   // ★겹침 수정: 뒤늦게 정리되는 구 호출이 이미 교체된 새 모델의 참조(showModel)를 null로 덮어써, 다음 전환이 이전 캐릭터를 못 지우던 레이스. 자기 모델일 때만 null.
+    startRoutine(showMixer, clips, combat?d.id:null, myTok, mIdle);
+  }catch(e){ console.warn('[select] 쇼케이스 로드 실패', d.id, e&&e.message); }
+}
+function startRoutine(mixer, clips, classId, tok, idleClip){
+  const idleAct = idleClip ? mixer.clipAction(idleClip) : null;
+  // ★초기 idle은 fadeIn 금지 — 가중치 0에서 시작하면 바인드(T)포즈가 한 프레임 비쳐 'T자 깜빡'. 즉시 풀 가중치로 재생.
+  if(idleAct){ idleAct.setLoop(THREE.LoopRepeat,Infinity); idleAct.reset().setEffectiveWeight(1).play(); }
+  const def = classId && CLASS_ANIM[classId]; if(!def) return;
+  const steps=def.seq.map((n,idx)=>({clip:clips.get(n), fx:def.fx&&def.fx[idx]})).filter(s=>s.clip);
+  if(!steps.length) return;
+  let i=0, prev=idleAct;
+  function step(){ if(tok!==routineToken) return;
+    if(i>=steps.length){ i=0; if(prev&&prev!==idleAct)prev.fadeOut(0.25); if(idleAct){ idleAct.reset().fadeIn(0.25).play(); prev=idleAct; } setTimeout(step,1100); return; }
+    const s=steps[i++]; const c=s.clip; const a=mixer.clipAction(c);
+    if(c.name==='Melee_2H_Attack_Spinning'){ const D=3000;
+      a.setLoop(THREE.LoopRepeat,Infinity); a.clampWhenFinished=false; a.timeScale=1.6; a.reset();
+      if(prev) prev.fadeOut(0.1); a.setEffectiveWeight(1).fadeIn(0.1).play(); prev=a;
+      if(s.fx) setTimeout(()=>{ if(tok===routineToken) spawnFx(s.fx); }, 120);
+      setTimeout(()=>{ a.timeScale=1; }, D); setTimeout(step, D); return;
+    }
+    a.setLoop(THREE.LoopOnce,1); a.clampWhenFinished=true; a.reset();
+    if(prev) prev.fadeOut(0.1); a.setEffectiveWeight(1).fadeIn(0.08).play(); prev=a;
+    // ★마법(시전) = 손 내리는 후반에 발사 / 근접·사격 = 스윙 정점
+    const isMagic = s.fx==='bolt'||s.fx==='nova'||s.fx==='novaIce';
+    if(s.fx) setTimeout(()=>{ if(tok===routineToken) spawnFx(s.fx); }, c.duration*1000*(isMagic?0.64:0.34));
+    setTimeout(step, Math.max(300, c.duration*1000*0.9));
+  }
+  setTimeout(step, 750);
+}
+
+// ════ 추종자 선택 = Dune형 세로 초상화 카드(흉상 3D를 캔버스로 렌더) ════
+let _portR=null, _portScene=null, _portCam=null, _portCache={};
+function _portInit(){ if(_portR) return;
+  _portR=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+  _portR.setPixelRatio(Math.min(2,devicePixelRatio)); _portR.setSize(300,300);
+  _portR.outputColorSpace=THREE.SRGBColorSpace; _portR.toneMapping=THREE.NoToneMapping;
+  _portScene=new THREE.Scene();
+  _portScene.add(new THREE.HemisphereLight(0xf0e2c4,0x2a2520,1.05));
+  const k=new THREE.DirectionalLight(0xfff2da,2.4); k.position.set(2.5,5,5); _portScene.add(k);
+  const rim=new THREE.DirectionalLight(0x88c0e0,1.6); rim.position.set(-4,3,-3); _portScene.add(rim);
+  const fil=new THREE.DirectionalLight(0xd8d0c0,0.5); fil.position.set(-2,1,5); _portScene.add(fil);
+  _portCam=new THREE.PerspectiveCamera(28,1,0.1,100); }
+function _stripTiny(m, keep){   // TinyHero.glb = 남(MaleCharacterPolyart)+여(FemaleCharacterPolyart) 통짜. keep='m'→여 제거, 'f'→남 제거.
+  const drop = keep==='m' ? 'FemaleCharacterPolyart' : 'MaleCharacterPolyart';
+  const o=m.getObjectByName(drop); if(o&&o.parent) o.parent.remove(o); }
+function _normBust(m){   // 초상화 전용: 전 캐릭터 동일 기준(bbox 전체높이)으로 정규화 → 머리 크기·프레이밍 일관(직업/NPC 섞여도).
+  m.updateMatrixWorld(true);
+  let bb=new THREE.Box3().setFromObject(m); const sz=new THREE.Vector3(); bb.getSize(sz);
+  if(sz.y>0.01){ m.scale.multiplyScalar(BODY_H/sz.y); m.updateMatrixWorld(true); }
+  bb=new THREE.Box3().setFromObject(m); m.position.y-=bb.min.y; }   // 발 접지
+// 정사각 얼굴 썸네일(좌측 리스트용) — 다중 리그(모델 자체 idle 우선)
+async function makeThumb(entry){ _portInit();
+  try{ await getClips();
+    const g=await loadGLB(entry.path || (CHAR_DIR+entry.file+'.glb')); const m=skClone(g.scene);
+    m.traverse(o=>{ if(o.isMesh||o.isSkinnedMesh) o.frustumCulled=false; });
+    if(entry.id==='mage') m.traverse(o=>{ if(/cape/i.test(o.name)) o.visible=false; });
+    if(entry.id==='tinyhero_m') _stripTiny(m,'m'); else if(entry.id==='tinyhero_f') _stripTiny(m,'f');   // ★썸네일도 남/여 분리
+    const mx=new THREE.AnimationMixer(m);
+    const clip = entry.id==='tinyhero_f' ? ((g.animations||[])[23]||(g.animations||[])[0])
+      : ((g.animations||[]).find(c=>/idle/i.test(c.name))||(g.animations||[])[0]||_idleClip);
+    if(clip){ try{ mx.clipAction(clip).play(); mx.update(0.4); }catch(e){} }
+    _normBust(m); m.rotation.y=-0.18; _portScene.add(m);
+    const bb=new THREE.Box3().setFromObject(m); const top=bb.max.y, focus=top-0.30;   // 머리~어깨
+    _portCam.position.set(0, focus, 1.5); _portCam.lookAt(0, focus, 0);
+    _portR.render(_portScene,_portCam);
+    const url=_portR.domElement.toDataURL('image/png'); _portScene.remove(m); return url;
+  }catch(e){ console.warn('[select] 썸네일 실패', entry.id, e&&e.message); return null; } }
+async function ensureFollowerThumbs(){
+  for(const d of FOLLOWER_ROSTER){ if(d.icon) continue; const u=await makeThumb(d); d.icon=u||''; }
+}
+
+function selectIndex(i){
+  if(phase===3){ selectFaction(i); return; }   // 진영 단계는 배너 2택
+  if(!roster.length) return; const n=roster.length; sel=((i%n)+n)%n;
+  refreshCards(); refreshInfo(); setShowcase(roster[sel], phase===1);
+  window.__sel.index=sel;
+}
+function applyChrome(){
+  if(phase===1){ elTitle.textContent='클래스 선택'; elDeco.textContent='CLASS SELECT'; elStep.textContent='STEP 1 / 3 · 함께 항해할 캐릭터를 선택해주세요'; btnNext.textContent='다음'; }
+  else if(phase===2){ elTitle.textContent='추종자 선택'; elDeco.textContent='FOLLOWER SELECT'; elStep.textContent='STEP 2 / 3 · 교역소 동료를 선택해주세요'; btnNext.textContent='다음'; }
+  else { elTitle.textContent='진영 선택'; elDeco.textContent='FACTION SELECT'; elStep.textContent='STEP 3 / 3 · 어느 편에 설지 선택해주세요'; }
+}
+
+let chosenChar=null, chosenFollower=null, chosenFaction=null;
+const nameByPhase={1:'',2:''};   // 1=캐릭터명, 2=추종자명 (단계 이동해도 각자 보존)
+async function goPhase(p){
+  if(phase===1||phase===2) nameByPhase[phase]=elName.value;   // 떠나기 전 현재 입력 보존
+  phase=p; window.__sel.phase=p;
+  applyChrome();
+  routineToken++;   // 직전 단계 루틴(setTimeout 체인) 무효화
+  document.body.classList.toggle('fmode', p===2);   // 추종자 모드 = 우측 패널 스탯/난이도 숨김(출신+이름입력)
+  document.body.classList.toggle('pmode', p===3);   // 진영 모드 = 배너 2택, 3D/로스터 숨김
+  if(p===1||p===2){ elName.placeholder = p===1?'캐릭터 이름을 입력하세요':'추종자 이름을 입력하세요'; elName.value=nameByPhase[p]||''; }
+  if(p===3){   // 진영 선택 — 쇼케이스 제거하고 배너만
+    if(showModel){ scene.remove(showModel); showModel=null; showMixer=null; fx.setModel(null); }
+    buildFactions(); window.__sel.faction=FACTIONS[factionSel].id; return;
+  }
+  sel=0; window.__sel.index=0;
+  roster=(p===1?CLASS_ROSTER:FOLLOWER_ROSTER);
+  if(p===2) await ensureFollowerThumbs();            // 추종자 얼굴 썸네일 렌더(좌측 리스트용)
+  buildRoster(); refreshInfo(); await setShowcase(roster[0], p===1);
+}
+function charNameVal(){ return (elName&&elName.value.trim())||'선장'; }
+function requireName(){   // 이름 미입력 시 진행 차단(흔들기+경고테두리+포커스)
+  if(elName.value.trim()) { elName.classList.remove('invalid'); return true; }
+  elName.classList.add('invalid','shake'); elName.focus();
+  setTimeout(()=>elName.classList.remove('shake'),400);
+  return false;
+}
+elName.addEventListener('input',()=>elName.classList.remove('invalid'));
+async function onNext(){
+  if(phase===1){ if(!requireName()) return; chosenChar=roster[sel].id; window.__sel.char=chosenChar; window.__sel.name=elName.value.trim(); await goPhase(2); }
+  else if(phase===2){ if(!requireName()) return; chosenFollower=roster[sel].id; window.__sel.follower=chosenFollower; window.__sel.followerName=elName.value.trim(); await goPhase(3); }
+  else { chosenFaction=FACTIONS[factionSel].id; window.__sel.faction=chosenFaction;
+    // ★출항 = 오프닝 골든패스 단일 진입(game.html?opening=1) — caravel 전투→난파→표류→깨어남→'클릭하여 일어나기'→그 자리(홈섬 해안)서 게임 시작. 페이지 이동/중간 로딩 없음.
+    //   ⚠️ 공개 배포 시 게임을 막으려면 아래를 데모 스텁으로 다시 닫을 것(btnNext '데모 버전 · 게임 준비 중' + return).
+    const nm=window.__sel.name||'선장', fnm=window.__sel.followerName||'동료';
+    // ★스폰섬 랜덤배정(2026-07-10, 카브 특수취급 폐지) — "시작의 섬 카브"는 해역 이름일 뿐 실제 섬이 아니었음.
+    //   실제 게임서버처럼: worldmap.canon.json의 isSpawn 섬 중 하나를 이 캐릭터에 랜덤배정 → home=<isle.id>로 바인딩(이후 이어하기마다 같은 섬).
+    let homeIsle=null;
+    try{ const canon=await fetch('worldmap.canon.json').then(r=>r.json());
+      const spawns=(canon.islands||[]).filter(i=>i.isSpawn);
+      if(spawns.length) homeIsle=spawns[Math.floor(Math.random()*spawns.length)]; }
+    catch(e){ console.warn('[select] canon 스폰섬 조회 실패, 폴백 사용', e&&e.message); }
+    const testMap = new URLSearchParams(location.search).get('testMap') || '';
+    const isCliffHarborTest = testMap === 'cliff-harbor';
+    const isSeaKeepTest = testMap === 'sea-keep';
+    const sName = isSeaKeepTest ? '테스트섬 Sea Keep' : (isCliffHarborTest ? '테스트섬 절벽항구' : (homeIsle ? homeIsle.prefab : '시작의섬 카브'));   // 못 찾으면(구맵 등) 구 폴백 유지
+    const homeId = (isCliffHarborTest || isSeaKeepTest) ? '' : (homeIsle ? homeIsle.id : '');
+    //   stream=1 = 오픈월드 섬 스트리밍 활성(퀘스트라인 Q7~Q8 '첫 섬 점령'이 근처 부족 섬 스트림인+거점 등록에 의존).
+    // 테스트맵은 섬 탐색감만 빠르게 판정: 오프닝·퀘스트·원거리 스트리밍을 끄고 단일 섬에 바로 스폰한다.
+    const mode = (isCliffHarborTest || isSeaKeepTest) ? 'opening=0&quest=0&stream=0&combat=0' : 'opening=1&quest=1&stream=1';
+    const test = testMap ? `&testMap=${encodeURIComponent(testMap)}` : '';
+    const seaKeep = new URLSearchParams(location.search).get('seaKeep') === '1' ? '&seaKeep=1' : '';
+    const url=`game.html?${mode}${test}${seaKeep}&s=${encodeURIComponent(sName)}&home=${encodeURIComponent(homeId)}&char=${encodeURIComponent(chosenChar)}&follower=${encodeURIComponent(chosenFollower)}&faction=${encodeURIComponent(chosenFaction)}&name=${encodeURIComponent(nm)}&followerName=${encodeURIComponent(fnm)}`;
+    window.__sel.go=url; location.href=url; }
+}
+async function onBack(){ if(phase===3) await goPhase(2); else if(phase===2) await goPhase(1); else location.href='intro/_journey.html'; }   // 첫 단계 BACK → 인트로(_journey)
+
+btnNext.onclick=onNext; btnBack.onclick=onBack; elFgo.onclick=onNext;
+addEventListener('keydown',e=>{
+  if(LB && LB.style.display!=='none'){   // 🎭 로비 모드 키: Enter=게임시작 / 방향=캐릭터 이동
+    if(e.code==='Enter') lbStartGame();
+    else if(e.code==='ArrowLeft'||e.code==='ArrowUp') lbSelect(lbSel-1);
+    else if(e.code==='ArrowRight'||e.code==='ArrowDown') lbSelect(lbSel+1);
+    return; }
+  if(e.code==='Enter'){ onNext(); return; }
+  if(e.target===elName) return;
+  const cur = phase===3 ? factionSel : sel;
+  if(e.code==='ArrowUp'||e.code==='ArrowLeft') selectIndex(cur-1);
+  else if(e.code==='ArrowDown'||e.code==='ArrowRight') selectIndex(cur+1);
+  else if(e.code==='Escape') onBack();
+  else if(/^Digit[1-9]$/.test(e.code)){ const i=+e.code.slice(5)-1; if(phase===3){ if(i<FACTIONS.length) selectFaction(i); } else if(i<roster.length) selectIndex(i); }
+});
+
+function loop(){
+  requestAnimationFrame(loop);
+  const dt=clock.getDelta();
+  if(showMixer) showMixer.update(dt);
+  if(showModel) showModel.rotation.y=-0.16+Math.sin(clock.elapsedTime*0.32)*0.07;
+  poolMat.opacity=0.14+Math.sin(clock.elapsedTime*1.5)*0.03;
+  fx.update(dt);
+  if(_renderOverride) _renderOverride(); else renderer.render(scene,cam);
+}
+addEventListener('resize',()=>{ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+// ── BGM (intro_mas) + 우상단 ON/OFF 토글 ──
+const bgm=new Audio('/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
+const sndBtn=document.getElementById('sndBtn'), sndLbl=document.getElementById('sndLbl');
+let sndOn = (localStorage.getItem('mas_bgm')!=='off');   // 기본 ON, 사용자 선택 기억
+function applySnd(){
+  sndBtn.classList.toggle('on',sndOn); sndBtn.classList.toggle('off',!sndOn);
+  sndLbl.textContent = sndOn?'ON':'OFF';
+  if(sndOn){ bgm.play().catch(()=>{}); } else { bgm.pause(); }
+}
+sndBtn.onclick=()=>{ sndOn=!sndOn; localStorage.setItem('mas_bgm', sndOn?'on':'off'); applySnd(); };
+applySnd();
+// 브라우저 자동재생 정책: ON이어도 첫 사용자 입력이 있어야 소리 시작 → 최초 제스처에 재생 시도
+function _bgmKick(){ if(sndOn) bgm.play().catch(()=>{}); removeEventListener('pointerdown',_bgmKick); removeEventListener('keydown',_bgmKick); }
+addEventListener('pointerdown',_bgmKick); addEventListener('keydown',_bgmKick);
+window.__bgm=bgm; window.__sndOn=()=>sndOn;
+
+window.__sel={ phase:1, index:0, char:null, follower:null, faction:null, name:null, followerName:null, go:null };
+window.__selectFaction=i=>selectFaction(i);
+window.__selectIndex=i=>selectIndex(i);
+window.__confirm=()=>onNext();
+window.__back=()=>onBack();
+window.__selReady=false;
+window.__playFx=(k)=>{ try{ fx.play(k); return true; }catch(e){ window.__fxErr=String(e&&e.message||e); return false; } };
+window.__sceneObjs=()=>scene.children.length;
+window.__modelPosY=()=>showModel?+showModel.position.y.toFixed(3):null;
+window.__dumpBones=()=>{ const list=[]; if(!showModel) return {posY:null,list}; showModel.updateMatrixWorld(true);
+  showModel.traverse(o=>{ if(o.isBone){ const v=new THREE.Vector3(); o.getWorldPosition(v); list.push({name:o.name, wy:v.y}); } });
+  return { posY:+showModel.position.y.toFixed(3), list }; };
+window.__dumpModel=()=>{ const out=[]; if(!showModel) return out;
+  showModel.updateMatrixWorld(true);
+  showModel.traverse(o=>{ if(!(o.isMesh||o.isSkinnedMesh)) return;
+    const mats=Array.isArray(o.material)?o.material:[o.material];
+    const bb=new THREE.Box3().setFromObject(o); const sz=new THREE.Vector3(); bb.getSize(sz);
+    mats.forEach((mt,k)=>{ if(!mt) return;
+      out.push({ name:o.name||'(noname)', mat:k, type:mt.type, vis:o.visible,
+        col:mt.color?('#'+mt.color.getHexString()):'-', map:!!mt.map, side:mt.side, blend:mt.blending,
+        topY:+bb.max.y.toFixed(2), botY:+bb.min.y.toFixed(2), h:+sz.y.toFixed(2) }); });
+  });
+  return out; };
+
+// ── 🎭 캐릭터 선택 로비 (세이브 로스터) — 3D 스테이지 재활용 ──
+const LB=document.getElementById('lobby'), lbList=document.getElementById('lbList');
+let lbChars=[], lbSel=0, _delArm=false, _delT=null;
+function lbLoadRoster(){ try{ let l=JSON.parse(localStorage.getItem('voyageRoster_v1')||'[]'); if(!Array.isArray(l)) l=[];
+  if(!l.length){ const old=localStorage.getItem('voyageSave_v1'); if(old){ try{ const s=JSON.parse(old); if(s){ if(!s.cid) s.cid='c_'+Date.now().toString(36); l=[s]; localStorage.setItem('voyageRoster_v1',JSON.stringify(l)); } }catch(_){} } }
+  return l.slice().sort((a,b)=>((b&&b.t)||0)-((a&&a.t)||0)); }catch(e){ return []; } }
+function lbClass(id){ const canonical=normalizeClassId(id); return CLASS_ROSTER.find(c=>c.id===canonical) || CLASS_ROSTER[0]; }
+function lbBuild(){ lbList.innerHTML='';
+  lbChars.forEach((c,i)=>{ const m=c.meta||{}, cls=lbClass(m.char), lvl=(c.combat&&c.combat.level)||1, gold=(c.inventory&&c.inventory.gold)||0;
+    const fac = m.faction==='remnant'?'남은 자':(m.faction==='watch'?'파수꾼':'');
+    const el=document.createElement('div'); el.className='lb-card'+(i===lbSel?' on':''); el.dataset.i=i;
+    el.innerHTML=`${i===lbSel?'<div class="lb-crown">👑</div>':''}<div class="lb-em" style="background-image:url('${cls.icon}')"></div>`
+      +`<div class="lb-info"><div class="lb-nm">${m.name||'이름 없음'}</div><div class="lb-cls">${cls.nm}${fac?' · '+fac:''}</div>`
+      +`<div class="lb-meta"><span>Lv <b>${lvl}</b></span><span>◎ <b>${gold}</b></span></div></div>`;
+    el.onclick=()=>lbSelect(i); lbList.appendChild(el); }); }
+function lbSelect(i){ if(!lbChars.length) return; lbSel=((i%lbChars.length)+lbChars.length)%lbChars.length;
+  [...lbList.children].forEach((el,k)=>{ el.classList.toggle('on',k===lbSel); const cr=el.querySelector('.lb-crown');
+    if(k===lbSel && !cr){ const d=document.createElement('div'); d.className='lb-crown'; d.textContent='👑'; el.appendChild(d); }
+    else if(k!==lbSel && cr){ cr.remove(); } });
+  setShowcase(lbClass((lbChars[lbSel].meta||{}).char), false); }   // 선택 캐릭터 클래스 3D
+function lbStartGame(){ const c=lbChars[lbSel]; if(!c) return; const m=c.meta||{}, e=encodeURIComponent;
+  document.getElementById('load').style.display='flex';
+  // 테스트맵 주소로 로비에 들어온 경우 기존 세이브의 session/position을 복원하면 이전 테스트 섬으로 되돌아간다.
+  // 외형 선택만 재사용하고, 테스트 세션은 신규 진입과 동일하게 별도 로드한다.
+  const testMap=new URLSearchParams(location.search).get('testMap')||'';
+  if(testMap==='sea-keep'||testMap==='cliff-harbor'){
+    const session=testMap==='sea-keep'?'테스트섬 Sea Keep':'테스트섬 절벽항구';
+    location.href='game.html?opening=0&quest=0&stream=0&combat=0&build=20260806e&testMap='+e(testMap)
+      +'&s='+e(session)+'&home=&char='+e(normalizeClassId(m.char))+'&follower='+e(m.follower||'')
+      +'&faction='+e(m.faction||'')+'&name='+e(m.name||'')+'&followerName='+e(m.followerName||'');
+    return;
+  }
+  const seaKeep=new URLSearchParams(location.search).get('seaKeep')==='1'?'&seaKeep=1&build=20260806j':'';
+  location.href='game.html?load=1&quest=1&stream=1&cid='+e(c.cid||'')+seaKeep
+    +'&s='+e(m.session||'시작의섬 카브')+'&home='+e(m.homeIslandId||'')+'&char='+e(normalizeClassId(m.char))+'&follower='+e(m.follower||'')
+    +'&faction='+e(m.faction||'')+'&name='+e(m.name||'')+'&followerName='+e(m.followerName||''); }
+async function lbNewChar(){ LB.style.display='none'; document.body.classList.remove('lobbymode'); await goPhase(1); }
+function lbDelChar(){ const c=lbChars[lbSel]; if(!c) return; const btn=document.getElementById('lbDel');
+  if(!_delArm){ _delArm=true; btn.textContent='정말 삭제? (다시 클릭)'; clearTimeout(_delT); _delT=setTimeout(()=>{ _delArm=false; btn.textContent='🗑 삭제'; },2500); return; }
+  _delArm=false; clearTimeout(_delT); btn.textContent='🗑 삭제';
+  try{ let l=lbLoadRoster().filter(x=>x.cid!==c.cid); localStorage.setItem('voyageRoster_v1',JSON.stringify(l)); if(!l.length) localStorage.removeItem('voyageSave_v1'); }catch(_){}
+  lbChars=lbLoadRoster();
+  if(!lbChars.length){ lbNewChar(); return; }
+  lbSel=Math.min(lbSel,lbChars.length-1); lbBuild(); lbSelect(lbSel); }
+document.getElementById('lbStart').onclick=lbStartGame;
+document.getElementById('lbNew').onclick=lbNewChar;
+document.getElementById('lbDel').onclick=lbDelChar;
+
+(async()=>{
+  lbChars = lbLoadRoster();
+  if(lbChars.length){   // 💾 세이브 있음 → 캐릭터 선택 로비 먼저(생성 흐름 대신)
+    document.body.classList.add('lobbymode');
+    lbBuild(); LB.style.display='flex';
+    document.getElementById('load').style.display='none';
+    window.__selReady=true; loop();
+    lbSelect(0);   // loop 시작 후 첫 캐릭터 3D 표시(setShowcase 비동기)
+  } else {              // 세이브 없음 → 신규 생성 흐름
+    await goPhase(1);
+    document.getElementById('load').style.display='none';
+    window.__selReady=true; loop();
+  }
+})();
+</script>
+</body></html>

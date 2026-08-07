@@ -1,0 +1,1401 @@
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAS Voyage — 오프닝</title>
+<!--
+  voyage/intro/index.html — 게임 오프닝 랜딩(1섹션 완성: 항해/타륜).
+  토대: GSAP ScrollTrigger(scrub+snap) + 게임 모듈(../modules/core·physics·water·ship) 그대로.
+  흐름: 수면 위 배(히어로) → 무겁게 스크롤 → 수면 통과 전환(물보라) → 수중 잠수, 타륜이 서서히 등장 + 설명 카드.
+  ★바다·배·하늘 = 게임 water.js/ship.js. 오브젝트 = 게임 에셋 /ship_helm.glb. 새로 만들지 않음.
+  스크롤 = 휠 따라가기 아님 → ScrollTrigger snap(섹션 스냅) + scrub(관성/무게감).
+  UI 톤: JWE 헥스 블루 HUD + 맵 정본 시안/네이비 글래스.
+  검증 계약: window.__introReady / window.__introGo(i) / window.__ctx / window.__helm 노출.
+-->
+<style>
+  @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/static/pretendard.min.css");
+  @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+  :root{
+    --navy:#06141f; --navy2:#0a1f30; --panel:rgba(9,28,44,.82);
+    --cyan:#41c6e0; --cyan-bright:#9bf0f8; --cyan-dim:#5a93a8;
+    --gold:#f0c64a; --line:rgba(80,200,225,.42); --line-soft:rgba(80,200,225,.18);
+    --txt:#dcf0f6; --txt-dim:rgba(180,222,233,.58);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  /* ScrollTrigger 토대: body 스크롤 허용(overflow:hidden 금지). 캔버스는 fixed로 깔고 500vh 컨테이너가 스크롤을 만든다. */
+  body{background:var(--navy);color:var(--txt);font-family:'Montserrat','Pretendard',system-ui,sans-serif;cursor:default;overscroll-behavior:none}
+  canvas{position:fixed!important;top:0;left:0;width:100vw;height:100vh;z-index:0;display:block}
+  /* 스크롤 길이 컨테이너 — 1000vh. ★섹션 간 거리를 크게 잡아 단일 휠 제스처로 섹션이 안 넘어가게(휠 ~2회 체감).
+     관성/이징 느낌(scrub+ease)은 그대로 유지(사령관: 무게감은 정답). */
+  #scroll{position:relative;height:600vh;z-index:1;pointer-events:none}  /* 1000→600vh: 스크롤 양 줄임(사령관: 너무 많았음). 묵직함은 scrub/snap이 유지 */
+  #ui{position:fixed;inset:0;z-index:5;pointer-events:none}
+
+  /* ── 코너 프레임(JWE 헥스 HUD) ── */
+  .frame{position:fixed;z-index:4;width:38px;height:38px;border:2px solid var(--line);opacity:.55}
+  .frame.tl{left:16px;top:16px;border-right:0;border-bottom:0}
+  .frame.tr{right:16px;top:16px;border-left:0;border-bottom:0}
+  .frame.bl{left:16px;bottom:16px;border-right:0;border-top:0}
+  .frame.br{right:16px;bottom:16px;border-left:0;border-top:0}
+
+  /* ── 로고 + 메타 ── */
+  .logo{position:fixed;left:34px;top:28px;font-size:20px;letter-spacing:.18em;font-weight:300;z-index:5;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+  .logo b{font-weight:800;color:var(--cyan);letter-spacing:.08em}
+  .logo .tab{display:inline-block;width:8px;height:15px;margin-right:9px;vertical-align:-2px;background:var(--cyan);
+             clip-path:polygon(0 0,100% 25%,100% 75%,0 100%);box-shadow:0 0 10px var(--cyan)}
+  .metaTR{position:fixed;right:32px;top:30px;z-index:5;font:10px/1.7 'Montserrat','Pretendard',sans-serif;letter-spacing:.22em;color:var(--txt-dim);text-align:right}
+  /* 좌하단 모노 텔레메트리(JWE //EXP/STATUS 식) */
+  .telem{position:fixed;left:34px;bottom:34px;z-index:5;font:10px/1.7 'Montserrat','Pretendard',sans-serif;letter-spacing:.16em;color:var(--cyan-dim);opacity:.8}
+  .telem b{color:var(--cyan-bright);font-weight:400}
+
+  /* ── 히어로 ── */
+  .hero{position:fixed;left:50%;top:15%;transform:translateX(-50%);text-align:center;z-index:5;text-shadow:0 2px 26px rgba(0,18,30,.92),0 1px 3px rgba(0,12,22,.7);will-change:opacity,transform}
+  /* 소견A: 텍스트 뒤 아주 은은한 방사형 어둠 백드롭(박스 아님 — 가장자리로 완전히 사라지는 그라디언트)으로 가독성↑ */
+  .hero::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:150vw;height:62vh;z-index:-1;pointer-events:none;
+    background:radial-gradient(ellipse 42% 58% at 50% 50%, rgba(4,18,30,.5), rgba(4,18,30,.26) 45%, rgba(4,18,30,0) 75%)}
+  .hero .kicker{font:11px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.26em;color:var(--cyan-bright);margin-bottom:18px}
+  .hero h1{margin:0;font-size:clamp(36px,5.5vw,64px);font-weight:200;letter-spacing:.02em;line-height:1.12}
+  .hero h1 b{font-weight:800}
+  .hero .rule{width:130px;height:1px;margin:20px auto 0;background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+  .hero p{margin:15px 0 0;font-size:13px;letter-spacing:.26em;color:var(--txt-dim)}
+  /* ── 게임 타이틀 + 메뉴(메인 메뉴 화면) ── */
+  .hero .gtitle{margin:6px 0 0;font-size:clamp(46px,8vw,96px);font-weight:200;letter-spacing:.05em;line-height:1.0;text-shadow:0 2px 30px rgba(0,18,30,.9)}
+  .hero .gtitle b{font-weight:800;color:var(--cyan)}
+  .hero .gsub{margin:16px 0 0;font-size:15px;letter-spacing:.08em;color:#e4f3f8;font-weight:500}
+  .menu{margin-top:28px;display:flex;flex-direction:column;gap:4px;align-items:center;pointer-events:auto}
+  /* ★엘든링 세로 메뉴 스타일(ref/스타트화면2): 박스 없음 · 발광 텍스트 · hover 시 아래 광원 */
+  .mbtn{background:none;border:0;cursor:pointer;position:relative;padding:9px 44px;
+        font:16px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.3em;font-weight:500;text-align:center;
+        color:rgba(238,230,212,.64);transition:color .2s,text-shadow .2s,letter-spacing .2s}
+  /* ★ER식: 글씨 '가운데를 관통'하는 가로 광원(아래 뭉침 X). 중앙 최대 밝기→좌우 페이드, 얇은 가로 띠. */
+  .mbtn::before{content:'';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:0;height:94px;pointer-events:none;z-index:-1;
+        background:radial-gradient(ellipse 56% 20% at 50% 50%, rgba(255,206,124,.6), rgba(255,206,124,0) 70%);transition:width .34s ease}
+  .mbtn::after{display:none}
+  /* ★게임식 선택 커서(호버 아님): 현재 선택 항목만 .active로 활성 — 엘든링식 가운데 관통 가로 광원 */
+  .mbtn.active{color:#fff;text-shadow:0 0 34px rgba(255,228,165,.95), 0 0 8px rgba(255,228,165,.6);letter-spacing:.36em}
+  .mbtn.active::before{width:640px}
+
+  /* ── 스크롤 힌트 ── */
+  .scrollhint{position:fixed;left:50%;bottom:42px;transform:translateX(-50%);text-align:center;z-index:5;
+              font:11px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.28em;color:rgba(200,238,245,.85);will-change:opacity}
+  .scrollhint .chev{display:block;margin-top:10px;font-size:16px;color:var(--cyan);animation:bob 1.7s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(6px);opacity:1}}
+
+  /* ── 수심 게이지(우측 — 잠수 진행 표시, JWE 모노 톤) ── */
+  .depth{position:fixed;right:34px;top:50%;transform:translateY(-50%);z-index:5;width:46px;text-align:center;
+         font:10px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.12em;color:var(--cyan-dim);opacity:.85;will-change:opacity}
+  .depth .bar{position:relative;width:2px;height:160px;margin:10px auto;background:var(--line-soft)}
+  .depth .fill{position:absolute;left:-1px;top:0;width:4px;height:0;background:linear-gradient(180deg,var(--cyan-bright),var(--cyan));box-shadow:0 0 8px var(--cyan)}
+  .depth .val{color:var(--cyan-bright);font-size:11px;letter-spacing:.06em}
+
+  /* ── 설명(에디토리얼 미니멀 — three.js 사이트식: 박스 없음 · 인덱스 워터마크 · 제목 reveal) ── */
+  .card{position:fixed;left:7%;bottom:13%;width:min(42vw,470px);z-index:5;opacity:0;pointer-events:none;
+        will-change:opacity;transition:opacity .5s ease}
+  /* 가독성: 화면 하단 전체 vignette(카드별 박스 아님 → 잘림 없음, 게임 사이트식) */
+  #cardvig{position:fixed;left:0;right:0;bottom:0;height:46%;z-index:4;pointer-events:none;opacity:0;transition:opacity .5s ease;
+        background:linear-gradient(0deg, rgba(2,10,18,.6), rgba(2,10,18,.16) 46%, rgba(2,10,18,0))}
+  .card .cidx{font:200 clamp(54px,7vw,102px)/.85 'Montserrat','Pretendard',sans-serif;color:rgba(175,222,235,.10);letter-spacing:-.02em}
+  .card .klabel{font:11px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.44em;color:var(--cyan);text-transform:uppercase;margin-top:4px}
+  .card .titwrap{overflow:visible;margin:8px 0 0}
+  /* ★lusion/igloo식 우아한 blur→선명 + 미세 스케일 페이드(글리치 아님) */
+  .card h2{margin:0;font-size:clamp(30px,4.2vw,54px);font-weight:800;color:#eef8fc;letter-spacing:.02em;line-height:1.04;text-shadow:0 2px 26px rgba(0,18,30,.85);
+           opacity:0;filter:blur(16px);transform:scale(1.035) translateY(10px);
+           transition:opacity .9s ease,filter .95s ease,transform 1.05s cubic-bezier(.19,.9,.22,1)}
+  .card.reveal h2{opacity:1;filter:blur(0);transform:none}
+  .card .cline{height:1px;width:0;margin:18px 0 15px;background:linear-gradient(90deg,var(--cyan),transparent);transition:width .85s ease .12s}
+  .card p{margin:0;font-size:15px;line-height:1.85;color:#d3e8ef;max-width:34ch;opacity:0;transform:translateY(12px);transition:opacity .7s ease .28s,transform .7s ease .28s}
+  .card.reveal h2{transform:translateY(0)}
+  .card.reveal .cline{width:132px}
+  .card.reveal p{opacity:1;transform:translateY(0)}
+  /* ★좌우 교차: 짝수 섹션은 우측 정렬 */
+  .card.right{left:auto;right:7%;text-align:right}
+  .card.right .titwrap{display:flex;justify-content:flex-end}
+  .card.right .cline{margin-left:auto}
+  .card.right p{margin-left:auto}
+  /* ★우측 섹션 인디케이터(게임 사이트식) */
+  #secnav{position:fixed;right:30px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:18px;opacity:0;pointer-events:none;transition:opacity .5s ease}
+  #secnav.on{opacity:1;pointer-events:auto}
+  #secnav button{display:flex;align-items:center;justify-content:flex-end;gap:9px;background:none;border:0;cursor:pointer;
+    color:rgba(200,230,240,.38);font:10px/1 'Montserrat','Pretendard',sans-serif;letter-spacing:.22em;transition:color .3s}
+  #secnav button i{font-style:normal;opacity:.7}
+  #secnav button span{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .35s ease,opacity .35s ease}
+  #secnav button::after{content:'';width:16px;height:1px;background:currentColor;opacity:.55;transition:width .3s}
+  #secnav button.active{color:var(--cyan)}
+  #secnav button.active span{max-width:120px;opacity:1}
+  #secnav button.active::after{width:30px}
+
+  /* ── 로딩 ── 🏮 내용은 /modules/loadscreen.js가 채운다(game·select와 동일 화면).
+     여기 배경은 모듈 로드 전 첫 프레임에 남색이 번쩍이지 않게 하려는 것. */
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+</style></head>
+<body>
+<div id="load"></div>
+
+<!-- 실제 스크롤 길이 — ScrollTrigger가 이 컨테이너로 진행도를 만든다 -->
+<div id="scroll"></div>
+
+<!-- HUD -->
+<div class="frame tl"></div><div class="frame tr"></div><div class="frame bl"></div><div class="frame br"></div>
+<div class="logo"><img src="logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
+<div class="telem">//NAV/STATUS<br>DEPTH&nbsp;&nbsp;<b id="tDepth">00.0</b> M<br>SECTOR&nbsp;<b>01 / 05</b></div>
+
+<div id="ui">
+  <div class="hero" id="hero">
+    <div class="kicker">THE FIRST STAR · 첫 번째 별</div>
+    <img class="gemblem" src="logo.png" alt="tomob" style="width:min(44vw,420px);margin:4px auto 0;display:block;filter:drop-shadow(0 8px 40px rgba(0,18,30,.95))">
+    <p class="gsub">별이 떨어진 뒤 바다가 차오른 세계, 토모브. 가라앉지 않은 마지막 바다 위에서 배를 짓고 항해합니다.</p>
+    <div class="menu">
+      <button class="mbtn primary" id="btnStart">▸ START GAME</button>
+      <button class="mbtn" id="btnPortfolio">포트폴리오 보기</button>
+      <button class="mbtn" id="btnContact">문의하기</button>
+    </div>
+  </div>
+
+  <div class="scrollhint" id="scrollhint">SCROLL TO DIVE<span class="chev">▾</span></div>
+
+  <div class="depth" id="depthUI">
+    <div>SURF</div>
+    <div class="bar"><div class="fill" id="depthFill"></div></div>
+    <div class="val" id="depthVal">00m</div>
+  </div>
+
+  <div id="cardvig"></div>
+  <div class="card" id="card">
+    <div class="cidx" id="cNum">01</div>
+    <div class="klabel" id="cKlabel">SAILING</div>
+    <div class="titwrap"><h2 id="cKo">항해</h2></div>
+    <div class="cline"></div>
+    <p id="cDesc">바람을 읽고 돛을 맞춰 배를 몬다. 이동·탐험·전투·교역 — 모든 것이 배를 통한다.</p>
+  </div>
+
+  <div id="secnav">
+    <button data-i="0"><i>01</i><span>SAILING</span></button>
+    <button data-i="1"><i>02</i><span>TRADE</span></button>
+    <button data-i="2"><i>03</i><span>BATTLE</span></button>
+    <button data-i="3"><i>04</i><span>EXPLORE</span></button>
+    <button data-i="4"><i>05</i><span>FACTION</span></button>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+  "gsap":"https://esm.sh/gsap@3.12.5",
+  "gsap/ScrollTrigger":"https://esm.sh/gsap@3.12.5/ScrollTrigger"
+}}</script>
+
+<script type="module">
+import { initCore }    from '../modules/core.js';
+import { initPhysics } from '../modules/physics.js';
+import { initWater }   from '../modules/water.js';
+import { initShip }    from '../modules/ship.js';
+import { GLTFLoader }  from 'three/addons/loaders/GLTFLoader.js';
+import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';   // 촘촘한 삼각 그물용
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass }from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { ShaderPass }     from 'three/addons/postprocessing/ShaderPass.js';
+import { OutputPass }     from 'three/addons/postprocessing/OutputPass.js';
+import * as THREE from 'three';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+gsap.registerPlugin(ScrollTrigger);
+
+const L = document.getElementById('load');
+// 🏮 공용 로딩 화면. 여기는 PRELOAD 개수로 실제 진행률을 알 수 있어 setProgress를 직접 준다.
+const LS = (await import('/modules/loadscreen.js')).initLoadScreen();
+try{
+  // ───────────────────────── 씬 ─────────────────────────
+  const ctx = initCore({ sky:0x8fc1e3 });
+  await initPhysics(ctx);
+  const { scene, camera } = ctx;
+  camera.position.set(0,9,48);
+
+  // 바다: 게임 water.js (사령관 확정 — three.js Water보다 낫다). 수중 진입 시 청록 안개+비네트 자동.
+  initWater(ctx);
+
+  // ★환경맵(PBR 금속/머티리얼이 반사를 받아 수중 어둠서도 또렷) + 은은한 환경광 — 사령관: GLB 어두움/금화 안 보임 지적.
+  try{ const pmrem=new THREE.PMREMGenerator(ctx.renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; }
+  catch(e){ console.warn('[intro] env map 실패', e&&e.message); }
+  const ambHemi=new THREE.HemisphereLight(0x9fd0ec, 0x0a2236, 0.9); scene.add(ambHemi);
+
+  // ── 수면 통과 전환 "베일"(IGLOO 전환.png) : 순간 splash가 아니라 화면 전체를 부드럽게 덮었다 천천히 빠지는 안개/물보라.
+  //   산/오브젝트가 안개 사이로 흐릿하게 드러났다 사라지는 느낌 → 화면 전체 미스트 + 위쪽이 더 짙은(수면에서 내려오는) 결.
+  //   톤은 무채색 아님(IGLOO는 흰안개, 우리는 시안/네이비). z-index 6 = 수중 비네트와 같은 층.
+  const splash=document.createElement('div'); splash.id='splash';
+  splash.style.cssText='position:fixed;inset:0;z-index:6;pointer-events:none;opacity:0;will-change:opacity;mix-blend-mode:screen;'+
+    'background:'+
+      'radial-gradient(ellipse 130% 90% at 50% 30%, rgba(214,244,250,.9), rgba(150,214,228,.62) 38%, rgba(58,140,170,.28) 70%, rgba(20,72,104,0) 100%),'+
+      'linear-gradient(180deg, rgba(196,236,246,.55), rgba(120,196,214,.18) 45%, rgba(40,110,144,0) 80%)';
+  document.body.appendChild(splash);
+
+  // ★수면 윤슬(sparkle) 제거 — 텍스처 없는 THREE.Points가 정사각 "네모"로 렌더됨(사령관 지적). 입자 폐기.
+
+  // ── 배(게임 모듈 그대로) ──
+  const SHIP = {
+    caravel:{ objUrl:'/obj/caravel-ship/source/model.fbx', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true },
+    empty:  { objUrl:'/obj/empty-ship/source/TexturedShip2.fbx', length:56, helmX:-17 },
+    oseberg:{},
+  };
+  const params = new URLSearchParams(location.search);
+  const pick = params.get('ship') || 'caravel';
+  const UW   = params.get('uw') || 'caustics';   // ★확정: caustics(일렁이는 물빛 ghostty water.glsl). ray(빛줄기)는 ?uw=ray로 비교용 잔존
+  const JUMP = params.get('jump');              // 'uw' → 로드 후 수중(타륜)으로 자동 점프(샘플 비교용)
+  const PICK = params.get('pick');              // '1' → 위치 잡기 모드(OrbitControls + 좌표 복사)
+  try{ await initShip(ctx, Object.assign({ spawn:{x:0,z:0}, showSides:false }, SHIP[pick]||{})); }
+  catch(e){ console.warn('[intro] 배 로드 실패', e&&e.message); }
+  // ★오프닝 배 정박 고정 — 07-22 풍속→추진 배선 이후, 조타·닻이 없는 이 연출용 배가 바람에 계속 밀려
+  //   화면 밖(x≈1970까지 실측)으로 표류하던 것 차단. anchored=추진0(ship.js 703줄) · 파도 위 부유(heightAt)는 유지.
+  try{ if(ctx.ship){ ctx.ship.anchored=true; ctx.ship.furl=1; ctx.ship.sail=0; ctx.ship.speed=0; ctx.ship.x=0; ctx.ship.z=0; } }catch(_){}
+
+  // ── 섹션 오브젝트들: 스크롤 내릴수록 깊이마다 차례로 등장(사령관) ──
+  //   각 섹션 = 게임 시스템 1개. glb/fbx 로드 → 정규화 → 깊이 y 배치 → 카메라가 그 깊이 도달 시 opacity 페이드 등장.
+  const OBJ_Y = -46;                       // 항해(타륜) 깊이 — shaft/rings(받침 연출)가 참조
+  const OBJ_POS = new THREE.Vector3(0, OBJ_Y, 0);
+  // ★수평 동굴 진입 레이아웃(사령관: 교역 이후 = 밑으로 X, 동굴로 수평 전진).
+  //   항해·교역 = 수직 잠수(cx,cz=0). 전투·탐험·진영 = 동굴 corridor(-Z, x=-36 동굴축). y는 corridor 바닥 따라 완만 하강.
+  //   동굴 중심 (-36,-120,-210)·아치 입구 +Z 정면 → 대포=입구 앞 / 나침반=동굴 안 / 테이블=더 깊이.
+  //   snapP = 각 섹션의 스크롤 진행도(SNAP과 동기) → vis/fog는 ★진행도 기반(거리 아님).
+  //   거리 기반은 수직 섹션(카메라가 Z로 뒤빠짐)서 통 반투명·동굴 안개묻힘 버그 유발 → 진행도로 통일.
+  const SECTIONS=[
+    { key:'sailing', en:'SAILING', ko:'항해', tag:'우클릭 드래그로 타륜 회전', snapP:0.24,
+      desc:'바람과 해류를 읽어 돛을 조율하고, 배를 몰아 바다를 건넙니다. 이동과 탐험, 전투와 교역 — 이 세계의 모든 여정은 배에서 시작됩니다.',
+      y:OBJ_Y, cx:0, cz:0, objs:[{url:'/ship_helm.glb', type:'glb', scale:13}] },
+    { key:'trade', en:'TRADE', ko:'교역', tag:'사서 옮겨, 비싼 곳에 판다', snapP:0.42,
+      desc:'항구마다 물자의 시세가 다릅니다. 값이 싼 곳에서 사들여 비싼 곳에 내다 팔며, 항해로 차익을 남깁니다. 모아 온 금화는 곧 이 바다에서의 힘이 됩니다.',
+      y:-104, cx:0, cz:0, objs:[{url:'/intro/barrel-pirate-ship/barrel.glb', type:'glb', scale:17, pos:[0,-9,0], albedo:'/intro/barrel-pirate-ship/source/model/textures/lambert1_albedo.jpg'}] },
+    { key:'battle', en:'BATTLE', ko:'전투', tag:'현측을 적에게 돌려라', snapP:0.58,
+      desc:'바람을 등지고 배의 현측을 적에게 돌려 대포를 정렬합니다. 무자비한 해전에서는, 잘 맞춘 일제사격 한 번이 승부를 가릅니다.',
+      y:-119, cx:52, cz:-120, objs:[{url:'/intro/ship-cannon/cannon.glb', type:'glb', scale:20, albedo:'/intro/ship-cannon/source/extracted/lambert1_albedo.jpg'}] },   // ★대포 — 사령관 페이더 위치(전투 카메라 정렬)
+    // ★탐험 = 나침반 단독(introCompass, 중앙). 진영 = 테이블 단독(introTable, 동굴 바로 앞). 둘 분리(사령관). objs는 비움 — 독립 오브젝트가 _vis로 페이드.
+    { key:'explore', en:'EXPLORE', ko:'탐험', tag:'미지의 해역으로', snapP:0.79,
+      desc:'나침반이 가리키는 곳에는 해도에 없는 섬과 항로가 있습니다. 아직 아무도 닿지 않은 해역으로 나아가, 먼저 발견하는 자가 그곳을 차지합니다.',
+      y:-122, cx:0, cz:-175, objs:[] },
+    { key:'faction', en:'FACTION', ko:'진영', tag:'지키거나, 부수거나', snapP:1.00,
+      desc:'바다가 세계를 삼키는 동안, 살아남은 열두 부족은 마지막 봉우리를 두고 맞섭니다. 지키려는 자와 부수려는 자 사이에서, 당신의 선택이 전장의 향방을 가릅니다.',
+      y:-128, cx:0, cz:-300, objs:[] },
+  ];
+  const _gltf=new GLTFLoader(); let _fbxL=null;
+  async function loadFBX(url){ if(!_fbxL){ const m=await import('three/addons/loaders/FBXLoader.js'); _fbxL=new m.FBXLoader(); } return _fbxL.loadAsync(url); }
+  // ★FBX/GLB 임베드 조명 제거 — RealisticCave2(광산터널)에 빨간 #ff3203 라이트 강도 500~2000 6개 박혀 전체 붉게 물들임. cave도 흰 hemi+따뜻 directional 딸려옴.
+  function stripLights(model){ const ls=[]; model.traverse(o=>{ if(o.isLight) ls.push(o); }); ls.forEach(l=>{ if(l.parent) l.parent.remove(l); }); return ls.length; }
+  // ★draw call 폭발 수정: FBX가 한 메시를 머티리얼 구간(group) 수천 개로 쪼개 보내면 group당 draw call 1개라 렉. (동굴=15,215 group → 15,215 calls)
+  //   group을 materialIndex별로 정점을 재정렬해 머티리얼당 1개로 합침 → draw call = 머티리얼 수(5). 삼각형·모양·머티리얼 불변.
+  function collapseGroups(geo){
+    const groups=geo.groups; if(!groups || groups.length<=8) return 0;
+    const attrs=geo.attributes, names=Object.keys(attrs);
+    const buckets=new Map();   // materialIndex → [[start,count],...]
+    for(const g of groups){ if(!buckets.has(g.materialIndex)) buckets.set(g.materialIndex,[]); buckets.get(g.materialIndex).push([g.start,g.count]); }
+    const mats=[...buckets.keys()].sort((a,b)=>a-b);
+    const dst={}; for(const n of names){ const a=attrs[n]; dst[n]=new a.array.constructor(a.array.length); }
+    const newGroups=[]; let cursor=0;
+    for(const mi of mats){ const startV=cursor;
+      for(const [s,c] of buckets.get(mi)){
+        for(const n of names){ const a=attrs[n], it=a.itemSize;
+          dst[n].set(a.array.subarray(s*it,(s+c)*it), cursor*it); }
+        cursor+=c;
+      }
+      newGroups.push([startV, cursor-startV, mi]);
+    }
+    for(const n of names){ attrs[n].array.set(dst[n]); attrs[n].needsUpdate=true; }
+    geo.clearGroups(); for(const [s,c,mi] of newGroups) geo.addGroup(s,c,mi);
+    return groups.length;
+  }
+  async function loadOne(o){
+    let model;
+    if(o.type==='glb'){ const g=await _gltf.loadAsync(o.url); model=g.scene; }
+    else if(o.texDir){
+      const m=await import('three/addons/loaders/FBXLoader.js');
+      const ldr=new m.FBXLoader(); ldr.setResourcePath(o.texDir);
+      model=await ldr.loadAsync(o.url);
+    } else { model=await loadFBX(o.url); }
+    stripLights(model);
+    let box=new THREE.Box3().setFromObject(model), sz=box.getSize(new THREE.Vector3());
+    model.scale.setScalar((o.scale||12)/Math.max(sz.x,sz.y,sz.z,1e-3)); model.updateMatrixWorld(true);
+    box=new THREE.Box3().setFromObject(model); const c=box.getCenter(new THREE.Vector3()); model.position.sub(c);
+    if(o.gold){ const tl=new THREE.TextureLoader(), bd='/intro/gold-coins-material/textures/';
+      const gm=new THREE.MeshStandardMaterial({ map:tl.load(bd+'TexturePlane_GoldCoins01_BaseColor.png'),
+        metalnessMap:tl.load(bd+'TexturePlane_GoldCoins01_Metallic.png'), roughnessMap:tl.load(bd+'TexturePlane_GoldCoins01_Roughness.png'),
+        metalness:0.3, roughness:0.5, envMapIntensity:1.5, emissive:0x1a1305, emissiveIntensity:0.25 }); gm.map.colorSpace=THREE.SRGBColorSpace;
+      model.traverse(m=>{ if(m.isMesh) m.material=gm; });
+    } else {
+      let tex=null;
+      if(o.albedo){ tex=new THREE.TextureLoader().load(o.albedo); tex.colorSpace=THREE.SRGBColorSpace; }   // dae→glb 변환 시 빠진 원본 텍스처(나무결/금속) 복원
+      model.traverse(m=>{ if(m.isMesh && m.material){ const ms=Array.isArray(m.material)?m.material:[m.material];
+        ms.forEach(mm=>{ if(tex){ mm.map=tex; if(mm.color) mm.color.setHex(0xffffff); mm.needsUpdate=true; }
+          if(mm.emissive){ mm.emissive.setHex(0x241e12); mm.emissiveIntensity=0.20; } }); }}); }
+    if(o.pos) model.position.add(new THREE.Vector3(o.pos[0],o.pos[1],o.pos[2]));
+    return model;
+  }
+  // ★프리로드: 모든 GLB/FBX 로드 promise 수집 → 로딩 화면이 전부 끝날 때까지 대기(스크롤 중 팝인 hitch 제거, 사령관).
+  const PRELOAD=[];  window.__PRELOAD=PRELOAD;
+  for(const sec of SECTIONS){
+    const ax=sec.cx||0, az=sec.cz||0;                 // corridor 앵커(수직 섹션은 0,0)
+    const grp=new THREE.Group(); grp.position.set(ax, sec.y, az); grp.visible=false; scene.add(grp); sec.group=grp;
+    const key=new THREE.PointLight(0x9fe8ff,0,64); key.position.set(ax+8, sec.y+9, az+15); scene.add(key); sec.keyLight=key;
+    const rim=new THREE.PointLight(0x6fe0c8,0,58); rim.position.set(ax-11, sec.y-3, az-7); scene.add(rim); sec.rimLight=rim;
+    PRELOAD.push(Promise.all(sec.objs.map(loadOne)).then(ms=>{ ms.forEach(m=>grp.add(m)); sec.objMeshes=ms;
+      const _lay=({
+        sailing:[{fx:0.34,fy:0.16,to:[-15,-45],c:'name'},{fx:0.74,fy:0.53,to:[65,55],c:'depth'}],
+        trade:[{fx:0.13,fy:0.17,to:[-30,-40],c:'name'},{fx:0.72,fy:0.30,to:[40,0],c:'depth'}],
+        battle:[{fx:0.12,fy:0.20,to:[-20,-30],c:'name'},{fx:0.70,fy:0.74,to:[30,20],c:'tag'}]
+      })[sec.key]||[{fx:0.12,fy:0.16,to:[-30,-30],c:'name'},{fx:0.72,fy:0.34,to:[40,0],c:'depth'}];
+      ms.forEach(m=>{ _rippleTargets.push(m); m.userData.hud={ code:'SECTOR_0'+(SECTIONS.indexOf(sec)+1), key:sec.key, ko:sec.ko, en:sec.en, tag:sec.tag, lay:_lay }; m.traverse(o=>{ if(o.isMesh) _addRipple(o, m); }); });   // ★퍼지는효과 + HUD(객체별 구성)
+      if(ctx.renderer.initTexture) ms.forEach(m=>m.traverse(o=>{ if(o.isMesh){ const a=Array.isArray(o.material)?o.material:[o.material]; a.forEach(mt=>{ if(mt.map) ctx.renderer.initTexture(mt.map); }); } }));
+    }).catch(e=>console.warn('[intro] obj', sec.key, e&&e.message)));
+  }
+  let helm = SECTIONS[0].group;            // 항해 타륜 = 우클릭 회전 대상
+  let introCave = null;                    // 동굴 입구 FBX — lazy load (p>0.40 첫 진입 시)
+  let caveLoadStarted = false;             // lazy load 플래그
+  let introCaveGlow = null;                // 동굴 glow 빌보드 — FBX와 독립, 즉시 생성
+  let introCaveLight = null;               // 동굴 glow 포인트 라이트 — 즉시 생성
+  let introCaveShaft = null;               // 동굴 입구 "빛샘" 볼류메트릭 광선 — 즉시 생성, 탐험 컷서 최대
+  let _caveProx = 0;                        // 동굴 근접도(0통~1진영) — god rays exposure에 사용(프레임루프→렌더오버라이드)
+  let startCaveLoad = null;                // 동굴 입구 FBX lazy load 함수 — 블록 안에서 할당, 프레임루프(블록 밖)서 호출(스코프 버그 수정)
+  let introFloor = null;                    // 해저 흙바닥(scene 직접·독립) — 통~동굴까지 연속. 전투서도 안 사라짐.
+  let introTunnel = null;                   // 동굴 안 터널 — 사용 안 함(빨간 동굴이 직접 발광). 로드는 두되 숨김.
+  let introCompass = null;                  // 나침반(탐험 전용, 단독) — 동굴 앞 코리도 중앙.
+  let introTable = null;                    // 테이블(진영 전용, 단독) — 동굴 바로 앞.
+
+  // ── [1단계] 교역 섹션: 심해 바닥(흙/암반) + 통 묻힘 + 뒤쪽 동굴 입구 (사령관: 타륜은 그대로, 통부터 묻힘) ──
+  {
+    const tradeSec = SECTIONS.find(s=>s.key==='trade');
+    // 바닥 — 굴곡진 흙/암반 해저. ★독립(scene 직접, 교역 그룹 종속 X) = 전투(동굴입구)까지 안 사라짐(사령관: 대포 공중에 뜸).
+    //   동굴 쪽(-Z)으로 완만 경사 하강 = corridor 따라 깊어짐(대포·통이 해저 위에 앉음).
+    const fg=new THREE.PlaneGeometry(620, 1500, 44, 100).rotateX(-Math.PI/2);   // ★크게(사령관: 가장자리 뚫려보임) — 좌우 스윙·코리도서 흙 끝 안 보이게
+    const pa=fg.attributes.position;
+    for(let i=0;i<pa.count;i++){ const x=pa.getX(i), z=pa.getZ(i);
+      const bump = Math.sin(x*0.09)*1.5 + Math.cos(z*0.08)*1.2 + Math.sin((x+z)*0.05)*0.9;
+      const slope = z*0.055;   // ★경사 완만(0.085→0.055): 먼 흙이 높게 깔려 물 수평선 가려짐(사령관: 둔덕 너머 바다 보임). 동굴 쪽 하강 유지.
+      pa.setY(i, bump + slope); }
+    fg.computeVertexNormals();
+    const floor=new THREE.Mesh(fg, new THREE.MeshStandardMaterial({ color:0x3d3326, roughness:0.97, metalness:0.0, side:THREE.DoubleSide }));   // ★DoubleSide: 낮은 카메라가 흙 둔덕 능선 넘을 때 뒷면 컬링으로 뚫려 바다 보이던 것 채움(사령관)
+    floor.position.set(0, -121, -95); scene.add(floor); tradeSec.floor=floor; window.__tradeFloor=floor; introFloor=floor;   // 독립 해저. 통부근 ~-113(기존과 동일·둔덕/통 묻힘 유지)·동굴쪽 하강
+    // 통 밑동 흙 둔덕(흙이 통을 감싸 올라옴) + 접지 그림자(통 아래 어둠) — 파묻힘 느낌(사령관: 접지·둔덕 없어 떠 보임)
+    const mgeo=new THREE.SphereGeometry(15, 40, 20, 0, Math.PI*2, 0, Math.PI*0.5);
+    mgeo.scale(1, 0.42, 1);   // 반구를 눌러 부드러운 흙더미(사령관: 둔덕 어색→매끄럽게)
+    const mound=new THREE.Mesh(mgeo, new THREE.MeshStandardMaterial({ color:0x2e2519, roughness:1.0, metalness:0.0 }));
+    mound.position.y=-13; tradeSec.group.add(mound);
+    // ★접지그림자 원 제거(사령관 bug: 낮은 각도서 짤린 그림자 보이다 스크롤하면 사라짐). 흙 둔덕만 유지.
+    // 동굴 입구 lazy load — p>0.40(교역 진입) 시 1회만 실행. 항해→교역 구간 메인스레드 블록 방지.
+    startCaveLoad = () => {
+      return import('three/addons/loaders/FBXLoader.js').then(m=>{
+        const ldr=new m.FBXLoader();
+        return ldr.loadAsync('/intro/dark-side-cave/source/lp-3-007.fbx');
+      }).then(cave=>{
+        stripLights(cave);
+        let bx=new THREE.Box3().setFromObject(cave), sz=bx.getSize(new THREE.Vector3());
+        cave.scale.setScalar(150/Math.max(sz.x,sz.y,sz.z)); cave.updateMatrixWorld(true);   // 멀어진 만큼 키움(원경 가독)
+        bx=new THREE.Box3().setFromObject(cave); const cc=bx.getCenter(new THREE.Vector3()); cave.position.sub(cc);
+        // 재질 단순화: diffuse + 이미시브 색상만 (노말맵·이미시브맵 제거 → 셰이더 컴파일 10배 빠름)
+        const bd='/intro/dark-side-cave/textures/', tl=new THREE.TextureLoader();
+        // ★샘플(voyage/동굴모습.png) = dark-side 동굴 입구서 강렬한 빨간 빛. 에셋 원본 _Emissive 텍스처 + 빨강 emissive 복원.
+        // 샘플 매칭: 바위(top/bottom)는 어둡게, 입구 내부(interior)에만 빨간빛 집중. 입구 코어는 glow 구가 담당.
+        const CMAP={
+          // ★바위(top/bottom)는 빨강 거의 제거(사령관: 빨강이 바위에 묻음) — 입구(interior)에만 빨강 집중. emissiveMap도 제거해 번짐 차단.
+          'interior':{ d:'lp-2-00lp6_interior_Diffuse.jpeg', ei:7.5, col:0x0b1a12 },   // ★emissiveMap(빨간 텍스처) 제거 + diffuse(붉은 바위)를 어둡게 죽임(col) + 초록 emissive 강화(ei7.5, 원경서도 보이게) → 순수 밝은 초록만.
+          'bottom_1':{ d:'lp-2-00lp6_bottom_1_Diffuse.jpeg', ei:0.04 },
+          'bottom_2':{ d:'lp-2-00lp6_bottom_2_Diffuse.jpeg', ei:0.04 },
+          'top_1':   { d:'lp-2-00lp6_top_1_Diffuse.jpeg',    ei:0.03 },
+          'top_2':   { d:'lp-2-00lp6_top_2_Diffuse.jpeg',    ei:0.03 },
+        };
+        const matCache={};
+        function buildMat(name){
+          if(matCache[name]) return matCache[name];
+          const def=CMAP[name]||CMAP['top_1'];
+          const dt=tl.load(bd+def.d); dt.colorSpace=THREE.SRGBColorSpace;
+          const opt={
+            map:dt, roughness:0.9, metalness:0.0,
+            emissive:new THREE.Color(0x46e88a), emissiveIntensity:def.ei,   // ★차원문 게이트색(gate.js GLOW 0x46e88a) 통일 — 구 빨강 0xff1808
+            side:THREE.FrontSide,
+          };
+          if(def.e){ const et=tl.load(bd+def.e); et.colorSpace=THREE.SRGBColorSpace; opt.emissiveMap=et; }
+          if(def.col!=null) opt.color=new THREE.Color(def.col);   // ★diffuse 틴트(붉은 바위 죽이기)
+          const m=new THREE.MeshStandardMaterial(opt);
+          matCache[name]=m; return m;
+        }
+        cave.traverse(o=>{ if(!o.isMesh) return;
+          const arr=Array.isArray(o.material)?o.material:[o.material];
+          const newArr=arr.map(m=>buildMat(m?.name||''));
+          o.material=Array.isArray(o.material)?newArr:newArr[0];
+          const collapsed=collapseGroups(o.geometry);   // ★15,215 group → 5 (draw call 폭발 수정)
+          if(collapsed) console.log('[intro] 동굴 group 병합:', collapsed, '→', o.geometry.groups.length, 'draw call');
+        });
+        cave.position.set(0, -142, -640); cave.rotation.set(0, 0, 0); cave.updateMatrixWorld(true);   // ★더 뒤로 + 살짝 내려 introFloor(연속 흙바닥)에 직접 접지(별도 패치 단차 제거).
+        // ★입구만 빛나게(사령관: 동그라미 구 ❌, 입구 구멍 모양 ⭕): 멀티머티리얼 1메시를 머티리얼별 메시로 분리 → interior(빨간 발광)만 블룸.
+        //   바위(top/bottom)는 블룸 제외 = 어둡게, interior(입구 안쪽 면)만 블룸 = 빛이 입구 모양 그대로 토해져 나옴.
+        const caveGrp=new THREE.Group();
+        cave.traverse(o=>{ if(!o.isMesh) return;
+          o.updateWorldMatrix(true,false);
+          const geo=o.geometry, mats=Array.isArray(o.material)?o.material:[o.material];
+          const grps=(geo.groups&&geo.groups.length)?geo.groups:[{start:0,count:geo.attributes.position.count,materialIndex:0}];
+          for(const g of grps){
+            const sub=new THREE.BufferGeometry();
+            for(const nm in geo.attributes){ const a=geo.attributes[nm], it=a.itemSize;
+              sub.setAttribute(nm, new THREE.BufferAttribute(a.array.slice(g.start*it,(g.start+g.count)*it), it)); }
+            const mat=mats[g.materialIndex]||mats[0];
+            const sm=new THREE.Mesh(sub, mat); sm.applyMatrix4(o.matrixWorld);
+            if(mat && mat.emissiveIntensity>1.5){ sm.layers.enable(1); sm.userData.caveInterior=true; }   // interior(ei2.6)만 블룸=입구 발광
+            caveGrp.add(sm);
+          }
+        });
+        scene.add(caveGrp); introCave=caveGrp; window.__cave=caveGrp;
+        // 메시 캐시 + GPU 텍스처 미리 업로드
+        introCave._meshes=[]; caveGrp.traverse(o=>{ if(o.isMesh) introCave._meshes.push(o); });
+        if(ctx.renderer.initTexture) introCave._meshes.forEach(o=>{
+          const ms=Array.isArray(o.material)?o.material:[o.material];
+          ms.forEach(m=>{ if(m.map) ctx.renderer.initTexture(m.map); if(m.emissiveMap) ctx.renderer.initTexture(m.emissiveMap); });
+        });
+        // 셰이더 컴파일 — cave 재질 준비 직후 즉시 실행
+        try{ ctx.renderer.compile(scene, ctx.camera||ctx.cam); }catch(e){}
+      }).catch(e=>console.warn('[intro] 동굴입구', e&&e.message));
+    };
+    // ★프리로드: 동굴 FBX(가장 무거운 hitch)도 시작 전에 미리 로드(사령관). lazy 트리거는 caveLoadStarted로 중복 방지.
+    caveLoadStarted = true; PRELOAD.push(startCaveLoad());
+
+    // ── 동굴 안 터널 (low_poly_mine_cave.glb, 사령관 교체) — 아치 안쪽에 배치, 나침반/테이블이 터널 안에. ──
+    const TUN = window.__TUN = { scale:1.0, x:-5, y:-125, z:-225, rotY:Math.PI };
+    PRELOAD.push(_gltf.loadAsync('/intro/low_poly_mine_cave.glb').then(gltf=>{
+      const tun = gltf.scene;
+      stripLights(tun);
+      const wrap=new THREE.Group();
+      let bx=new THREE.Box3().setFromObject(tun), sz=bx.getSize(new THREE.Vector3());
+      tun.scale.setScalar(TUN.scale * 80/Math.max(sz.x,sz.y,sz.z)); wrap.add(tun); tun.updateMatrixWorld(true);
+      const _tunMat=new THREE.MeshStandardMaterial({ color:0x2e2820, roughness:0.96, metalness:0.02, side:THREE.DoubleSide });
+      tun.traverse(o=>{ if(o.isMesh) o.material=Array.isArray(o.material)?o.material.map(()=>_tunMat):_tunMat; });
+      let b=new THREE.Box3().setFromObject(tun); let c=b.getCenter(new THREE.Vector3()); tun.position.sub(c);
+      wrap.position.set(TUN.x, TUN.y, TUN.z); wrap.rotation.set(0, TUN.rotY, 0);
+      scene.add(wrap); introTunnel=wrap; window.__tunnel=wrap;
+      const tunLight=new THREE.PointLight(0xbfd8e8, 0, 280); tunLight.position.set(TUN.x, TUN.y+8, TUN.z+60); scene.add(tunLight); wrap.userData.light=tunLight;
+      // 메시 캐시 + GPU 미리 업로드
+      introTunnel._meshes=[]; tun.traverse(o=>{ if(o.isMesh) introTunnel._meshes.push(o); });
+      if(ctx.renderer.initTexture) introTunnel._meshes.forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ if(m.map) ctx.renderer.initTexture(m.map); }); });
+      window.__tunSet=(o)=>{ Object.assign(TUN,o);
+        tun.scale.setScalar(TUN.scale * 80/Math.max(sz.x,sz.y,sz.z)); tun.position.set(0,0,0); tun.updateMatrixWorld(true);
+        let bb=new THREE.Box3().setFromObject(tun); let cc=bb.getCenter(new THREE.Vector3()); tun.position.sub(cc);
+        wrap.position.set(TUN.x,TUN.y,TUN.z); wrap.rotation.set(0,TUN.rotY,0);
+        tunLight.position.set(TUN.x,TUN.y+8,TUN.z+60); };
+    }).catch(e=>console.warn('[intro] 동굴터널', e&&e.message)));
+
+    // ── 탐험 = 나침반 단독(동굴 앞 코리도 중앙) / 진영 = 테이블 단독(동굴 바로 앞). 사령관: 둘 분리. ──
+    // 나침반(탐험 전용)
+    PRELOAD.push(loadOne({ url:'/intro/fantasy-compass/source/extracted/Sketchfab/Sketchfab_showcase.fbx', type:'fbx', scale:11, albedo:'/intro/fantasy-compass/source/extracted/Sketchfab/Textures/V1/Compass_Base_color_V1.png' })   // ★크기 줄임(사령관: 너무 큼, 테이블 기준)
+    .then(compass=>{
+      // ★단색 금색 덮기 제거(사령관: 원본 glb가 온통 금색 아님). loadOne 원본 텍스처 유지 + 유리덮개 투명 → 나침반 면(장미) 보이게 + 흰 반사 줄임.
+      compass.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
+        const isGlass=/Glass/i.test(o.name||'');
+        ms.forEach(m=>{ m.emissive=new THREE.Color(0x140e04); m.emissiveIntensity=0.14;
+          if(m.specular) m.specular.setHex(0x1c1c1c); if('shininess' in m) m.shininess=24;   // 흰 specular 블로우아웃 억제
+          m.userData.baseOpacity = isGlass ? 0.08 : 1.0;   // ★유리덮개 거의 투명 → 가려진 나침반 면 드러남
+          m.needsUpdate=true; }); }});
+      const grp=new THREE.Group();
+      let cb=new THREE.Box3().setFromObject(compass); compass.position.y -= cb.min.y;   // 바닥 접지
+      grp.add(compass);
+      // ★접지그림자 원 제거(사령관: 통처럼 짤린 그림자 — 흙바닥(introFloor)에 직접 앉히면 그림자 불필요).
+      grp.position.set(-134, -115, -72); scene.add(grp); introCompass=grp; window.__compass=grp; grp.userData.compass=compass;   // ★나침반 — 사령관 페이더 위치(탐험 카메라 정렬)
+      const cli=new THREE.PointLight(0xdaf0fb, 0, 120); cli.position.set(-134, -107, -60); scene.add(cli); grp.userData.light=cli;
+      introCompass._meshes=[]; grp.traverse(o=>{ if(o.isMesh) introCompass._meshes.push(o); });
+      if(ctx.renderer.initTexture) introCompass._meshes.forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ if(m.map) ctx.renderer.initTexture(m.map); }); });
+      _rippleTargets.push(grp); grp.userData.hud={ code:'SECTOR_04', key:'explore', ko:'탐험', en:'EXPLORE', tag:(SECTIONS.find(s=>s.key==='explore')||{}).tag||'', lay:[{fx:0.13,fy:0.15,to:[-30,-30],c:'name'},{fx:0.72,fy:0.38,to:[40,0],c:'depth'}] }; introCompass._meshes.forEach(o=>_addRipple(o, grp));   // ★퍼지는효과: 나침반 호버 그물 + HUD
+    }).catch(e=>console.warn('[intro] 나침반', e&&e.message)));
+    // 테이블(진영 전용)
+    PRELOAD.push(loadOne({ url:'/intro/old-pirate-table/source/Table_fbx.fbx', type:'fbx', scale:18 })
+    .then(table=>{
+      const tbd='/intro/old-pirate-table/textures/', ttl=new THREE.TextureLoader();
+      const tblMC={};
+      function mkTblMat(mname){
+        const n=['lambert1','lambert2','lambert3'].includes(mname)?mname:'lambert1';
+        if(tblMC[n]) return tblMC[n];
+        const d=ttl.load(tbd+n+'_Base_Color.png'); d.colorSpace=THREE.SRGBColorSpace;
+        const met=ttl.load(tbd+n+'_Metallic.png'), ro=ttl.load(tbd+n+'_Roughness.png'), nm=ttl.load(tbd+n+'_Normal_OpenGL.png');
+        return tblMC[n]=new THREE.MeshStandardMaterial({map:d,metalnessMap:met,roughnessMap:ro,normalMap:nm,metalness:0.6,roughness:1.0,emissive:0x1a1505,emissiveIntensity:0.15,side:THREE.DoubleSide});   // ★DoubleSide=뚫려보임 수정, metalness↓=빈 금속 구멍 방지
+      }
+      table.traverse(o=>{ if(!o.isMesh) return;
+        const arr=Array.isArray(o.material)?o.material:[o.material];
+        o.material=Array.isArray(o.material)?arr.map(m=>mkTblMat(m?.name||'')):mkTblMat(arr[0]?.name||'');
+      });
+      const grp=new THREE.Group();
+      let tb=new THREE.Box3().setFromObject(table); table.position.y -= tb.min.y;   // 바닥 접지
+      grp.add(table);
+      // ★테이블 밑동 살짝 흙으로 덮음 (사령관: 테이블도 살짝). 받침 둘레 낮은 흙더미만 — 평면 그림자원은 낮은 카메라각서 길게 늘어져 제거.
+      { const tmg=new THREE.SphereGeometry(12,40,18,0,Math.PI*2,0,Math.PI*0.5); tmg.scale(1,0.16,1);
+        const tpa=tmg.attributes.position; for(let i=0;i<tpa.count;i++){ const x=tpa.getX(i),z=tpa.getZ(i),y=tpa.getY(i); if(y>0.1) tpa.setY(i, y+Math.sin(x*0.8)*0.4+Math.cos(z*0.7)*0.4); } tmg.computeVertexNormals();
+        const tmd=new THREE.Mesh(tmg, new THREE.MeshStandardMaterial({color:0x342a1f,roughness:1.0,metalness:0.0}));
+        tmd.position.y=-0.5; grp.add(tmd); }
+      grp.position.set(53, -135.5, -354); scene.add(grp); introTable=grp; window.__table=grp; grp.userData.tableObj=table;   // ★테이블 — 사령관 페이더 위치(진영 카메라 정렬)
+      const tli=new THREE.PointLight(0xffd9c0, 0, 170); tli.position.set(53, -123, -342); scene.add(tli); grp.userData.light=tli;
+      introTable._meshes=[]; grp.traverse(o=>{ if(o.isMesh) introTable._meshes.push(o); });
+      if(ctx.renderer.initTexture) introTable._meshes.forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ if(m.map) ctx.renderer.initTexture(m.map); if(m.normalMap) ctx.renderer.initTexture(m.normalMap); }); });
+      _rippleTargets.push(grp); grp.userData.hud={ code:'SECTOR_05', key:'faction', ko:'진영', en:'FACTION', tag:(SECTIONS.find(s=>s.key==='faction')||{}).tag||'', lay:[{fx:0.12,fy:0.18,to:[-30,-30],c:'name'},{fx:0.72,fy:0.76,to:[30,20],c:'tag'}] }; introTable._meshes.forEach(o=>_addRipple(o, grp));   // ★퍼지는효과: 진영 테이블 호버 그물 + HUD
+    }).catch(e=>console.warn('[intro] 테이블', e&&e.message)));
+
+    // ── 동굴 입구 glow + 라이트 — FBX와 독립, 즉시 생성. 교역(p:0.42)부터 페이드 인. ──
+    const _cg=new THREE.Mesh(new THREE.SphereGeometry(15,12,10),
+      new THREE.MeshBasicMaterial({color:0x4dffa0,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}));
+    _cg.position.set(0,-140,-622); scene.add(_cg); introCaveGlow=_cg;   // 입구 안쪽 초록 fill(차원문 게이트색·은은). 동굴 따라 내림.
+    const _cl=new THREE.PointLight(0x46e88a,0,180); _cl.position.set(0,-138,-612); scene.add(_cl); introCaveLight=_cl;   // ★차원문 게이트색(gate.js 0x46e88a). 범위 180: 원경서도 초록 fill
+    // ★동굴은 확대된 introFloor(연속 흙바닥) 위에 직접 접지 — 별도 흙패치 제거(단차 경계가 전환 중 깜빡이던 원인, 사령관).
+
+    // ── 동굴 입구 "빛샘" 볼류메트릭 광선(사령관: 입구에서 빛이 새어나오는 효과) ──
+    //   입구(z≈-208)에 좁은 apex, 카메라쪽(+Z)으로 벌어지는 따뜻한 원뿔. additive·실루엣 소프트·미세 깜빡임.
+    //   ★빛샘은 동굴 모델과 무관 — 셰이더 지오메트리(godray 패턴 재활용). depthTest로 동굴/터널이 뒤를 가림.
+    {
+      const h=80, rNarrow=3.5, rWide=26;
+      const sg=new THREE.CylinderGeometry(rNarrow, rWide, h, 32, 1, true).rotateX(-Math.PI/2);  // top(narrow)→ -Z(입구)
+      const sm=new THREE.ShaderMaterial({
+        transparent:true, depthWrite:false, depthTest:true, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, fog:false,
+        uniforms:{ uOpacity:{value:0}, uTime:{value:0} },
+        vertexShader:'varying float vY;varying vec3 vN;void main(){vY=uv.y;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        // 입구(vY=1)서 밝고 카메라쪽(vY=0)으로 사라짐 + 실루엣서 더 밝게(볼류메트릭 느낌) + 미세 깜빡임
+        fragmentShader:'varying float vY;varying vec3 vN;uniform float uOpacity,uTime;void main(){'+
+          'float src=pow(clamp(vY,0.0,1.0),1.25);'+
+          'float edge=pow(1.0-abs(dot(normalize(vN),vec3(0.0,0.0,1.0))),1.5);'+
+          'float flick=0.86+0.14*sin(uTime*1.9+vY*7.0);'+
+          'float a=src*(0.10+0.48*edge)*uOpacity*flick;'+
+          'gl_FragColor=vec4(0.36,1.0,0.62,a);}'   // ★차원문 게이트색(초록) 빛샘 — 구 빨강 vec4(1.0,0.16,0.06)
+      });
+      const _shaft=new THREE.Mesh(sg, sm);
+      _shaft.position.set(0, -132, -622 + h/2);   // narrow end at 입구(z=-622), 카메라쪽(+Z)으로 벌어짐
+      _shaft.renderOrder=3; scene.add(_shaft); introCaveShaft=_shaft; _shaft.layers.enable(1);   // 빛샘도 블룸
+    }
+  }
+
+  // ── 수중 표현(미니멀·절제, 입자 없이 "수면 안"이 살아있게) : god ray/반짝이 덕지덕지 금지. ──
+  //    ① 단일 광추(soft cone) — 주인공(타륜)을 떠받치는 빛.
+  //    ② 동심원 링/파동 — 받침 아래(IGLOO 랜딩4안에들어감).
+  //    ③ caustics 빛결 — 수면에서 굴절된 빛 그물이 깊이에 따라 흐르는 풀스크린 셰이더(★입자 대체. 은은하게).
+  //    ④ 깊이 그라디언트 강화 — 화면 하단으로 갈수록 어두운 navy(수심감).
+  let shaft=null;
+  // ① 단일 광추: 위에서 타륜으로 떨어지는 부드러운 원뿔. additive·약발광. 1개뿐(과하면 끔).
+  {
+    const h=46, rTop=2.2, rBot=15;
+    const geo=new THREE.CylinderGeometry(rTop, rBot, h, 28, 1, true);
+    const mat=new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending,
+      uniforms:{ uOpacity:{value:0} },
+      vertexShader:'varying float vY;varying vec3 vN;void main(){vY=uv.y;vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.0);gl_Position=projectionMatrix*mv;}',
+      // 위(밝음)→아래(사라짐) 페이드 + 가장자리 부드럽게(테두리만 보이는 실린더 티 제거)
+      fragmentShader:'varying float vY;varying vec3 vN;uniform float uOpacity;void main(){float top=smoothstep(0.0,0.35,vY);float edge=pow(1.0-abs(dot(normalize(vN),vec3(0.0,0.0,1.0))),1.4);float a=top*(0.10+0.22*edge)*uOpacity;gl_FragColor=vec4(0.62,0.90,1.0,a);}'
+    });
+    shaft=new THREE.Mesh(geo, mat); shaft.position.set(0, OBJ_Y + h*0.5 - 4, 0); scene.add(shaft);
+  }
+  // ★플랑크톤 더스트(THREE.Points) 제거 — 정사각 "네모"로 보임 + 평평한 수중을 가린 임시방편(사령관 지적). 입자 폐기.
+  //   대신 ③caustics 빛결 + ④깊이 그라디언트로 "수중 자체"를 살린다(아래 풀스크린 오버레이).
+
+  // ── 수중 샘플(공개 셰이더 그대로 이식) : 풀스크린 plane에 ShaderToy 셰이더를 입힘. additive로 수중(water.js 안개) 위에 빛만 더함. ──
+  //   ray      = 0xhckr/ghostty-shaders/underwater.glsl (ShaderToy lljGDt, Alex Sherwin) — 수중 sun ray(빛줄기)+깊이 감쇠+청록 틴트
+  //   caustics = 0xhckr/ghostty-shaders/water.glsl       (ShaderToy water)                — 반복 삼각함수 caustics 빛 패턴
+  //   ※ iChannel0(터미널 텍스트) 의존부만 제거하고 절차적 빛 부분 그대로. iTime→uTime / iResolution→uRes / mainImage→main.
+  let uwScreen=null;
+  {
+    const RAY_FRAG=`precision highp float; uniform float uOpacity,uTime; uniform vec2 uRes;
+      float hash21(vec2 p){p=fract(p*vec2(233.34,851.73));p+=dot(p,p+23.45);return fract(p.x*p.y);}
+      float rayStrength(vec2 raySource,vec2 rayRefDirection,vec2 coord,float seedA,float seedB,float speed){
+        vec2 sourceToCoord=coord-raySource; float cosAngle=dot(normalize(sourceToCoord),rayRefDirection);
+        float dither=hash21(coord)*0.015-0.0075;
+        float ray=clamp((0.45+0.15*sin(cosAngle*seedA+uTime*speed))+(0.3+0.2*cos(-cosAngle*seedB+uTime*speed))+dither,0.0,1.0);
+        float distFade=smoothstep(0.0,uRes.x,uRes.x-length(sourceToCoord)); return ray*mix(0.5,1.0,distFade);}
+      void main(){
+        vec2 fragCoord=gl_FragCoord.xy; vec2 coord=vec2(fragCoord.x,uRes.y-fragCoord.y);
+        vec2 rayPos1=vec2(uRes.x*0.7,uRes.y*1.1); vec2 rayRefDir1=normalize(vec2(1.0,0.116));
+        vec2 rayPos2=vec2(uRes.x*0.8,uRes.y*1.2); vec2 rayRefDir2=normalize(vec2(1.0,-0.241));
+        vec4 rays1=vec4(1.0)*rayStrength(rayPos1,rayRefDir1,coord,36.2214,21.11349,1.1);
+        vec4 rays2=vec4(1.0)*rayStrength(rayPos2,rayRefDir2,coord,22.39910,18.0234,0.9);
+        vec4 col=rays1*0.5+rays2*0.4;
+        float brightness=1.0-(coord.y/uRes.y);
+        col.r*=0.05+(brightness*0.8); col.g*=0.15+(brightness*0.6); col.b*=0.3+(brightness*0.5);
+        gl_FragColor=vec4(col.rgb*uOpacity,1.0);
+      }`;
+    const CAUSTICS_FRAG=`precision highp float; uniform float uOpacity,uTime; uniform vec2 uRes;
+      #define TAU 6.28318530718
+      void main(){
+        vec2 fragCoord=gl_FragCoord.xy; vec3 water_color=vec3(1.0)*0.5;
+        float time=uTime*0.5+23.0; vec2 uv=fragCoord/uRes;
+        vec2 p=mod(uv*TAU,TAU)-250.0; vec2 i=vec2(p); float c=1.0; float inten=0.005;
+        for(int n=0;n<6;n++){ float t=time*(1.0-(3.5/float(n+1)));
+          i=p+vec2(cos(t-i.x)+sin(t+i.y),sin(t-i.y)+cos(t+i.x));
+          c+=1.0/length(vec2(p.x/(sin(i.x+t)/inten),p.y/(cos(i.y+t)/inten))); }
+        c/=6.0; c=1.17-pow(c,1.4);
+        vec3 color=vec3(pow(abs(c),15.0));
+        color=clamp((color+water_color)*1.2,0.0,1.0);
+        gl_FragColor=vec4(color*vec3(0.34,0.60,0.82)*uOpacity*0.24,1.0);  // 전체(오브젝트 포함) 비치니 은은하게(0.24)
+      }`;
+    const geo=new THREE.PlaneGeometry(2,2);
+    const mat=new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending,
+      uniforms:{ uOpacity:{value:0}, uTime:{value:0}, uRes:{value:new THREE.Vector2(innerWidth,innerHeight)} },
+      vertexShader:'void main(){gl_Position=vec4(position.xy,0.999,1.0);}',
+      fragmentShader: (UW==='caustics') ? CAUSTICS_FRAG : RAY_FRAG
+    });
+    uwScreen=new THREE.Mesh(geo, mat);
+    uwScreen.frustumCulled=false; uwScreen.renderOrder=4;   // 통·바닥·오브젝트 위에도 caustics 비침 → 화면 앞뒤 같은 바다(사령관)
+    scene.add(uwScreen);
+    addEventListener('resize', ()=>{ mat.uniforms.uRes.value.set(innerWidth,innerHeight); });
+  }
+
+  // ③ 타륜 받침 아래 "은은한 동심원 링/파동"(IGLOO 랜딩4안에들어감 = 바닥 동심원). ★딱 1요소. 과하면 uOpacity 0으로 끔.
+  //   수평 디스크에 동심원 사인 링 + 바깥으로 천천히 퍼지는 파동. 시안 약발광·저투명.
+  let rings=null;
+  {
+    const geo=new THREE.RingGeometry(2.0, 26, 96, 1).rotateX(-Math.PI/2);
+    const mat=new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending,
+      uniforms:{ uOpacity:{value:0}, uTime:{value:0} },
+      vertexShader:'varying vec3 vL;void main(){vL=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+      // 동심원 링(거리 기반 사인) + 바깥으로 퍼지는 파동 + 가장자리/중심 페이드
+      fragmentShader:'precision mediump float;varying vec3 vL;uniform float uOpacity,uTime;'+
+        'void main(){float r=length(vL.xz);'+
+        'float ring=0.5+0.5*sin(r*0.9 - uTime*1.3);ring=pow(ring,3.0);'+        // 또렷한 동심원
+        'float fade=smoothstep(26.0,18.0,r)*smoothstep(2.0,6.0,r);'+            // 안/밖 부드럽게
+        'float a=ring*fade*uOpacity*0.55;'+
+        'gl_FragColor=vec4(0.42,0.86,0.96,a);}'
+    });
+    rings=new THREE.Mesh(geo, mat); rings.position.set(0, OBJ_Y-7.5, 0); scene.add(rings);
+  }
+
+  // ── (옵션) god ray 빛기둥 — UW='godray'. 수면에서 내려오는 빛 부채살을 화면이 아닌 "실제 3D 공간"에 세움.
+  //    리서치(three-good-godrays) 권장 = 수중 공간감의 핵심. 단 절제(3가닥, 덕지덕지 X). 카메라 정면(z) 평면 + additive. ──
+  let godrays=null;
+  if(UW==='godray'){
+    godrays=new THREE.Group();
+    const mats=[];
+    const mkRay=(x,z,rotZ,w,op)=>{
+      const g=new THREE.PlaneGeometry(w, 76);
+      const m=new THREE.ShaderMaterial({ transparent:true, depthWrite:false, side:THREE.DoubleSide, blending:THREE.AdditiveBlending,
+        uniforms:{ uOpacity:{value:0}, uBase:{value:op} },
+        vertexShader:'varying float vy;void main(){vy=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        // 위(수면쪽)서 밝고 아래로 사라짐 + 좌우 가장자리 부드럽게(빛 부채살 결)
+        fragmentShader:'varying float vy;uniform float uOpacity,uBase;void main(){float top=smoothstep(0.0,0.55,vy);float a=top*uBase*uOpacity;gl_FragColor=vec4(0.55,0.88,1.0,a);}' });
+      const mesh=new THREE.Mesh(g,m); mesh.position.set(x, OBJ_Y+18, z); mesh.rotation.z=rotZ; mesh.renderOrder=-1;
+      godrays.add(mesh); mats.push(m); return m;
+    };
+    mkRay(-9,-3, 0.13, 7, 0.10); mkRay(4, 2, -0.09, 11, 0.07); mkRay(12,-7, 0.05, 6, 0.08);
+    godrays.userData.mats=mats; scene.add(godrays);
+  }
+
+  // ── 타륜 우클릭 드래그 자유회전(yaw+pitch, 관성 추종). 시점은 스크롤 주도, 마우스는 타륜 전용 ──
+  let helmRotY=0, helmRotX=0, tgtY=0, tgtX=0, dragging=false, lastX=0, lastY=0;
+  addEventListener('contextmenu', e=>e.preventDefault());
+  addEventListener('pointerdown', e=>{ if(e.button===2){ dragging=true; lastX=e.clientX; lastY=e.clientY; } });
+  addEventListener('pointerup',   e=>{ if(e.button===2) dragging=false; });
+  addEventListener('pointermove', e=>{ if(dragging){ tgtY += (e.clientX-lastX)*0.011; tgtX += (e.clientY-lastY)*0.011;
+    tgtX=Math.max(-1.2,Math.min(1.2,tgtX)); lastX=e.clientX; lastY=e.clientY; } });
+  // ★마우스 패럴랙스(lusion/igloo식): 시점 미세 이동 + 텍스트 미세 이동
+  const _mp={x:0,y:0,tx:0,ty:0};
+  // ★퍼지는효과(ref/퍼지는효과.png): 마우스 raycast가 히어로 GLB 표면에 닿으면 그 지점에서 삼각 와이어망이 링으로 확산 발광
+  const _ptr=new THREE.Vector2(-2,-2);
+  const _ray=new THREE.Raycaster();
+  // 공유 uniform(모든 dissolve 머티리얼 + 와이어망이 같은 객체 참조 → 프레임당 1회 갱신)
+  const _rip={ uHit:{value:new THREE.Vector3()}, uFront:{value:0}, uEnv:{value:0}, uTime:{value:0}, uColor:{value:new THREE.Color(0xf2fbff)} };
+  const _rippleTargets=[];           // raycast 대상 원본 메시
+  const _ripple={ hit:new THREE.Vector3(), phase:0, env:0, maxR:13, playing:false, wasHover:false, model:null, anchors:null };
+  // HUD 앵커: 객체 표면의 실제 정점을 샘플 → 화면 극단(상/좌/하/우/좌하) 5점 선택. {mesh,lp}로 저장해 회전·변환에 붙어 따라감.
+  function _sampleAnchors(model){
+    const cand=[], wv=new THREE.Vector3(); model.updateMatrixWorld(true);
+    model.traverse(o=>{ if(o.isMesh && o.geometry && o.geometry.attributes && o.geometry.attributes.position){
+      const pos=o.geometry.attributes.position, step=Math.max(1,Math.floor(pos.count/30));
+      for(let i=0;i<pos.count;i+=step){ const lp=new THREE.Vector3().fromBufferAttribute(pos,i);
+        wv.copy(lp).applyMatrix4(o.matrixWorld); cand.push({mesh:o, lp, wx:wv.x, wy:wv.y}); } } });
+    if(!cand.length) return null;
+    const w2=c=>({mesh:c.mesh, lp:c.lp});
+    // ★레퍼: 라벨에서 상단 클러스터로 부채꼴 → 상단 밴드(월드 y 상위 45%)서 x로 퍼진 4점 + 우측 1점 + 하단 1점
+    const byY=[...cand].sort((a,b)=>b.wy-a.wy);
+    const band=byY.slice(0, Math.max(4, Math.floor(byY.length*0.45)));
+    band.sort((a,b)=>a.wx-b.wx);
+    const up=[0,0.34,0.67,1].map(f=>w2(band[Math.min(band.length-1, Math.round(f*(band.length-1)))]));
+    const right=w2(cand.reduce((a,b)=>b.wx>a.wx?b:a));
+    const low=w2(cand.reduce((a,b)=>b.wy<a.wy?b:a));
+    return { up, right, low };
+  }
+  const _RIP_GROW=1.4;               // 그물이 중심→전체로 퍼지는 시간(초). 느리게 퍼짐. 이후 호버 유지 시 정지
+  const _RIP_MAXR=13;                // 확산 최대 반경(고정값) — GLB 크기 자동측정 안 함
+  let _rayTick=0, _ripHit=null;      // raycast throttle(3프레임마다) 캐시 — 매프레임 광선교차 비용↓
+  const _tmpV=new THREE.Vector3(), _tmpS=new THREE.Vector3(), _tmpSph=new THREE.Sphere();
+  const _dissolved=new Set();
+  const _rippleSegs=[];              // 모든 그물 LineSegments (각 seg.userData.rippleModel = 소속 GLB)
+  function _shown(o){ let n=o; while(n){ if(!n.visible) return false; n=n.parent; } return true; }
+  // 원본 GLB 표면: hit 반경(uFront) 안쪽을 dither noise로 사라지게(퍼지며 dissolve)
+  function _injectDissolve(mat){
+    if(!mat || _dissolved.has(mat)) return; _dissolved.add(mat);
+    mat.onBeforeCompile=(sh)=>{
+      sh.uniforms.uHit=_rip.uHit; sh.uniforms.uFront=_rip.uFront; sh.uniforms.uEnv=_rip.uEnv;
+      sh.vertexShader='varying vec3 vWP;\n'+sh.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\n  vWP=(modelMatrix*vec4(transformed,1.0)).xyz;');
+      sh.fragmentShader='uniform vec3 uHit; uniform float uFront,uEnv; varying vec3 vWP;\n'
+        +'float _h21(vec3 p){ return fract(sin(dot(p,vec3(41.3,289.1,73.7)))*43758.5453); }\n'
+        +sh.fragmentShader.replace('#include <clipping_planes_fragment>',
+          '#include <clipping_planes_fragment>\n  { float _d=distance(vWP,uHit); float _t=(uFront-_d)/2.4; if(_t>0.0){ float _n=_h21(floor(vWP*5.5)); if(_t*uEnv>_n*0.6) discard; } }\n');
+    };
+    mat.needsUpdate=true;
+  }
+  function _addRipple(mesh, model){
+    if(!mesh.geometry) return;
+    // solid는 그대로 유지(dissolve 안 함) — 그물만 오버레이로 퍼졌다 페이드아웃
+    // 2) 사라진 영역 + 확산 프론트에 밝은 삼각 와이어망(bloom 발광)
+    const mat=new THREE.ShaderMaterial({
+      transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, depthTest:true, uniforms:_rip,
+      vertexShader:'varying vec3 vW; void main(){ vec4 wp=modelMatrix*vec4(position,1.0); vW=wp.xyz; gl_Position=projectionMatrix*viewMatrix*wp; }',
+      fragmentShader:['uniform float uTime,uEnv,uFront; uniform vec3 uHit,uColor; varying vec3 vW;',
+        'void main(){',
+        '  float d=distance(vW,uHit);',
+        '  float rd=uFront-d;',                        // >0: 프론트가 지나간 뒤(그물이 남는 영역)
+        '  float front=exp(-pow(rd*1.2,2.0));',        // 파동 프론트 링 — 가장 밝음
+        '  float body=smoothstep(-0.8,1.6,rd);',       // 프론트 지나간 뒤 그물이 남아 전체를 감쌈
+        '  float a=(body*0.18 + front*1.1)*uEnv;',     // additive 누적 과밝음 방지(명멸 롤백)
+        '  vec3 col=uColor*(0.5 + front*1.2);',        // 프론트 링에서만 살짝 색 부스트
+        '  gl_FragColor=vec4(col, clamp(a,0.0,1.0));',
+        '}'].join('\n')
+    });
+    // 촘촘한 삼각 그물: 원본 지오메트리를 tessellate(엣지 세분) → WireframeGeometry
+    let wgeo=mesh.geometry;
+    try{
+      let g=mesh.geometry.index? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+      g.computeBoundingBox(); const sz=g.boundingBox.getSize(new THREE.Vector3());
+      const maxEl=Math.max(sz.x,sz.y,sz.z)/13;   // 최장변 13등분 — 촘촘하되 라인 과밀·렉 방지
+      wgeo=new TessellateModifier(maxEl,3).modify(g);
+    }catch(e){ console.warn('[ripple] tessellate', e&&e.message); wgeo=mesh.geometry; }
+    const seg=new THREE.LineSegments(new THREE.WireframeGeometry(wgeo), mat);
+    seg.frustumCulled=false; seg.layers.enable(1); seg.renderOrder=4; seg.visible=false;   // BLOOM_LAYER=1, 기본 숨김
+    seg.userData.rippleModel=model;   // 소속 GLB — hover된 GLB의 그물만 표시
+    mesh.add(seg); _rippleSegs.push(seg);
+  }
+  addEventListener('mousemove', e=>{ _mp.tx=(e.clientX/innerWidth-0.5); _mp.ty=(e.clientY/innerHeight-0.5);
+    _ptr.x=(e.clientX/innerWidth)*2-1; _ptr.y=-(e.clientY/innerHeight)*2+1; });
+
+  // ───────────────────────── HUD 리더라인 오버레이 (igloo.inc식, ref/화면/퍼지는효과및특수.png) ─────────────────────────
+  // 호버 대상(model.userData.hud)의 표면 앵커를 화면좌표로 투영 → 옆에 꺾인 리더라인 + 라벨/실시간 수치. ripple env로 그려짐/사라짐.
+  const _hud=(()=>{
+    const NS='http://www.w3.org/2000/svg';
+    const wrap=document.createElement('div'); wrap.id='introHud';
+    wrap.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden;opacity:0;font-family:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,monospace;';
+    const svg=document.createElementNS(NS,'svg'); svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+    svg.style.cssText='position:absolute;inset:0;'; wrap.appendChild(svg);
+    // 배경 도트 그리드(레퍼) — 옅은 규칙 점격자
+    const defs=document.createElementNS(NS,'defs');
+    defs.innerHTML='<pattern id="hudDots" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(210,232,245,.16)"/></pattern>';
+    svg.appendChild(defs);
+    const grid=document.createElementNS(NS,'rect'); grid.setAttribute('width','100%'); grid.setAttribute('height','100%'); grid.setAttribute('fill','url(#hudDots)'); svg.appendChild(grid);
+    const mkLine=()=>{ const p=document.createElementNS(NS,'polyline'); p.setAttribute('fill','none'); p.setAttribute('stroke','rgba(220,240,255,.4)'); p.setAttribute('stroke-width','1'); p.setAttribute('vector-effect','non-scaling-stroke'); svg.appendChild(p); return p; };   // 은은하게(사령관)
+    const fan=[mkLine(),mkLine(),mkLine(),mkLine()], lRight=mkLine(), lBot=mkLine();
+    const mkSpark=()=>{ const p=document.createElementNS(NS,'path'); p.setAttribute('fill','none'); p.setAttribute('stroke','rgba(220,240,255,.5)'); p.setAttribute('stroke-width','1'); svg.appendChild(p); return p; };
+    const sparks=[mkSpark(),mkSpark(),mkSpark(),mkSpark(),mkSpark(),mkSpark()];
+    const arrow=document.createElementNS(NS,'path'); arrow.setAttribute('fill','rgba(226,244,255,.7)'); svg.appendChild(arrow);
+    const mkTxt=()=>{ const d=document.createElement('div'); d.style.cssText='position:absolute;color:rgba(214,236,255,.55);text-transform:uppercase;letter-spacing:.14em;white-space:pre;font-size:11.5px;line-height:1.55;text-shadow:0 0 6px rgba(90,160,220,.22);'; wrap.appendChild(d); return d; };   // 모노 터미널체·저채도(사령관: 은은)
+    const tTitle=mkTxt(), tRead=mkTxt(), tHint=mkTxt();
+    document.body.appendChild(wrap);
+    const V=new THREE.Vector3(), _wv=new THREE.Vector3(), _box=new THREE.Box3(); let lastDepth=null;
+    const proj=(x,y,z)=>{ V.set(x,y,z).project(camera); return [ (V.x*0.5+0.5)*innerWidth, (-V.y*0.5+0.5)*innerHeight, V.z ]; };
+    const P=(c)=>{ _wv.copy(c.lp).applyMatrix4(c.mesh.matrixWorld); return proj(_wv.x,_wv.y,_wv.z); };
+    const spk=(x,y,r)=>`M${x-r},${y}L${x+r},${y}M${x},${y-r}L${x},${y+r}M${x-r*0.55},${y-r*0.55}L${x+r*0.55},${y+r*0.55}M${x-r*0.55},${y+r*0.55}L${x+r*0.55},${y-r*0.55}`;
+    const dash=(l,env)=>{ const len=l.getTotalLength()||1; l.setAttribute('stroke-dasharray',len); l.setAttribute('stroke-dashoffset', len*(1-Math.min(1,env*1.35))); };
+    // ★단순 지시선: 접점(P)에서 대각선 → 가로선 → 정보. dir=+1(오른쪽)/-1(왼쪽).
+    function callout(line, spark, el, P, dir, rise, run, html){
+      const E=[P[0]+dir*Math.max(16,rise*0.5), P[1]-rise], T=[E[0]+dir*run, E[1]];
+      line.setAttribute('points', P[0]+','+P[1]+' '+E[0]+','+E[1]+' '+T[0]+','+T[1]);
+      spark.setAttribute('d', spk(P[0],P[1],4));
+      el.style.left=(T[0]+dir*8)+'px'; el.style.top=(E[1]-16)+'px';
+      el.style.textAlign=dir>0?'left':'right'; el.style.transform=dir>0?'none':'translateX(-100%)';
+      el.innerHTML=html;
+    }
+    // 접점 계산(호버 시작 시 1회) — 화면 AABB → GLB별 정규화 접점 3개 + 수치 캡처. 캐시 = 회전·프레임에도 안 움직임.
+    function calc(model){
+      _box.setFromObject(model);
+      let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+      for(let i=0;i<8;i++){ const p=proj((i&1)?_box.max.x:_box.min.x,(i&2)?_box.max.y:_box.min.y,(i&4)?_box.max.z:_box.min.z);
+        if(p[0]<minX)minX=p[0]; if(p[1]<minY)minY=p[1]; if(p[0]>maxX)maxX=p[0]; if(p[1]>maxY)maxY=p[1]; }
+      return { ok:(maxX>minX), cx:(minX+maxX)/2, cy:(minY+maxY)/2, hw:Math.max(24,(maxX-minX)/2), hg:Math.max(24,(maxY-minY)/2), depth:Math.abs(camera.position.y) };
+    }
+    const _content={   // plain 멀티라인(\n) — 타이핑 리빌용
+      name:(h)=> h.code+'\n'+h.ko+'  '+h.en,
+      depth:(h,depth)=>'DEPTH '+(depth||0).toFixed(2),
+      info:(h)=>({ sailing:'HDG 042°\n12.4 KN', trade:'CARGO 12.4t\nMKT +38%', battle:'RANGE 880m\n6 GUNS', explore:'37.24°N\n129.41°E', faction:'3 FACTIONS\nNEUTRAL' }[h.key] || 'SCAN 29.69'),
+      tag:(h)=> (h.tag||'')
+    };
+    // ═══════════ 드래그 튜너 (라벨·접점 전부 뷰포트 비율 → 화면 고정, 회전 안 따라감) ═══════════
+    // fx,fy=라벨앵커  uw=밑줄폭  ex,ey=접점(동그라미). 전부 화면 비율(0~1). 끌어놓은 자리에 그대로 박힘.
+    // 오브젝트(섹션 key)별 정보선 레이아웃. L=name(사선) R=depth(직각 rt) I=정보수치(사선). st=1자직선.
+    const _GEN={ L:{fx:0.30,fy:0.25,uw:150,ex:0.45,ey:0.40}, R:{fx:0.66,fy:0.52,uw:110,ex:0.56,ey:0.52,rt:true}, I:{fx:0.40,fy:0.55,uw:130,ex:0.50,ey:0.60} };
+    const _LAYOUTS={
+      sailing:{ L:{fx:0.3493,fy:0.2748,uw:150,ex:0.4793,ey:0.3878}, R:{fx:0.6608,fy:0.5181,uw:110,ex:0.5638,ey:0.5165,rt:true}, I:{fx:0.4118,fy:0.5493,uw:130,ex:0.5047,ey:0.6035} },
+      trade:{ L:{fx:0.3777,fy:0.4335,uw:150,ex:0.4719,ey:0.5556}, R:{fx:0.6088,fy:0.5529,uw:110,ex:0.5588,ey:0.5965,rt:true,off:true}, I:{fx:0.5949,fy:0.7195,uw:130,ex:0.5313,ey:0.6412} },   // depth(R) 뺌 — off
+      battle:{ L:{fx:0.3355,fy:0.4689,uw:150,ex:0.4293,ey:0.5526}, R:{fx:0.5815,fy:0.8827,uw:110,ex:0.4979,ey:0.8166,rt:true}, I:{fx:0.6219,fy:0.6217,uw:130,ex:0.5469,ey:0.6826} },
+      explore:{ L:{fx:0.3934,fy:0.4325,uw:150,ex:0.4734,ey:0.5589}, R:{fx:0.5788,fy:0.5208,uw:110,ex:0.5018,ey:0.5570,rt:true}, I:{fx:0.4039,fy:0.7152,uw:130,ex:0.4777,ey:0.6126} },
+      faction:{ L:{fx:0.3434,fy:0.3378,uw:150,ex:0.4684,ey:0.4338}, R:{fx:0.7358,fy:0.8604,uw:110,ex:0.6627,ey:0.8676,rt:true,off:true}, I:{fx:0.6238,fy:0.6699,uw:130,ex:0.5277,ey:0.5585} },   // depth(R) 뺌 — off
+    };
+    function cfg(key){ key=key||'sailing'; window.__hud=window.__hud||{};
+      if(!window.__hud[key]){ let s=null; try{ s=localStorage.getItem('hud_'+key); }catch(e){}
+        let v=s?JSON.parse(s):null;
+        if(!v||!v.L||v.L.ex==null||!v.I) v=JSON.parse(JSON.stringify(_LAYOUTS[key]||_GEN));   // 저장 없으면 기본 레이아웃
+        window.__hud[key]=v; }
+      return window.__hud[key]; }
+    const panel=document.createElement('div'); panel.style.cssText='position:fixed;left:12px;bottom:70px;z-index:9;background:rgba(8,16,26,.92);color:#cfefff;font:11px ui-monospace,monospace;line-height:1.7;padding:9px 11px;border:1px solid rgba(120,200,255,.4);border-radius:6px;pointer-events:none;white-space:pre;display:none'; document.body.appendChild(panel);
+    function save(){ const key=window.__hudTarget||'sailing', c=cfg(key); try{ localStorage.setItem('hud_'+key,JSON.stringify(c)); }catch(e){}
+      console.log('[HUD_SAVE] '+key+' '+JSON.stringify(c));
+      panel.textContent='◆ 드래그 튜너 ['+key+']\n라벨·동그라미 끌어 배치. 자동저장.\n───────────\nL(name) '+JSON.stringify(c.L)+'\nR(depth) '+JSON.stringify(c.R)+'\nI(수치) '+JSON.stringify(c.I); }
+    const mkDot=()=>{ const d=document.createElement('div'); d.style.cssText='position:absolute;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:transparent;pointer-events:auto;cursor:grab;z-index:8;display:none'; wrap.appendChild(d); return d; };   // 파란 테두리 제거(사령관) — 별표만 마커, 원은 투명 잡기영역
+    const dotL=mkDot(), dotR=mkDot(), dotI=mkDot();
+    // 라벨·동그라미 공통 드래그(전부 뷰포트 비율)
+    function dragXY(el, get, set){ let a,b,sx,sy,on=false;
+      el.addEventListener('mousedown',e=>{ if(!window.__hudTune)return; on=true; const g=get(); a=g[0];b=g[1];sx=e.clientX;sy=e.clientY; el.style.cursor='grabbing'; e.preventDefault();e.stopPropagation(); });
+      addEventListener('mousemove',e=>{ if(!on)return; set(a+(e.clientX-sx)/innerWidth, b+(e.clientY-sy)/innerHeight); });
+      addEventListener('mouseup',()=>{ if(on){ on=false; el.style.cursor='grab'; save(); } }); }
+    const _tc=()=>cfg(window.__hudTarget||'sailing');   // 현재 튜닝 대상 레이아웃
+    dragXY(tTitle, ()=>[_tc().L.fx,_tc().L.fy], (x,y)=>{const c=_tc();c.L.fx=x;c.L.fy=y;});
+    dragXY(tRead,  ()=>[_tc().R.fx,_tc().R.fy], (x,y)=>{const c=_tc();c.R.fx=x;c.R.fy=y;});
+    dragXY(tHint,  ()=>[_tc().I.fx,_tc().I.fy], (x,y)=>{const c=_tc();c.I.fx=x;c.I.fy=y;});
+    dragXY(dotL,   ()=>[_tc().L.ex,_tc().L.ey], (x,y)=>{const c=_tc();c.L.ex=x;c.L.ey=y;});
+    dragXY(dotR,   ()=>[_tc().R.ex,_tc().R.ey], (x,y)=>{const c=_tc();c.R.ex=x;c.R.ey=y;});
+    dragXY(dotI,   ()=>[_tc().I.ex,_tc().I.ey], (x,y)=>{const c=_tc();c.I.ex=x;c.I.ey=y;});
+
+    // 타이핑 리빌(모노 터미널). 보인 부분 + 안보이는 부분(자리만, opacity:0) → 레이아웃 고정(안 흔들림). 커서=border-right.
+    const _esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    function typeInto(el, text, justShown){
+      if(justShown) el._ty=0;
+      el._ty=Math.min(text.length, (el._ty||0)+2);   // 프레임당 2자
+      const n=el._ty, done=n>=text.length;
+      const caret=done?'':'border-right:1px solid rgba(200,230,255,.7)';
+      el.innerHTML='<span style="'+caret+'">'+_esc(text.slice(0,n))+'</span><span style="opacity:0">'+_esc(text.slice(n))+'</span>';
+    }
+    function drawOne(line,spark,dot,el,c,html,yoff,just){
+      const W=innerWidth,H=innerHeight, Ax=c.fx*W, Ay=c.fy*H, Ex=c.ex*W, Ey=c.ey*H;
+      const dir=(Ex>=Ax)?1:-1;               // 접점이 라벨 오른쪽→밑줄 오른쪽 / 왼쪽→밑줄 왼쪽 (오브젝트 쪽으로 뻗음)
+      if(c.rt){ line.setAttribute('points', Ax+','+Ay+' '+Ex+','+Ay+' '+Ex+','+Ey); }        // 직각(수평 → 수직)
+      else if(c.st){ line.setAttribute('points', Ax+','+Ay+' '+Ex+','+Ey); }                 // 1자선(라벨→접점 단일 직선)
+      else { const UEx=Ax+dir*c.uw; line.setAttribute('points', Ax+','+Ay+' '+UEx+','+Ay+' '+Ex+','+Ey); }   // 밑줄 → 사선 → 접점
+      spark.setAttribute('d', spk(Ex,Ey,4)); dot.style.left=Ex+'px'; dot.style.top=Ey+'px';
+      el.style.left=Ax+'px'; el.style.top=(Ay-yoff)+'px';
+      el.style.textAlign=dir>0?'left':'right'; el.style.transform=dir>0?'none':'translateX(-100%)';   // 라벨은 오브젝트 반대쪽에
+      typeInto(el, html, just);
+    }
+    function update(model, env){
+      const h=model&&model.userData&&model.userData.hud;
+      if(!h || env<0.02){ wrap.style.opacity='0'; dotL.style.display=dotR.style.display=panel.style.display='none'; tTitle._on=tRead._on=tHint._on=false; return; }   // 숨을 때 타이핑 리셋 → 다음 호버 시 재타이핑
+      const ev=window.__hudDbg?1:env; wrap.style.opacity=String(Math.min(1,ev));
+      const c=cfg(h.key), depth=Math.abs(camera.position.y), tune=!!window.__hudTune;
+      // 라벨별 그리기(off:true면 숨김 → 오브젝트마다 라벨 개수 다르게). just=이번에 처음 등장(타이핑 시작).
+      const one=(fanE,sparkE,dotE,txtE,lc,html,yoff)=>{
+        if(!lc || lc.off){ fanE.setAttribute('points',''); sparkE.setAttribute('d',''); dotE.style.display='none'; txtE.innerHTML=''; txtE.style.pointerEvents='none'; txtE._on=false; return; }
+        const just=!txtE._on; txtE._on=true;
+        drawOne(fanE,sparkE,dotE,txtE,lc,html,yoff,just); dash(fanE,ev);
+        dotE.style.display=tune?'block':'none'; txtE.style.pointerEvents=tune?'auto':'none'; txtE.style.cursor='grab';
+      };
+      one(fan[0],sparks[0],dotL,tTitle,c.L,_content.name(h,depth),34);
+      one(fan[1],sparks[1],dotR,tRead,c.R,_content.depth(h,depth),26);
+      one(fan[2],sparks[2],dotI,tHint,c.I,_content.info(h),34);
+      panel.style.display=tune?'block':'none';
+      if(tune && !panel.textContent) save();
+      fan[3].setAttribute('points','');
+      lRight.setAttribute('points',''); lBot.setAttribute('points',''); arrow.setAttribute('d','');
+      for(let i=3;i<sparks.length;i++) sparks[i].setAttribute('d','');
+    }
+    return { update, calc };
+  })();
+  // ★튜너 모드: URL #hudtune (기본 조타) 또는 #hudtune=trade/battle/explore/faction → 해당 오브젝트 HUD 강제표시 + 스크롤 고정 + 드래그 튜너 ON.
+  if(location.hash.indexOf('hudtune')>=0){ window.__hudTune=true; window.__hudLock=true;
+    const _m=location.hash.match(/hudtune=(\w+)/); window.__hudTarget=(_m&&_m[1])||'sailing';
+    const _t=SECTIONS.find(s=>s.key===window.__hudTarget)||SECTIONS[0];
+    const _jump=()=>{ if(window.__setP) window.__setP(_t.snapP); else setTimeout(_jump,60); }; setTimeout(_jump,200); }
+
+  // ───────────────────────── 카메라 스크롤(키프레임) ─────────────────────────
+  // 진행도 p(0→1)에 따라 카메라 pos/look 보간. ScrollTrigger가 p를 무겁게(scrub) 굴린다.
+  // ★수평 동굴 진입 KF(사령관): 히어로→수면통과→항해→교역(여기까지 수직 잠수)→동굴로 수평 전진→입구(대포)→아치 통과→안쪽.
+  const KF=[
+    { p:0.00, pos:[0,    10, 47], look:[0,    5,   0] },   // 히어로 — 배 화면 하단(위에 로고)
+    { p:0.09, pos:[0,    3,  41], look:[0,  -24,  14] },   // 수면 통과 — 아래 내려다보며 잠수 시작
+    // ★지그재그 동선(사령관): 카메라 x는 좌→우→좌 엇갈림, look.x=0 고정 → 오브젝트는 옆에서 들어와 화면 가운데 정착.
+    { p:0.24, pos:[0,  -44,  15], look:[0,  -46,   0] },   // 항해 — 정면(원복, 사령관)
+    // ★전방 직시 전진(사령관): look.x=pos.x로 진행방향(-Z) 직시 → 오브젝트 앞·중앙(조타만큼 바짝 gap~15), 동굴은 지그재그 따라 10시/2시. 펼침 ±50.
+    { p:0.42, pos:[ 19,-101,  28], look:[0, -104,   0] },   // 교역 — 통 정면(원래 프레이밍 유지, 사령관: 통은 냅둬)
+    { p:0.58, pos:[51,-112,-95],   look:[51,-114,-145] },   // 전투 — 사령관 직접 pick
+    { p:0.79, pos:[-135,-109,-53], look:[-135,-111,-103] }, // 탐험 — 사령관 직접 pick
+    { p:1.00, pos:[51,-128,-328],  look:[51,-130,-378] },   // 진영 — 사령관 직접 pick
+  ];
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  function sampleKF(p){ let a=KF[0],b=KF[KF.length-1];
+    for(let i=0;i<KF.length-1;i++){ if(p>=KF[i].p && p<=KF[i+1].p){ a=KF[i]; b=KF[i+1]; break; } }
+    const t=(p-a.p)/Math.max(1e-4,(b.p-a.p)), e=t*t*(3-2*t);
+    return { pos:a.pos.map((v,i)=>lerp(v,b.pos[i],e)), look:a.look.map((v,i)=>lerp(v,b.look[i],e)) }; }
+
+  // 스크롤 진행도 상태. 표시 진행도 p는 목표 tp로 '무겁게' 이징(관성/이즈드 추종).
+  //  - 실 스크롤(ScrollTrigger.onUpdate)은 tp를 설정 → p가 따라간다(휠 따라가기X·무게감O).
+  //  - __introGo도 tp만 바꾸므로 헤드리스에서 전환 중간 프레임이 실제로 보인다(전환 샷 보존).
+  const sc = { p:0, tp:0 };
+
+  // ── GSAP ScrollTrigger : 500vh 컨테이너로 0→1 진행도. scrub=무게감, snap=섹션 스냅(2섹션). ──
+  // SNAP 지점 = 정착 progress. 섹션 늘면 [0, 0.25, 0.5, 0.75, 1]로 확장.
+  const SNAP=[0, 0.09, 0.24, 0.42, 0.58, 0.79, 1];   // 히어로/수면통과/항해/교역/전투(대포)/탐험(동굴입구컷)/진영(테이블) — 대포 이후 한 스크롤씩
+  const st = ScrollTrigger.create({
+    trigger:'#scroll', start:'top top', end:'bottom bottom',
+    scrub:1.1,                                  // 무거운(관성) 추종 — 휠 따라가기 아님(사령관: 정답, 유지)
+    // ★단일 휠로 안 넘어가게: 컨테이너 1000vh로 섹션 거리↑ + snap delay↑(휠 멈춘 뒤 끈적이게 정착) → 휠 ~2회 체감.
+    snap:{ snapTo:SNAP, duration:{min:0.6,max:1.3}, delay:0.22, ease:'power2.inOut' },
+    onUpdate:self=>{ sc.tp = self.progress; }
+  });
+  // ★통합 wrapper(_journey): ScrollTrigger 유지(scrub 무게감 그대로) — 부모가 iframe scrollY를 흘려보내 구동.
+  //   과거 embed 시 st.disable()로 껐던 것 폐기(= 묵직함 너프 원인). 스크롤바만 숨김.
+  if(new URLSearchParams(location.search).has('embed')){
+    const _sb=document.createElement('style');
+    _sb.textContent='::-webkit-scrollbar{width:0;height:0}html{scrollbar-width:none}';
+    document.head.appendChild(_sb);
+  }
+
+  // 검증 계약: __introGo(i) — i섹션(SNAP[i])으로 프로그램적 스크롤/점프.
+  //   ScrollTrigger 진행도는 scrollY로 결정되므로 실제 스크롤을 이동시킨다(스냅 대상 지점).
+  //   헤드리스에서도 결정적이도록 진행도(sc.p)도 즉시 동기화.
+  // 검증 디버그 훅: 진행도 p를 즉시 고정(이징/스냅 우회) — 헤드리스 정밀 캡처용.
+  window.__setP = (v)=>{ sc.p = sc.tp = Math.max(0, Math.min(1, v)); };
+  window.__introP = ()=> sc.p;   // 통합 wrapper: 인트로 진행도(이징 후) 조회 — 진영 도달 판정용
+  window.__scrollTP = (v)=>{ sc.tp = Math.max(0, Math.min(1, v)); };   // ★_journey: 목표 progress만 설정 → sc.p 무겁게 이징(scrub 유지). ScrollTrigger scroll감지 우회.
+  window.__introGo = (i)=>{
+    i = Math.max(0, Math.min(SNAP.length-1, i|0));
+    const target = SNAP[i];
+    sc.tp = target;                              // 목표만 설정 → p가 무겁게 이징(전환 중간 프레임 보존)
+    const max = (document.documentElement.scrollHeight - innerHeight);
+    if(max>0){ scrollTo(0, Math.round(target*max)); ScrollTrigger.update(); }
+  };
+
+  // ───────────────────────── 프레임 루프 ─────────────────────────
+  const hero=document.getElementById('hero'), scrollhint=document.getElementById('scrollhint'),
+        card=document.getElementById('card'), depthUI=document.getElementById('depthUI'),
+        depthFill=document.getElementById('depthFill'), depthVal=document.getElementById('depthVal'),
+        tDepth=document.getElementById('tDepth');
+  const _look=new THREE.Vector3();
+  // 카드 요소(섹션마다 동적 갱신) + 깊이별 색 상수
+  const cKlabel=document.getElementById('cKlabel'), cKo=document.getElementById('cKo'),
+        cNum=document.getElementById('cNum'), cDesc=document.getElementById('cDesc'),
+        cTag=document.getElementById('cTag'), typeEl=document.getElementById('typeLine');
+  const _cShallow=new THREE.Color(0x0e3850), _cDeep=new THREE.Color(0x050f1d);  // 얕은 청록 → 깊은 짙은남색
+  let _cardKey=null;
+  // ★우측 섹션 인디케이터 — 클릭 시 해당 섹션으로 스크롤
+  const _cardvig=document.getElementById('cardvig');
+  const _secnav=document.getElementById('secnav');
+  const _snBtns=_secnav?[..._secnav.querySelectorAll('button')]:[];
+  _snBtns.forEach((b,bi)=>b.addEventListener('click', ()=>{ if(window.__introGo) window.__introGo(bi+2); }));   // KF: 0히어로1수면 후 섹션은 인덱스+2
+  function updateCard(sec){
+    const i=SECTIONS.indexOf(sec)+1;
+    if(cKlabel) cKlabel.textContent=sec.en;
+    if(cKo) cKo.textContent=sec.ko;
+    if(cNum) cNum.textContent=String(i).padStart(2,'0');   // 인덱스 워터마크(01, 02…)
+    if(cDesc) cDesc.textContent=sec.desc;
+    // ★좌우 교차: 짝수 섹션(교역·탐험)은 우측 정렬
+    if(card) card.classList.toggle('right', i%2===0);
+    // ★섹션 전환마다 reveal 재생(제목 slide-up + 라인 draw + 설명 페이드)
+    if(card){ card.classList.remove('reveal'); void card.offsetWidth; card.classList.add('reveal'); }
+  }
+
+  // 검증/설계 디버그 훅: window.__camOverride={pos:[x,y,z],look:[x,y,z]} 설정 시 KF 대신 그 좌표 고정.
+  //   동굴 수평 전진 경로 설계용(헤드리스 프로브가 카메라를 잡고 캡처). null이면 정상 스크롤.
+  window.__camOverride = null;
+
+  // ───────────────────────── 위치 잡기 도구(?pick=1) — WASD 자유비행 ─────────────────────────
+  //  WASD=이동, Q/E=아래/위, Shift=빠르게, 방향키=시점 회전. 1~7=섹션 점프. C=현재 pos/look을 KF 한 줄로 복사.
+  //  ★OrbitControls 대신 WASD — 우클릭 드래그가 타륜 회전과 겹쳐서(사령관).
+  let __pickP=0.24, __pickPanel=null, __ff=null; const _UP=new THREE.Vector3(0,1,0);
+  if(PICK){
+    const ff={ pos:new THREE.Vector3(), yaw:0, pitch:0, keys:new Set(), fwd:new THREE.Vector3(0,0,-1) };
+    __ff=ff;
+    const SECT=[['히어로',0.00],['수면',0.09],['항해',0.24],['교역',0.42],['전투',0.58],['탐험',0.79],['진영',1.00]];
+    const setFromKF=(pp)=>{ __pickP=pp; sc.p=sc.tp=pp; const kk=sampleKF(pp);
+      ff.pos.set(kk.pos[0],kk.pos[1],kk.pos[2]);
+      const d=new THREE.Vector3(kk.look[0]-kk.pos[0],kk.look[1]-kk.pos[1],kk.look[2]-kk.pos[2]).normalize();
+      ff.pitch=Math.asin(Math.max(-1,Math.min(1,d.y))); ff.yaw=Math.atan2(d.x,d.z); };
+    const pk=document.createElement('div'); pk.id='pickpanel';
+    pk.style.cssText='position:fixed;right:14px;top:96px;z-index:40;background:rgba(6,18,28,.92);border:1px solid #41c6e0;'+
+      'color:#9bf0f8;font:11px/1.7 Montserrat,Pretendard,sans-serif;padding:12px 14px;white-space:pre;pointer-events:none;min-width:300px;box-shadow:0 8px 30px rgba(0,0,0,.6)';
+    document.body.appendChild(pk); __pickPanel=pk;
+    const MV=new Set(['w','a','s','d','q','e','shift','arrowup','arrowdown','arrowleft','arrowright']);
+    addEventListener('keydown',e=>{
+      const i='1234567'.indexOf(e.key); if(i>=0){ setFromKF(SECT[i][1]); return; }
+      const k=e.key.toLowerCase();
+      if(k==='c'){ const P=ff.pos, L=P.clone().add(ff.fwd.clone().multiplyScalar(50));
+        const line=`{ p:${__pickP.toFixed(2)}, pos:[${Math.round(P.x)},${Math.round(P.y)},${Math.round(P.z)}], look:[${Math.round(L.x)},${Math.round(L.y)},${Math.round(L.z)}] },`;
+        try{ navigator.clipboard.writeText(line); }catch(_){}
+        console.log('[PICK]',line); pk.dataset.copied=line; return; }
+      if(MV.has(k)){ ff.keys.add(k); if(k.startsWith('arrow')) e.preventDefault(); }
+    });
+    addEventListener('keyup',e=>{ ff.keys.delete(e.key.toLowerCase()); });
+    window.__pickJump=setFromKF; setFromKF(0.24);
+  }
+
+  // (단일 씬 통합 폐기 — _journey 씬 분리 방식으로 복귀. warp/dim 원본 사용)
+  const caveProg=0;   // 통합 제거 호환용 상수(항상 0 → 아래 통합 분기 전부 비활성)
+
+  ctx.onUpdate((dt,now)=>{
+    // ★마우스 패럴랙스 이징(부드럽게 추종)
+    _mp.x += (_mp.tx-_mp.x)*0.045; _mp.y += (_mp.ty-_mp.y)*0.045;
+    // ★퍼지는효과: GLB 진입 순간 1회 펄스 → 가운데서 천천히 퍼졌다가 사라짐(계속 안 대도 완주, 재진입 시 재생)
+    if(_rippleTargets.length){
+      let hitModel=_ripHit;
+      if((++_rayTick%2)===0){                       // 2프레임마다 광선교차(호버 반응성↑, 비용 여전히 낮음)
+        hitModel=null;
+        if(_ptr.x>-1.5){ _ray.setFromCamera(_ptr, camera);
+          const hs=_ray.intersectObjects(_rippleTargets.filter(_shown), true);
+          if(hs.length){ let o=hs[0].object; while(o && _rippleTargets.indexOf(o)<0) o=o.parent; hitModel=o; } }
+        _ripHit=hitModel;
+      }
+      const isHover=!!hitModel;
+      if(isHover && !_ripple.playing){          // 호버 진입 → 그물 성장 시작(중심에서 퍼져 전체를 감쌈)
+        const _bs=new THREE.Box3().setFromObject(hitModel).getBoundingSphere(_tmpSph);
+        _ripple.hit.copy(_bs.center); _ripple.maxR=_bs.radius*1.18; _ripple.model=hitModel; _ripple.phase=0; _ripple.playing=true; _ripple.depth=Math.abs(camera.position.y);
+        _ripple.hudBox=_hud.calc(hitModel);     // ★HUD 박스 1회 캐시 = 라벨 화면 고정
+      } else if(isHover && _ripple.playing && hitModel!==_ripple.model){   // 다른 GLB로 옮기면 새 모델로 재시작
+        const _bs2=new THREE.Box3().setFromObject(hitModel).getBoundingSphere(_tmpSph);
+        _ripple.hit.copy(_bs2.center); _ripple.maxR=_bs2.radius*1.18; _ripple.model=hitModel; _ripple.phase=0; _ripple.depth=Math.abs(camera.position.y);
+        _ripple.hudBox=_hud.calc(hitModel);     // ★다른 GLB로 이동 → 박스 재계산
+      }
+      _ripple.wasHover=isHover;
+      if(_ripple.playing){
+        if(isHover) _ripple.phase=Math.min(1, _ripple.phase + dt/_RIP_GROW);   // 호버 중: 퍼져 전체 감싼 뒤 그 상태로 정지(멈춤)
+        const _tgt=isHover?1:0;                                                 // 마우스 떼면 사라짐
+        _ripple.env += (_tgt-_ripple.env)*(1-Math.pow(0.015,dt));               // 부드러운 나타남/소멸
+        if(!isHover && _ripple.env<0.01){ _ripple.playing=false; _ripple.env=0; }
+      }
+      const ph=_ripple.phase;
+      _rip.uTime.value=now; _rip.uEnv.value=_ripple.env;
+      _rip.uFront.value=Math.min(1, ph/0.85)*_ripple.maxR*1.05;   // 프론트가 중심→전체 훑고 정지(ph=1 유지 시 전체 그물 고정)
+      _rip.uHit.value.copy(_ripple.hit);
+      if(window.__hudLock){   // 튜너: 대상 오브젝트(__hudTarget) 강제 표시 (라벨·접점 전부 화면 고정 → 회전 안 따라감)
+        const tk=window.__hudTarget||'sailing';
+        const hm=_rippleTargets.find(t=>t.userData.hud&&t.userData.hud.key===tk);
+        _hud.update(hm||_ripple.model, hm?1:_ripple.env);
+      } else _hud.update(_ripple.model, _ripple.env);   // ★정보선: 화면 고정 라벨
+      // 그물은 현재 펄스가 걸린 GLB(통/대포/타륜)에만 — 다른 GLB(대포 등) 침범 방지
+      for(let i=0;i<_rippleSegs.length;i++){ _rippleSegs[i].visible = _ripple.playing && _rippleSegs[i].userData.rippleModel===_ripple.model; }
+    }
+    // 무거운(관성) 추종: 표시 진행도 p가 목표 tp로 이즈드. dt 보정으로 프레임레이트 무관 일정.
+    if(window.__hudLock){ const _t=SECTIONS.find(s=>s.key===(window.__hudTarget||'sailing')); if(_t) sc.tp=_t.snapP; }   // 튜너: 대상 섹션에 스크롤 고정
+    const k = 1 - Math.pow(0.12, dt);            // dt당 감쇠(시상수 ~0.5s) — 묵직한 관성 추종
+    sc.p += (sc.tp - sc.p) * k;
+    if(Math.abs(sc.tp - sc.p) < 0.0005) sc.p = sc.tp;
+    const p = sc.p;
+    const s = sampleKF(p);
+    // 카메라: 시점은 스크롤이 주도(마우스는 타륜 전용). 수면 통과 시 미세 진동(풍덩).
+    if(PICK && __ff){   // 위치 잡기 모드 — WASD 자유비행
+      const ff=__ff, K=ff.keys, mv=(K.has('shift')?2.8:1)*70*dt, rot=1.4*dt;
+      if(K.has('arrowleft')) ff.yaw+=rot; if(K.has('arrowright')) ff.yaw-=rot;
+      if(K.has('arrowup')) ff.pitch+=rot; if(K.has('arrowdown')) ff.pitch-=rot;
+      ff.pitch=Math.max(-1.45,Math.min(1.45,ff.pitch));
+      const cp=Math.cos(ff.pitch);
+      ff.fwd.set(cp*Math.sin(ff.yaw), Math.sin(ff.pitch), cp*Math.cos(ff.yaw));
+      const right=new THREE.Vector3().crossVectors(ff.fwd,_UP).normalize();
+      if(K.has('w')) ff.pos.addScaledVector(ff.fwd, mv);
+      if(K.has('s')) ff.pos.addScaledVector(ff.fwd,-mv);
+      if(K.has('d')) ff.pos.addScaledVector(right, mv);
+      if(K.has('a')) ff.pos.addScaledVector(right,-mv);
+      if(K.has('e')) ff.pos.y+=mv; if(K.has('q')) ff.pos.y-=mv;
+      camera.position.copy(ff.pos); camera.lookAt(ff.pos.clone().add(ff.fwd));
+      if(__pickPanel){ const P=ff.pos, L=P.clone().add(ff.fwd.clone().multiplyScalar(50));
+        __pickPanel.textContent='◆ 위치 잡기(WASD)\nWASD=이동  Q/E=아래/위  Shift=빠르게\n방향키=시점 회전\n1히어로 2수면 3항해 4교역 5전투 6탐험 7진영\nC=현재 좌표 복사\n──────────────\n'+
+          `섹션 p=${__pickP.toFixed(2)}\npos [${Math.round(P.x)}, ${Math.round(P.y)}, ${Math.round(P.z)}]\nlook[${Math.round(L.x)}, ${Math.round(L.y)}, ${Math.round(L.z)}]`+
+          (__pickPanel.dataset.copied?('\n✓ 복사됨:\n'+__pickPanel.dataset.copied):''); }
+    }
+    else if(window.__camOverride){ const o=window.__camOverride;
+      camera.position.set(o.pos[0],o.pos[1],o.pos[2]); camera.lookAt(o.look[0],o.look[1],o.look[2]); }
+    else{
+    camera.position.set(s.pos[0], s.pos[1], s.pos[2]);
+    _look.set(s.look[0], s.look[1], s.look[2]);
+    const sdv=Math.abs(camera.position.y);
+    if(sdv<6){ camera.position.y += Math.sin(now*0.018)*(1-sdv/6)*0.55; }
+    if(!window.__hudLock){ camera.position.x += _mp.x*5.5; camera.position.y += -_mp.y*3.5; }   // ★마우스 시점 패럴랙스(pos만) — 튜너 땐 끔(박스 고정)
+    camera.lookAt(_look);
+    }
+    const sd=Math.abs(camera.position.y);
+
+    // 수면 통과 전환 "베일"(IGLOO 전환.png): 순간이 아니라 넓은 깊이 구간(±16u)에서 천천히 차오르고 빠진다.
+    //   부드러운 종(bell) 곡선으로 0→peak→0 — 산/오브젝트가 안개 사이로 흐릿하게 드러났다 사라지는 느낌.
+    const band=16, sp=Math.max(0, 1 - sd/band);
+    const veil=Math.pow(sp, 1.6) * (0.4 + 0.6*sp);     // 길고 부드러운 차오름/빠짐(peak ≈ 1)
+    splash.style.opacity=Math.min(1, veil).toFixed(3);
+
+    // ★수면 윤슬(sparkle) 제거됨 — 입자 폐기(네모 지적).
+
+    // ── 섹션 vis(★진행도 기반 종 곡선) + 현재 섹션 = vis 최대. 거리 아님(수직 섹션 Z오프셋 버그 회피). ──
+    helmRotY += (tgtY-helmRotY)*0.12; helmRotX += (tgtX-helmRotX)*0.12;   // 우클릭 드래그(관성)
+    let curSec=SECTIONS[0], settled=0;
+    SECTIONS.forEach(sec=>{
+      sec._vis = Math.max(0, Math.min(1, 1 - Math.abs(p - sec.snapP)/0.14));   // snapP ±0.14서 0, 정점서 1
+      if(sec._vis>settled){ settled=sec._vis; curSec=sec; }
+    });
+
+    // 수중 fog: 섹션 정착 시 멀리(오브젝트+동굴 배경 어렴풋이) / 사이=자욱. ★corridor(교역~)는 시야 트여 동굴 계속 보임.
+    if(scene.fog && camera.position.y < -0.5 && !window.__noFog){
+      scene.fog.near = 3;
+      const corridorReach=Math.max(0, Math.min(1, (p-0.36)/0.12));   // 교역부터 동굴 향해 시야 트임(접근 비트도 동굴 보이게)
+      scene.fog.far = 30 + Math.max(settled, corridorReach) * 820;    // 동굴 z-340 원경까지(카메라 최대 거리 ~400) 보이게 far↑
+      const dT=Math.max(0,Math.min(1,(p-0.18)/0.78));                 // 항해(p.24)~진영(p1.0) = 깊을수록 짙게
+      scene.fog.color.lerpColors(_cShallow,_cDeep,dT);
+      scene.background.lerpColors(_cShallow,_cDeep,dT);
+    }
+    // 깊이 잠수하면 수면 메시(카메라 따라다니는 y=0 plane) 숨김 — 위쪽 하늘색/수면 차단
+    if(ctx.water && ctx.water.mesh) ctx.water.mesh.visible = (camera.position.y > -26);
+
+    // ── 섹션 오브젝트: 등장(페이드·진행도) + 조명 + 회전(전 섹션 — 사령관) ──
+    //   ★corridor(전투·탐험·진영) 오브젝트는 통(p>0.40)부터 등장해 계속 보임 = 앞쪽 glb들이 원경 랜드마크로(사령관). 항해·교역은 자기 섹션 페이드.
+    const cvis=Math.max(0, Math.min(1, (p-0.40)/0.06));
+    SECTIONS.forEach(sec=>{
+      const grp=sec.group; if(!grp) return;
+      const vis=sec._vis;
+      const corridor=(sec.key==='battle'||sec.key==='explore'||sec.key==='faction');
+      const ov = corridor ? cvis : vis;                              // corridor=등장후 유지, 그 외=섹션 벨
+      grp.visible = ov>0.005;
+      grp.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
+        ms.forEach(m=>{ m.transparent=ov<0.99; m.opacity=ov; m.depthWrite=ov>0.6; }); }});
+      if(sec.keyLight) sec.keyLight.intensity=5.5*vis;               // 조명은 섹션 정착 시 강조(vis)
+      if(sec.rimLight) sec.rimLight.intensity=3.2*vis;
+      // 부유 + 회전: ★현재 정착 섹션(curSec)의 오브젝트만 우클릭 드래그 회전(사령관: 통 돌릴 때 대포 같이 돌던 것 수정). 코리도 랜드마크는 고정.
+      // ★자동회전(idle)은 보이는 모든 GLB(조타 포함, 사령관). 속도 0.00006→0.0004(보이게). 우클릭(helmRot)만 현재 섹션.
+      (sec.objMeshes||[]).forEach(m=>{ if(ov>0.15){ const cur=(sec===curSec);
+        m.rotation.set(cur?helmRotX:0, (cur?helmRotY:0) + now*0.0004, 0); } });
+    });
+    // ── 동굴 lazy load 트리거: 교역(p>0.40) 진입 시 1회만 ──
+    if(p > 0.40 && !caveLoadStarted){ caveLoadStarted=true; startCaveLoad(); }
+    // ── 동굴 입구 빛 = god rays(방사형 빛줄기) + 약한 코어 블룸. 다가갈수록 강해짐(사령관). 통(원경)=은은, 진영=강. ──
+    const prox=Math.max(0, Math.min(1, (p-0.42)/0.58));                  // 통0 → 진영1
+    _caveProx=prox;                                                      // 렌더 오버라이드(god rays exposure)서 사용
+    if(introCaveGlow) introCaveGlow.visible=false;                       // ★글로우 구 완전 제거(동그라미 원인)
+    if(introCaveLight) introCaveLight.intensity=4 + 16*prox;             // ★초록 포인트라이트 강화(입구 안쪽 벽 초록 물들임)
+    if(introCaveShaft) introCaveShaft.visible=false;                     // ★빛샘 콘 제거 — god rays가 대신 빛줄기를 만듦
+    // ── 동굴 입구 FBX(원경·독립): 교역(p0.40)부터 페이드 인 → 진영까지 계속 보임(사령관: 통부터 저 멀리 계속). ──
+    if(introCave){
+      const cv=Math.max(0, Math.min(1, (p-0.40)/0.10));
+      introCave.visible=cv>0.01;
+      (introCave._meshes||[]).forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ m.transparent=cv<0.99; m.opacity=cv; }); });
+    }
+    // ── 해저 흙바닥(독립): 잠수하며 등장 → corridor 내내 유지(전투/입구서도 안 사라짐 — 사령관: 대포 공중에 뜸). ──
+    if(introFloor){
+      const fv=Math.max(0, Math.min(1, (p-0.18)/0.12));               // 항해 잠수서 등장, 교역 전 완전
+      introFloor.visible=fv>0.01;
+      introFloor.material.transparent=fv<0.99; introFloor.material.opacity=fv;
+    }
+    // ── 동굴 안 터널: 사용 안 함(빨간 동굴이 직접 발광). 항상 숨김. ──
+    if(introTunnel) introTunnel.visible=false;
+    // ── 나침반(탐험 전용): 통(p>0.40)부터 등장해 계속 보임(원경 랜드마크 — 사령관). 천천히 회전. ──
+    if(introCompass){
+      const av=cvis;
+      introCompass.visible=av>0.01;
+      (introCompass._meshes||[]).forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ const bo=(m.userData&&m.userData.baseOpacity!=null)?m.userData.baseOpacity:1; m.transparent=(av*bo)<0.99; m.opacity=av*bo; }); });
+      if(introCompass.userData.light) introCompass.userData.light.intensity=2.6*Math.max(0,Math.min(1,1-Math.abs(p-0.79)/0.13));
+      // ★나침반은 항상 자동회전(idle, 원복) + 탐험 섹션이면 우클릭 추가.
+      if(introCompass.userData.compass){ const c=introCompass.userData.compass; const cur=(curSec.key==='explore');
+        c.rotation.set(cur?helmRotX:0, (cur?helmRotY:0) + now*0.0004, 0); }
+    }
+    // ── 테이블(진영 전용): 통(p>0.40)부터 등장해 계속 보임 — 빨간 동굴 바로 앞 원경 랜드마크. ──
+    if(introTable){
+      const av=cvis;
+      introTable.visible=av>0.01;
+      (introTable._meshes||[]).forEach(o=>{ const ms=Array.isArray(o.material)?o.material:[o.material]; ms.forEach(m=>{ m.transparent=av<0.99; m.opacity=av; }); });
+      if(introTable.userData.light) introTable.userData.light.intensity=0.35*av;   // 테이블 조명 완화(사령관: 너무 환함)
+      // ★진영 섹션이면 우클릭 드래그로 회전 (사령관: 테이블도 돌게)
+      // ★테이블도 항상 자동회전(idle) + 진영 섹션이면 우클릭 추가.
+      if(introTable.userData.tableObj){ const t=introTable.userData.tableObj; const cur=(curSec.key==='faction');
+        t.rotation.set(cur?helmRotX:0, (cur?helmRotY:0) + now*0.0003, 0); }
+    }
+
+    // HUD 페이드 + 카드(현재 섹션 동적)
+    hero.style.opacity = Math.max(0, 1 - p*7);
+    scrollhint.style.opacity = Math.max(0, 1 - p*9);
+    const showCard = camera.position.y < -22 && settled > 0.35;     // 수중 + 섹션 정착(진행도 기반)
+    if(showCard && _cardKey!==curSec.key){ _cardKey=curSec.key; updateCard(curSec); }
+    card.style.opacity = showCard ? '1' : '0';
+    if(showCard) card.style.transform = `translate(${-_mp.x*16}px, ${-_mp.y*11}px)`;   // ★텍스트 마우스 패럴랙스(깊이감)
+    if(_cardvig) _cardvig.style.opacity = showCard ? '1' : '0';   // 하단 vignette(가독성)
+    if(!showCard) card.classList.remove('reveal');   // 카드 사라지면 reveal 리셋(다음 진입 시 updateCard가 재생)
+    // ★우측 섹션 인디케이터: 카드 보일 때 표시 + 현재 섹션 강조
+    if(_secnav){ _secnav.classList.toggle('on', showCard);
+      if(showCard) _snBtns.forEach((b,bi)=>b.classList.toggle('active', SECTIONS[bi]===curSec)); }
+
+    // 수심 게이지 + 텔레메트리(연출용)
+    const depthM = Math.max(0, -camera.position.y);
+    depthFill.style.height = Math.min(100, p*100).toFixed(0)+'%';
+    depthVal.textContent = depthM.toFixed(0)+'m';
+    tDepth.textContent = depthM.toFixed(1).padStart(4,'0');
+    depthUI.style.opacity = p>0.05 ? '0.85' : '0';
+
+    // 수중 풀스크린(caustics) — 물빛 일렁임. 전 구간(테이블까지) 유지 — 사령관: 탐험·진영에서도 동일.
+    let uwScr = Math.max(0, Math.min(1, -camera.position.y/26));
+    if(uwScreen){ uwScreen.material.uniforms.uOpacity.value = uwScr; uwScreen.material.uniforms.uTime.value = now*0.001;
+      uwScreen.visible = uwScr>0.001 && camera.position.y < 1.5; }
+    const sailVis=Math.max(0,Math.min(1, 1-(Math.abs(camera.position.y-SECTIONS[0].y)-10)/22));
+    // ★광추(조명 비추는 빛기둥)·동심원 파동(퍼지는 거) 제거 — 사령관: "원래대로, 뭔가 더 들어간 거 빼". 타륜은 오브젝트만.
+    if(shaft) shaft.material.uniforms.uOpacity.value = 0;
+    if(rings) rings.material.uniforms.uOpacity.value = 0;
+    if(godrays){ godrays.userData.mats.forEach(m=>m.uniforms.uOpacity.value = 0); }
+  });
+  ctx.onUpdate(()=> ctx.stepPhysics());
+
+  // ── 동굴 빨간빛 "선택적 블룸"(샘플 voyage/동굴모습.png 매칭): ★동굴/글로우만 번지고 테이블·바다·배는 안 번짐 ──
+  //   표준 2-composer 기법: ①bloomComposer=블룸 대상(레이어1)만 밝게 렌더(나머지 검정)→블룸. ②finalComposer=실제 씬 + 블룸텍스처 가산.
+  const BLOOM_LAYER=1; const bloomLayer=new THREE.Layers(); bloomLayer.set(BLOOM_LAYER);
+  const _darkMat=new THREE.MeshBasicMaterial({color:0x000000}); const _matStash={};
+  const _black=new THREE.Color(0x000000);
+  // ★B: darken 대상 메시(블룸레이어 아닌 isMesh) 1회 캐싱 → 매 프레임 scene.traverse 전체순회 제거(코리도 CPU↓).
+  //   prewarm 첫 블룸 렌더(모든 오브젝트 로드 후) 시점에 lazy 빌드. 이후 메시 추가 없음(프리로드 완비).
+  let _darkList=null;
+  function _buildDarkList(){ _darkList=[]; scene.traverse(o=>{ if(o.isMesh && !bloomLayer.test(o.layers)) _darkList.push(o); }); }
+  const _sz=new THREE.Vector2(innerWidth, innerHeight);
+  const _caveScreen=new THREE.Vector3();
+  const bloomComposer=new EffectComposer(ctx.renderer); bloomComposer.renderToScreen=false;
+  bloomComposer.addPass(new RenderPass(scene, camera));
+  // ── 입구 안쪽 빨간 발광 = 부드러운 블룸(떨림 없음·안정적). god rays(방사 블러)는 화면 shimmer 때문에 제거(사령관). ──
+  const bloom=new UnrealBloomPass(_sz, 0.8, 0.85, 0.0);  // strength/radius/threshold. 입구 모양으로 은은하게 번짐.
+  bloomComposer.addPass(bloom);
+  const finalComposer=new EffectComposer(ctx.renderer);
+  finalComposer.addPass(new RenderPass(scene, camera));
+  const mixPass=new ShaderPass(new THREE.ShaderMaterial({
+    uniforms:{ baseTexture:{value:null}, bloomTexture:{value:bloomComposer.renderTarget2.texture} },
+    vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+    fragmentShader:'uniform sampler2D baseTexture;uniform sampler2D bloomTexture;varying vec2 vUv;'+
+      'void main(){ gl_FragColor = texture2D(baseTexture,vUv) + vec4(1.0)*texture2D(bloomTexture,vUv); }',
+  }), 'baseTexture'); mixPass.needsSwap=true;
+  finalComposer.addPass(mixPass);
+  finalComposer.addPass(new OutputPass());
+  // ★블룸 컴포저는 저해상도(흐릿한 블룸이라 무손실, 비용↓), 최종 컴포저는 풀해상도.
+  const _setPR=(c, pr)=>{ c.setSize(innerWidth,innerHeight); c.setPixelRatio(pr); };
+  const _PRbloom=()=>Math.min(1, devicePixelRatio), _PRfinal=()=>Math.min(2, devicePixelRatio);
+  _setPR(bloomComposer, _PRbloom()); _setPR(finalComposer, _PRfinal());
+  // ★코리도 동적 해상도(A): 블룸 켜진 무거운 구간(교역~동굴)만 출력 픽셀레이트↓ → 그 구간 fps 회복.
+  //   인트로(블룸 off)는 _PRfinal 그대로 = 화질 유지. ?hq=1 = 비활성(코리도도 풀해상도, 원본 비교용).
+  const CORRIDOR_PR = params.has('hq') ? null : Math.min(1.0, devicePixelRatio);
+  let _corLow=false;
+  let _bloomCleared=false;
+  ctx.setRenderOverride(()=>{
+    // ── 코리도 진입/이탈 시 출력 해상도 1회 전환(hysteresis — 매 프레임 RT 재할당 방지) ──
+    if(CORRIDOR_PR!=null){ const want=_caveProx>0.015;
+      if(want!==_corLow){ _corLow=want; _setPR(finalComposer, want?CORRIDOR_PR:_PRfinal()); } }
+    // ★동굴 보일 때만 블룸 17패스 실행. 안 보이면(히어로/항해) 단일 합성 → 상시 렉 제거(사령관).
+    if(_caveProx > 0.015){
+      bloom.strength = 0.35 + 0.65*_caveProx;
+      const bg=scene.background, fog=scene.fog;
+      scene.background=_black; scene.fog=null;
+      if(!_darkList) _buildDarkList();
+      for(const o of _darkList){ if(o.visible){ _matStash[o.uuid]=o.material; o.material=_darkMat; } }   // occlusion: 입구 발광 외 검정
+      bloomComposer.render();
+      for(const o of _darkList){ const s=_matStash[o.uuid]; if(s){ o.material=s; _matStash[o.uuid]=undefined; } }
+      scene.background=bg; scene.fog=fog;
+      _bloomCleared=false;
+    } else if(!_bloomCleared){                                            // 블룸 텍스처 1회 클리어(잔상 방지) 후 스킵
+      ctx.renderer.setRenderTarget(bloomComposer.renderTarget2); ctx.renderer.setClearColor(_black,1); ctx.renderer.clear();
+      ctx.renderer.setRenderTarget(null); _bloomCleared=true;
+    }
+    finalComposer.render();   // 실제 씬 + 블룸텍스처(없으면 검정=가산 0) 합성 — 톤매핑 일관
+  });
+  addEventListener('resize', ()=>{ _sz.set(innerWidth,innerHeight); _setPR(bloomComposer, _PRbloom()); _setPR(finalComposer, (CORRIDOR_PR!=null&&_corLow)?CORRIDOR_PR:_PRfinal()); });
+  window.__bloom = bloom;   // 튜닝 훅: __bloom.strength/.radius/.threshold
+  window.__finalComposer = finalComposer; window.__corState = ()=>({ corLow:_corLow, corPR:CORRIDOR_PR, prFinal:_PRfinal(), rtW:finalComposer.renderTarget1.width, rtH:finalComposer.renderTarget1.height });   // ★검증 훅
+
+  ctx.start();
+  // ★프리로드 게이트(사령관): 모든 GLB/FBX 로드 완료까지 로딩 화면 유지 → 스크롤 중 팝인 hitch 제거.
+  {
+    const _total=Math.max(1, PRELOAD.length);
+    let _done=0;
+    // 🏮 등불이 실제 프리로드 진행률만큼 차오른다(퍼센트 텍스트는 레퍼런스에 없어 표시하지 않음).
+    const _bump=()=>{ _done++; LS.setProgress(_done/_total); LS.setStage('바다를 불러오는 중… '+Math.round(_done/_total*100)+'%'); };
+    PRELOAD.forEach(p=>p.then(_bump, _bump));
+    await Promise.all(PRELOAD.map(p=>p.catch(()=>{})));
+    // ── ★prewarm(코리도 진입 hitch 제거): 로더가 캔버스를 덮은 동안 코리도 오브젝트를 강제로 켜고
+    //    블룸 경로까지 1프레임 강제 렌더 → ①전 머티리얼 셰이더 컴파일 ②동굴/대포/나침반/테이블 정점버퍼 GPU 업로드
+    //    ③블룸 패스(UnrealBloom) 첫 컴파일 ④fog null 변형 컴파일 을 전부 로딩 중에 끝낸다.
+    //    frustumCulled=false로 카메라가 안 보는 코리도 오브젝트도 확실히 draw(=업로드)되게 함. 화면엔 로더가 덮여 안 보임.
+    try{
+      const _warmObjs=[introCave, introCompass, introTable, introTunnel, introFloor, ...SECTIONS.map(s=>s.group)].filter(Boolean);
+      const _visBak=_warmObjs.map(o=>o.visible); _warmObjs.forEach(o=>{ o.visible=true; });
+      const _wm=[]; _warmObjs.forEach(o=>o.traverse(m=>{ if(m.isMesh) _wm.push(m); }));
+      const _fcBak=_wm.map(m=>m.frustumCulled);
+      _wm.forEach(m=>{ m.frustumCulled=false; const a=Array.isArray(m.material)?m.material:[m.material]; a.forEach(mm=>{ if(mm) mm.transparent=true; }); });
+      ctx.renderer.compile(scene, camera);                                       // 전 머티리얼 셰이더 컴파일(visible 상태)
+      const _proxBak=_caveProx; _caveProx=1;                                    // 블룸 경로 강제 가동
+      const _ro=ctx.getRenderOverride(); if(_ro) _ro(); else ctx.renderer.render(scene,camera);   // bloomComposer+finalComposer 1프레임
+      _caveProx=_proxBak;
+      _wm.forEach((m,i)=>{ m.frustumCulled=_fcBak[i]; const a=Array.isArray(m.material)?m.material:[m.material]; a.forEach(mm=>{ if(mm){ mm.transparent=false; mm.opacity=1; } }); });
+      _warmObjs.forEach((o,i)=>{ o.visible=_visBak[i]; });
+      console.log('[intro] prewarm 완료 — obj '+_warmObjs.length+' / mesh '+_wm.length);
+    }catch(e){ console.warn('[intro] prewarm 실패', e&&e.message); }
+    LS.done();   // 등불 만점화 후 페이드아웃
+    L.style.transition='opacity .5s'; L.style.opacity='0'; setTimeout(()=>{ LS.hide(); }, 520);
+  }
+  window.__introReady=true;
+  window.__ctx=ctx; window.__helm=helm;   // 검증/디버그 계약
+  // ── [1] GAME START → 캐릭터·추종자 선택(select.html) → 튜토리얼 ──
+  { const bs=document.getElementById('btnStart');
+    if(bs) bs.addEventListener('click', ()=>{ (window.top||window).location.href='/select.html'; }); }  // ★_journey iframe 안에서도 최상위 창을 이동 → 선택(클래스→추종자→진영) 전체화면 진입
+  // ★게임식 메뉴 선택 커서(호버 아님): 항상 하나 활성 · 위/아래 키 이동 · 마우스 올리면 선택 · 엔터 실행
+  { const _mb=[...document.querySelectorAll('.menu .mbtn')]; let _msel=0;
+    const _mrender=()=>_mb.forEach((b,i)=>b.classList.toggle('active', i===_msel));
+    _mrender();
+    _mb.forEach((b,i)=>b.addEventListener('mouseenter', ()=>{ _msel=i; _mrender(); }));
+    addEventListener('keydown', e=>{
+      if(sc.p>0.05) return;   // 히어로 화면일 때만
+      if(e.key==='ArrowDown'){ _msel=(_msel+1)%_mb.length; _mrender(); e.preventDefault(); }
+      else if(e.key==='ArrowUp'){ _msel=(_msel-1+_mb.length)%_mb.length; _mrender(); e.preventDefault(); }
+      else if(e.key==='Enter'){ _mb[_msel].click(); }
+    });
+  }
+  // 셰이더 컴파일은 cave lazy load .then() 안에서 즉시 실행 (cave 재질 준비 직후)
+  // 초기 위치 동기화(헤드리스 첫 샷이 히어로에서 시작하도록)
+  window.__introGo(0);
+  if(JUMP==='uw'){ setTimeout(()=>window.__introGo(2), 80); }   // 샘플 비교: 로드 후 수중(타륜)으로 자동 점프
+
+  // ── 🎛️ 오브젝트 페이더 패널 (dev): ?fader=1 로 활성화. 대포/나침반/테이블/동굴 pos·rot·scale 직접 조정. ──
+  if(new URLSearchParams(location.search).has('fader')){
+    const battleSec=SECTIONS.find(s=>s.key==='battle');
+    const OBJS={
+      '대포':()=>({pos:battleSec.group, rot:(battleSec.objMeshes||[])[0], scl:(battleSec.objMeshes||[])[0]}),
+      '나침반':()=>({pos:introCompass, rot:introCompass&&introCompass.userData.compass, scl:introCompass&&introCompass.userData.compass}),
+      '테이블':()=>({pos:introTable, rot:introTable&&introTable.userData.tableObj, scl:introTable&&introTable.userData.tableObj}),
+      '동굴':()=>({pos:introCave, rot:introCave, scl:introCave}),
+    };
+    const ST={}; for(const k in OBJS){ const o=OBJS[k](); if(!o.pos){ST[k]={px:0,py:0,pz:0,rx:0,ry:0,rz:0,base:1,mul:1};continue;} const p=o.pos.position,r=o.rot.rotation,s=o.scl.scale.x; ST[k]={px:p.x,py:p.y,pz:p.z,rx:r.x,ry:r.y,rz:r.z,base:s||1,mul:1}; }
+    const CAM={px:0,py:0,pz:0,lx:0,ly:0,lz:0};
+    window.__faderST=ST; window.__faderCAM=CAM; let sel='대포';
+    ctx.onUpdate(()=>{ const o=OBJS[sel](),s=ST[sel]; if(!o||!o.pos||!s)return; o.pos.position.set(s.px,s.py,s.pz); if(o.rot)o.rot.rotation.set(s.rx,s.ry,s.rz); if(o.scl)o.scl.scale.setScalar(s.base*s.mul); });   // ★카메라는 안 건드림 → ?pick=1(WASD)과 동시 사용 가능
+    const OBJROWS=[['px','x',-150,150,0.5],['py','y',-200,-40,0.5],['pz','z',-700,60,1],['rx','rotX',-3.15,3.15,0.01],['ry','rotY',-3.15,3.15,0.01],['rz','rotZ',-3.15,3.15,0.01],['mul','scale',0.1,4,0.02]];
+    const CAMROWS=[['px','camX',-150,150,0.5],['py','camY',-200,-40,0.5],['pz','camZ',-700,80,1],['lx','lookX',-200,200,1],['ly','lookY',-220,-20,1],['lz','lookZ',-800,80,2]];
+    const P=document.createElement('div'); P.id='faderPanel';
+    P.style.cssText='position:fixed;top:8px;right:8px;width:300px;z-index:99999;background:rgba(6,14,22,.95);border:2px solid #3c9;border-radius:8px;padding:10px;font:11px/1.4 monospace;color:#cfe';
+    P.innerHTML='<div style="font-weight:bold;color:#3c9;margin-bottom:6px">🎛️ 페이더</div><div id="ftabs" style="display:flex;gap:2px;margin-bottom:8px;flex-wrap:wrap"></div><div id="frows"></div><div id="faderOut" style="margin-top:8px;padding:6px;background:#021;border-radius:4px;color:#7fa;white-space:pre-wrap;font-size:10px"></div>';
+    document.body.appendChild(P);
+    const tabsEl=P.querySelector('#ftabs'), rowsEl=P.querySelector('#frows'), outEl=P.querySelector('#faderOut');
+    const tabsKeys=Object.keys(OBJS);   // 카메라는 ?pick=1(WASD)로 — 페이더는 오브젝트 전용
+    tabsEl.innerHTML=tabsKeys.map(k=>'<button data-o="'+k+'" style="flex:1;min-width:46px;padding:6px 2px;background:'+(k===sel?'#3c9':'#163')+';color:#fff;border:0;border-radius:4px;cursor:pointer;font:11px monospace">'+k+'</button>').join('');
+    const curRows=()=>sel==='카메라'?CAMROWS:OBJROWS;
+    const curST=()=>sel==='카메라'?CAM:ST[sel];
+    function buildRows(){ rowsEl.innerHTML=curRows().map(function(rw){ return '<div style="display:flex;align-items:center;gap:5px;margin:4px 0"><span style="width:42px;color:#9be">'+rw[1]+'</span><input type="range" data-k="'+rw[0]+'" min="'+rw[2]+'" max="'+rw[3]+'" step="'+rw[4]+'" style="flex:1"><span data-v="'+rw[0]+'" style="width:48px;text-align:right;color:#fff"></span></div>'; }).join('');
+      rowsEl.querySelectorAll('input[data-k]').forEach(function(inp){ inp.oninput=function(){ curST()[inp.dataset.k]=+inp.value; sync(); }; }); }
+    function sync(){ var s=curST(); curRows().forEach(function(rw){ var i=rowsEl.querySelector('input[data-k="'+rw[0]+'"]'); if(i)i.value=s[rw[0]]; var v=rowsEl.querySelector('span[data-v="'+rw[0]+'"]'); if(v)v.textContent=(+s[rw[0]]).toFixed(rw[0][0]==='r'?2:(rw[0]==='mul'?2:1)); });
+      if(sel==='카메라') outEl.textContent='카메라\npos ['+CAM.px.toFixed(0)+', '+CAM.py.toFixed(0)+', '+CAM.pz.toFixed(0)+']\nlook ['+CAM.lx.toFixed(0)+', '+CAM.ly.toFixed(0)+', '+CAM.lz.toFixed(0)+']';
+      else { var o=ST[sel]; outEl.textContent=sel+'\npos ['+o.px.toFixed(1)+', '+o.py.toFixed(1)+', '+o.pz.toFixed(1)+']\nrot ['+o.rx.toFixed(2)+', '+o.ry.toFixed(2)+', '+o.rz.toFixed(2)+']\nscale x'+o.mul.toFixed(2); } }
+    tabsEl.querySelectorAll('button[data-o]').forEach(function(b){ b.onclick=function(){ sel=b.dataset.o;
+      if(sel==='카메라'){ var p=ctx.camera.position; CAM.px=p.x;CAM.py=p.y;CAM.pz=p.z; var d=ctx.camera.getWorldDirection(new THREE.Vector3()); CAM.lx=p.x+d.x*150;CAM.ly=p.y+d.y*150;CAM.lz=p.z+d.z*150; }
+      tabsEl.querySelectorAll('button[data-o]').forEach(function(x){x.style.background=x.dataset.o===sel?'#3c9':'#163';}); buildRows(); sync(); }; });
+    buildRows(); sync();
+    console.log('[intro] 🎛️ 페이더(?fader=1). 오브젝트=window.__faderST, 카메라=window.__faderCAM');
+  }
+}catch(e){ LS.fail('인트로 초기화 실패<br>'+(e&&e.message||e)); console.error(e); }
+</script>
+
+<!-- [근거]  (재작업 1회 반영 — 토대 유지·보강만)
+  확정(출처):
+   - 배·바다·하늘 = voyage/modules/(core·physics·water·ship) 그대로 import. 수중 안개/비네트 = water.js 내장(0x0e3850, far=14→잠수 시 95로 확장).
+   - 주인공 오브젝트 = 게임 에셋 /ship_helm.glb(복셀 아닌 타륜). 배 caravel 프로파일 = _PROJECT.md "🔧 배별 갑판"(length56·center·flip·albedoDir·stripRig·useModelHelm).
+   - GSAP ScrollTrigger scrub+snap + 500vh 스크롤 컨테이너 = 사령관 디렉션(휠 따라가기X·섹션스냅·무게감) + _PROJECT.md(Codrops cinematic scroll 패턴). import = esm.sh gsap@3.12.5 / ScrollTrigger.
+   - 타륜 우클릭 드래그 자유회전(yaw+pitch 관성) + 서서히 가까워지며 등장 = 사령관 디렉션. 등장 스케일 0.72→1·시작 p0.32(소견B: 중간컷 또렷).
+   - UI 톤(헥스 칩·코너 프레임·모노 텔레메트리 //NAV/STATUS·시안/네이비 글래스 카드·Close식 코너브래킷) = intro/3~8.jpg(JWE 헥스 블루 HUD) + mas/bug/랜딩2_상세.png(Close 코너브래킷·모노 섹션라벨) + 애셋/전체완성본 맵(교역).png(시안/네이비 글래스 패널·게이지·컴퍼스 톤).
+   - 검증 계약(window.__introReady/__introGo(i)/__ctx/__helm) = scripts/_intro_shot.mjs 요구.
+   - ★IGLOO 레퍼런스 = mas/bug/ 5장 직접 Read 후 반영(앤 경로정정):
+       · 전환.png  → 수면 통과 "베일": 순간 splash 아님, 화면 전체를 부드럽게 덮었다 천천히 빠지는 안개/물보라(±16u 종곡선·screen blend·시안톤). 수면 경계는 통과 순간 fog.far 40으로 좁혀 안개로 녹임. [검증: _shots/intro_veil_0.png — camY≈1.8서 veil opacity 0.75]
+       · 랜딩1.png/랜딩4.png → 단일 오브젝트=주인공+넓은 여백 미니멀 + 림라이트 부각. 타륜 섹션 방향성 일치(유지·강화).
+       · 랜딩4안에들어감.png → 타륜 받침 아래 "은은한 동심원 링/파동" 1요소(셰이더 ring, uw로 페이드, 과하면 uOpacity 0).
+   - ★수중 표현(재작업3) = 사령관 디렉션 "입자로 때우지 말고 수면 안 자체를 살려라(단 미니멀)":
+       · 입자(수면 윤슬 sparkle·플랑크톤 더스트) = THREE.Points가 정사각 "네모"로 보임 + 평평한 수중을 가린 임시방편 → 코드에서 완전 제거.
+       · 대체 = 풀스크린 셰이더 1장: ③caustics 빛결(절차적 노이즈 2겹 능선, martinRenou/threejs-caustics 근사·텍스처 불필요·저강도 0.26·하단 차분) + ④깊이 그라디언트(teal→navy, 하단으로 어두워져 수심감). 광추1·동심원 링1 유지(사령관: 거슬린단 말 없음). 전부 uOpacity로 끌 수 있음.
+   - ★스크롤 임계(재작업3) = 사령관 "단일 휠로 안 넘어가게, 휠 2회 정도. 단 무거운 관성/이징은 정답(유지)": #scroll 500vh→1000vh(섹션 거리↑) + snap delay 0.08→0.22(휠 멈춘 뒤 끈적이게 정착). scrub/ease 무게감 그대로.
+  미정(비움):
+   - 나머지 4섹션(교역·전투·점령·의뢰) — 이 1섹션 통과 시 같은 SNAP/KF 패턴으로 확장(SNAP=[0,.25,.5,.75,1]).
+   - 타륜 스케일/조명/광추·동심원·caustics·전환 베일·스크롤 거리 수치 = 사령관 피드백 튜닝값.
+   - 바다 절대 스케일(미터 환산) = _PROJECT.md 기준 미정 → 수심 게이지 'm'은 연출 표기.
+  제안:
+   - 배 기본값을 caravel로(원본 나무/돛 텍스처가 히어로로 가장 완성도 높음). ?ship=empty|oseberg 토글 유지.
+   - 수심 게이지(우측)·좌하단 모노 텔레메트리 = JWE HUD 차용한 잠수 진행 피드백(레퍼런스 직접 항목 아님 = 제안).
+   - 히어로 텍스트 뒤 방사형 어둠 백드롭(.hero::before, 박스 아님·가장자리 완전 페이드) + text-shadow 보강 = 소견A 가독성(제안 수치).
+-->
+</body></html>
