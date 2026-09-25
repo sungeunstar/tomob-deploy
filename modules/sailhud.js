@@ -12,8 +12,8 @@ export function initSailhud(ctx){
           // ★침로 배지 = 가는 방향(16방위 + 각도). 헤딩업이라 12시=진행방향.
           '<div id="bhHeading" style="font:13px system-ui;color:#efe2bb;background:rgba(10,16,24,.78);border:1px solid rgba(185,146,63,.5);border-radius:8px;padding:3px 13px;white-space:nowrap;letter-spacing:.06em;text-shadow:0 1px 2px #000;"><span style="color:#9ab;font-size:11px;">방향</span> <b>N</b> <span style="color:#8aa;font-size:11px;">000°</span></div>'
           +'<div id="bhDial" style="position:relative;width:158px;height:158px;filter:drop-shadow(0 5px 16px rgba(0,0,0,.6));">'
-          +'<img src="/dial_frame.png" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;">'
-          +'<img id="bhRose" src="/dial_rose.png" style="position:absolute;left:50%;top:50%;width:70%;height:70%;transform:translate(-50%,-50%);transform-origin:50% 50%;pointer-events:none;">'
+          +'<img src="/tomob-deploy/dial_frame.png" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;">'
+          +'<img id="bhRose" src="/tomob-deploy/dial_rose.png" style="position:absolute;left:50%;top:50%;width:70%;height:70%;transform:translate(-50%,-50%);transform-origin:50% 50%;pointer-events:none;">'
           // ★바람·돛 바늘 = 직접 그린 SVG(PNG 기본방향 제각각 문제 제거, 회전 정확 통제). 둘 다 회전 0 = 위(12시).
           //   바람화살(녹색)=풍향(12시 기준). 돛바늘=돛방향, 코드에서 +180 렌더 → 효율 100%일 때 바람 정반대(6시)를 가리킴.
           +'<svg id="bhNeedles" width="158" height="158" viewBox="0 0 158 158" style="position:absolute;inset:0;pointer-events:none;overflow:visible;">'
@@ -23,7 +23,7 @@ export function initSailhud(ctx){
           +'  <g id="bhSail"><line x1="79" y1="79" x2="79" y2="32" stroke="#caa86a" stroke-width="3.4" stroke-linecap="round"/>'
           +'    <path id="bhSailCloth" d="M79,36 q17,10 0,22 z" fill="#e9cf86" stroke="#7a5e23" stroke-width="0.9"/></g>'
           +'</svg>'
-          +'<img src="/dial_hub.png" style="position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%);pointer-events:none;">'
+          +'<img src="/tomob-deploy/dial_hub.png" style="position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%);pointer-events:none;">'
           +'</div>'
           +'<div id="bhInfo" style="font:12px system-ui;color:#cfe0f0;background:rgba(10,16,24,.72);border-radius:8px;padding:3px 11px;white-space:nowrap;"></div>'
           // ⚡ 전력 항해 스태미나 게이지(Shift)

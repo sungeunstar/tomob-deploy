@@ -30,9 +30,9 @@ export function initForge(ctx){
     if(!ctx.terrain || furnace) return;
     const gy=ctx.terrain.groundAt(x,z,5000);
     furnace={x,y:gy,z};
-    const tx=new THREE.TextureLoader().load(encodeURI('/stylized-weaponsmith/textures/Weaponsmith_Base_color.png'));
+    const tx=new THREE.TextureLoader().load(encodeURI('/tomob-deploy/stylized-weaponsmith/textures/Weaponsmith_Base_color.png'));
     tx.colorSpace=THREE.SRGBColorSpace; tx.flipY=false;
-    new FBXLoader().load(encodeURI('/stylized-weaponsmith/source/weaponsmith.fbx'), obj=>{
+    new FBXLoader().load(encodeURI('/tomob-deploy/stylized-weaponsmith/source/weaponsmith.fbx'), obj=>{
       obj.traverse(o=>{ if(o.isMesh){ o.material=new THREE.MeshStandardMaterial({ map:tx, roughness:0.85, metalness:0.1, flatShading:true }); o.castShadow=o.receiveShadow=true; } });
       const bb=new THREE.Box3().setFromObject(obj), s=bb.getSize(new THREE.Vector3());
       obj.scale.setScalar(9/Math.max(s.x,s.z));
@@ -47,7 +47,7 @@ export function initForge(ctx){
 
   // ── 스타일 (invui와 같은 map 톤) ──
   if(!document.getElementById('hb_font')){ const lf=document.createElement('link'); lf.id='hb_font'; lf.rel='stylesheet'; lf.href='https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap'; document.head.appendChild(lf); }
-  const MAP_BG = encodeURI('/애셋/map3.png');
+  const MAP_BG = encodeURI('/tomob-deploy/애셋/map3.png');
   const st=document.createElement('style'); st.textContent=`
     #fg_prompt{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);z-index:25;background:rgba(20,16,9,.8);color:#ffe28a;padding:8px 20px;border-radius:8px;border:1px solid rgba(201,168,90,.5);font:14px Pretendard,system-ui;display:none;pointer-events:none;text-shadow:0 1px 3px #000}
     #fg_panel{position:fixed;inset:0;z-index:42;display:none;align-items:center;justify-content:center;background:rgba(3,7,12,.74);backdrop-filter:blur(4px);font-family:Pretendard,system-ui,'Malgun Gothic'}

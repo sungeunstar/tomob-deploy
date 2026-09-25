@@ -19,7 +19,7 @@ import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT — 육상 지시
 // ★크루 외형 = 사령관이 고른 추종자(?follower=) 모델. opening.js/game.html FOLLOWER_MODELS와 1:1 동기화.
 //   ★KayKit 클래스 6종 한정(사령관 지시 2026-07-05) — 전부 자체 애니 0 → Rig_Medium 공용 클립 리타깃(아래).
 //   구 id(keeper 등 비-KayKit 저장분)는 rogue 폴백.
-const KAY_DIR = '/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
+const KAY_DIR = '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
 const FOLLOWER_MODELS = {
   rogue:        KAY_DIR+'Rogue.glb',
   knight:       KAY_DIR+'Knight.glb',
@@ -29,7 +29,7 @@ const FOLLOWER_MODELS = {
   rogue_hooded: KAY_DIR+'Rogue_Hooded.glb',
 };
 // Rig_Medium 공용 애니 세트(player.js와 동일 리그) — 잡일 FSM용 idle/walk/run + 선택 클립(sit/interact/wave).
-const RIG_DIR = '/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+const RIG_DIR = '/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
 // ★2026-07-13(사령관 "추종자 공격할땐 무기 꺼내서 공격해야지") — CombatMelee 세트 추가.
 //   player.js가 이미 이 파일에서 Melee_1H_Attack_Chop 등 실제 스윙 클립을 검증된 방식으로 씀(동일 리그) — 그대로 재사용.
 const RIG_SETS = ['Rig_Medium_General.glb', 'Rig_Medium_MovementBasic.glb', 'Rig_Medium_Simulation.glb', 'Rig_Medium_CombatMelee.glb'];

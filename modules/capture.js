@@ -9,7 +9,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { tribeById, sigilUrl, TRIBES } from './tribes.js';   // ★ROLE_AXIS 제거 — 야외 영입 로직 폐지(항구 여관 탭으로 이관). TRIBES는 tickSeasonDrift가 계속 사용.
 import { toast as ukToast } from './uikit.js';
 
-const FLAG = encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
+const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
 const CAP_R    = 16;    // 깃발 점령 반경(이 안에 있으면 게이지)
 const CAP_TIME = 5;     // 점령 소요(초, 1x 기여 기준)
 const DECAY    = 0.6;   // 비접전 시 게이지 감쇠 배율

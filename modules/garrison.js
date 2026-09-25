@@ -10,13 +10,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { toast as ukToast } from './uikit.js';
 import { BAL } from './balance.js';
 
-const GUARD = '/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/character-soldier.glb';   // 잠긴 왕국 병사(내장 애니 idle/walk/attack/die)
+const GUARD = '/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/character-soldier.glb';   // 잠긴 왕국 병사(내장 애니 idle/walk/attack/die)
 // 🛡 용병 로스터 — 전부 자체 애니 내장 모델(리타깃 불필요). 이름=세계관(구 추종자 로스터에서 계승).
 const MERCS = [
   { url:GUARD, nm:'잠긴 왕국 병사' },
-  { url:'/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/character-orc.glb', nm:'이방 용병' },
-  { url:'/GruntPolyart.glb',  nm:'봉우리 투사' },
-  { url:'/DogPolyart.glb',    nm:'들개 기사' },
+  { url:'/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/character-orc.glb', nm:'이방 용병' },
+  { url:'/tomob-deploy/GruntPolyart.glb',  nm:'봉우리 투사' },
+  { url:'/tomob-deploy/DogPolyart.glb',    nm:'들개 기사' },
 ];
 const RANGE = 13, CD = 1.3, DMG = 16, HEIGHT = 1.8;
 const PATROL_R = 14, PATROL_SPD = 1.6;   // 정찰 반경(m)·보행 속도

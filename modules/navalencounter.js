@@ -10,21 +10,21 @@ import { initNavalcombat } from './navalcombat.js';
 // 적 배 풀 (sandbox SHIP_PROFILES 기반). headOff = 시각 뱃머리 보정(후진 버그용). name = 전투개시 배너 표기.
 export const ENEMY_POOL = {
   queen:   { headOff: Math.PI, name: "Queen Anne's Revenge",
-             opt: { objUrl:'/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25, showSides:false } },
   caravel: { headOff: 0, name: 'Caravel',
-             opt: { objUrl:'/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
   empty:   { headOff: 0, name: 'Derelict',
-             opt: { objUrl:'/obj/empty-ship/optimized.glb', length:56, helmX:-17, clothSail:'all', showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/empty-ship/optimized.glb', length:56, helmX:-17, clothSail:'all', showSides:false } },
   egyptian:{ headOff: 0, name: 'Egyptian Ship',
-             opt: { objUrl:'/obj/egyptian-ship/optimized.glb', length:24, center:true, flip:true, helmX:-8, helmScale:1.2, rawPBR:{dir:'/obj/egyptian-ship/textures/', base:'Egyptian_Ships_Ship'}, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/egyptian-ship/optimized.glb', length:24, center:true, flip:true, helmX:-8, helmScale:1.2, rawPBR:{dir:'/obj/egyptian-ship/textures/', base:'Egyptian_Ships_Ship'}, showSides:false } },
   // ★2026-07-13(사령관 확인): oseberg(바이킹 롱십)를 타던 상선을 때리면 여지껏 egyptian으로 폴백 — 모양이 완전히 바뀌어 보임.
   //   objUrl/texUrl은 initShip(ship.js) 기본값과 동일(oseberg가 원래 그 함수의 기본 모델 — 가장 오래·안정적으로 검증된 경로).
   //   headOff/flip 등은 캐러벨·empty와 같은 "보정 불필요" 계열 기준(대칭 롱십이라 npc.js buildTemplate도 뱃머리 보정 스킵함).
   //   ⚠️ 실플레이 미검증 — 카메라 방향(headOff)·helm 위치가 어색하면 F5 후 조정 필요.
   oseberg: { headOff: 0, name: 'Viking Longship',
-             opt: { objUrl:'/obj/oseberg-ship/_ex/oseberg.1.8.obj', texUrl:'/obj/oseberg-ship/textures/Body-wood-texture.png', length:24, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/oseberg-ship/_ex/oseberg.1.8.obj', texUrl:'/tomob-deploy/obj/oseberg-ship/textures/Body-wood-texture.png', length:24, showSides:false } },
   shipx:   { headOff: 0, name: 'Ship X',
-             opt: { objUrl:'/obj/ship-x-sail-opaque/optimized.glb', length:70, center:true, bakeFrame:true, deckLevels:[0.9,2.8], ovDeckW:46, ovDeckL:13, deckCx:7, deckCz:-0.5, useModelHelm:true, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/ship-x-sail-opaque/optimized.glb', length:70, center:true, bakeFrame:true, deckLevels:[0.9,2.8], ovDeckW:46, ovDeckL:13, deckCx:7, deckCz:-0.5, useModelHelm:true, showSides:false } },
 };
 
 const LAT = [0, -62, 64, -124, 126];   // 좌우 벌림(중앙→양옆 교대). count만큼 사용.

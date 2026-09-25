@@ -22,7 +22,7 @@ import * as THREE from 'three';
 import { createLightPool, createVisiblePool, radialTexture } from './fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
 
 // ═══════════ 불꽃 = mattatz THREE.Fire 볼류메트릭(레이마칭) — 하네스 그대로 ═══════════
-const FIRE_TEX = new THREE.TextureLoader().load('/_fire_ref.png');
+const FIRE_TEX = new THREE.TextureLoader().load('/tomob-deploy/_fire_ref.png');
 FIRE_TEX.magFilter = FIRE_TEX.minFilter = THREE.LinearFilter;
 FIRE_TEX.wrapS = FIRE_TEX.wrapT = THREE.ClampToEdgeWrapping;
 

@@ -267,7 +267,7 @@ export function initNavalcombat(ctx, opts = {}) {
   const banner = document.createElement('div');
   banner.id = 'nc-battlebanner';
   banner.style.cssText = 'position:fixed;left:50%;top:16%;transform:translate(-50%,-14px);z-index:30;width:min(720px,62vw);aspect-ratio:1680/540;'
-    + "background:url('" + encodeURI('/전투개시에셋.png') + "') center/contain no-repeat;"
+    + "background:url('" + encodeURI('/tomob-deploy/전투개시에셋.png') + "') center/contain no-repeat;"
     + 'pointer-events:none;opacity:0;transition:opacity .45s ease,transform .45s ease;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))';
   // 진입한 배 이름 = 단검 사이 가운데(에셋 세로 ~57% 지점)
   banner.innerHTML = `<div id="nc-bn-name" style="position:absolute;left:50%;top:56.5%;transform:translate(-50%,-50%);width:46%;text-align:center;
@@ -545,8 +545,8 @@ export function initNavalcombat(ctx, opts = {}) {
         <div id="nc-php" style="height:100%;width:100%;background:linear-gradient(90deg,#3a86e8,#5ab0ff)"></div></div>
     </div>
     <div id="nc-fire" style="position:absolute;right:18px;bottom:18px;text-align:right;text-shadow:0 1px 3px #000">
-      <div style="font:600 13px Pretendard;color:#ffd98a;display:flex;align-items:center;justify-content:flex-end;gap:4px"><img src="/ui/icons/icon_cannon.png" style="height:18px;filter:drop-shadow(0 1px 1px #000)">사격 <span class="k">좌클릭</span> <span style="color:#bdb4a0;font-weight:400">현측 직사</span></div>
-      <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:4px"><img src="/ui/icons/icon_reload.png" style="height:15px;filter:drop-shadow(0 1px 1px #000)"><span id="nc-cd" style="font:12px ui-monospace,Consolas,monospace;color:#9fe">준비됨</span></div>
+      <div style="font:600 13px Pretendard;color:#ffd98a;display:flex;align-items:center;justify-content:flex-end;gap:4px"><img src="/tomob-deploy/ui/icons/icon_cannon.png" style="height:18px;filter:drop-shadow(0 1px 1px #000)">사격 <span class="k">좌클릭</span> <span style="color:#bdb4a0;font-weight:400">현측 직사</span></div>
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:4px"><img src="/tomob-deploy/ui/icons/icon_reload.png" style="height:15px;filter:drop-shadow(0 1px 1px #000)"><span id="nc-cd" style="font:12px ui-monospace,Consolas,monospace;color:#9fe">준비됨</span></div>
       <div id="nc-side" style="font:12px Pretendard;color:#bdb4a0;margin-top:2px"></div>
       <div style="font:11px Pretendard;color:#8a8170;margin-top:5px"><span class="k">G</span> 적 리젠 ON/OFF</div>
     </div>
@@ -794,7 +794,7 @@ export function initNavalcombat(ctx, opts = {}) {
 //  - 내 배 무적·적 리스폰 = 사령관 테스트 요청(opts.playerInvincible/respawn로 끌 수 있음).
 //  - 격침 연출 = destruct 3덩어리 voronoi 파편 + 폭연 + 원본 숨김.
 // 수정(2026-06-29 밤 2차 — 사령관 포그라운드 미해결 4건):
-//  - 🔊 선체피격/격침음: sfxOne('crash')=crash.ogg가 404(dev서버 curl 확인) → sfxPath('/w2.mp3')로 교체. canon.mp3는 200(발사음 정상).
+//  - 🔊 선체피격/격침음: sfxOne('crash')=crash.ogg가 404(dev서버 curl 확인) → sfxPath('/tomob-deploy/w2.mp3')로 교체. canon.mp3는 200(발사음 정상).
 //  - 🎯 머즐 플래시: cannon.muzzleFlash(섬광 스프라이트+점광원+연기) broadside 각 포구서 호출(현측 바깥 방향).
 //  - 💥 피격 가시성: cannon.explode에 점광원+불꽃 크기 강화.
 //  - 🌊 격침 파편 부력: destruct makeBreakable({buoy:true}) → 물리 바닥 없는 바다서 가라앉던 파편을 수면(WL)에 부유시켜 잔해로 남김.

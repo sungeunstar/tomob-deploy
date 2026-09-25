@@ -14,11 +14,11 @@ import { BUILDINGS as SETTLE_BUILDINGS } from './settlement.js';   // 🏛️ �
 import { SHIPS as SHIPYARD_SHIPS } from './shipyard.js';           // 🚢 배 카탈로그 — 제작 탭 [선박]에 편입(정의는 shipyard.js가 SSOT)
 
 // ── 아이템 아이콘 = 3D 모델 자동 렌더 (모듈 1회 셋업, 결과 dataURL 캐시) ──
-const _STONE='/assets/kenney_survival-kit/Models/GLB format/resource-stone.glb';
+const _STONE='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/resource-stone.glb';
 const _PLAT='/assets/kenney_all_in_one_3.4.0/3D assets/Platformer Kit/Models/GLB format/';   // 디스크 확인됨(추출 O)
-const _DUN='/obj/LowPolyDungeonsLite/Models/', _DUNTEX='/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
-const _KAIO='/assets/kenney_all_in_one_3.4.0/3D assets/', _KSURV='/assets/kenney_survival-kit/Models/GLB format/';   // Kenney 빌드 GLB(임베드 머티)
-const _KRB='/KayKit_ResourceBits_1.0_FREE/KayKit_ResourceBits_1.0_FREE/Assets/gltf/';   // 🪨 KayKit ResourceBits(광물 너겟·바·통나무) — 텍스처 gltf폴더에 복사됨
+const _DUN='/obj/LowPolyDungeonsLite/Models/', _DUNTEX='/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
+const _KAIO='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/', _KSURV='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/';   // Kenney 빌드 GLB(임베드 머티)
+const _KRB='/tomob-deploy/KayKit_ResourceBits_1.0_FREE/KayKit_ResourceBits_1.0_FREE/Assets/gltf/';   // 🪨 KayKit ResourceBits(광물 너겟·바·통나무) — 텍스처 gltf폴더에 복사됨
 const ICON_MODELS={
   // ★timber/stone/gem/rum = 크래프트 2D 아이콘(ui/icons/) 사용 → ICON_MODELS 썸네일 제외(pv 우선). timber는 통나무 모델 부재로 크레이트 placeholder였음.
   // 🪨 광물 = KayKit ResourceBits 실제 너겟/바 모델(전엔 전부 똑같은 틴팅 stone). tin/coal/cobalt은 전용 모델 없어 틴팅 유지.
@@ -27,16 +27,16 @@ const ICON_MODELS={
   bronze:{ path:_KRB+'Copper_Bar.gltf' },
   gold  :{ path:_KRB+'Gold_Nugget_Medium.gltf' },
   silver:{ path:_KRB+'Silver_Nugget_Medium.gltf' },
-  cannon:{ path:'/obj/pirateship/Cannon_00.fbx', tint:0x3a3f45 },
+  cannon:{ path:'/tomob-deploy/obj/pirateship/Cannon_00.fbx', tint:0x3a3f45 },
   // 🛠️ 손도구(퀵슬롯 썸네일 — player.js LOADOUT과 동일 GLB)
   pickaxe:{ path:_KSURV+'tool-pickaxe.glb', rot:[0.15,-0.5,0.35] },
-  axe    :{ path:'/KayKit_Adventurers_2.0_FREE/Assets/gltf/axe_1handed.gltf', rot:[0.15,-0.5,0.35] },
-  torch  :{ path:'/torch_simple.glb', rot:[0.1,-0.3,0.15] },
+  axe    :{ path:'/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/axe_1handed.gltf', rot:[0.15,-0.5,0.35] },
+  torch  :{ path:'/tomob-deploy/torch_simple.glb', rot:[0.1,-0.3,0.15] },
   hammer :{ path:_KSURV+'tool-hammer-upgraded.glb', rot:[0.15,-0.5,0.35] },   // 🔨 철거 도구 썸네일
-  woodblock:{ path:'/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/wood.gltf' },    // 🧱 축성 티어1
-  wallblock:{ path:'/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/stone.gltf' },   // 🧱 축성 티어2
-  ironblock:{ path:'/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/metal.gltf' },   // 🧱 축성 티어3
-  cannonblock:{ path:'/obj/pirateship/Cannon_00.fbx', tint:0x3a3f45 },   // 🔫 포대 = 대포 모델 썸네일
+  woodblock:{ path:'/tomob-deploy/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/wood.gltf' },    // 🧱 축성 티어1
+  wallblock:{ path:'/tomob-deploy/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/stone.gltf' },   // 🧱 축성 티어2
+  ironblock:{ path:'/tomob-deploy/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/metal.gltf' },   // 🧱 축성 티어3
+  cannonblock:{ path:'/tomob-deploy/obj/pirateship/Cannon_00.fbx', tint:0x3a3f45 },   // 🔫 포대 = 대포 모델 썸네일
   // 던전 건축 부품 = 실제 모델 + 단일아틀라스 텍스처 렌더(이모지 아님)
   dfloor  :{ path:_DUN+'Ground_01.fbx',    tex:_DUNTEX },
   dfloor2 :{ path:_DUN+'Ground_03.fbx',    tex:_DUNTEX },
@@ -66,21 +66,21 @@ const ICON_MODELS={
   // 🚩 거점 깃발(outpost.js와 같은 모델 — 제작 항목과 실제 설치물이 일치해야 알아본다)
   banner  :{ path:_KAIO+'Castle Kit/Models/GLB format/flag.glb' },
   // 🗡️ 용병 배치 — 명부 항목이라 고정 모델이 없다. 대표 아이콘으로 검을 쓴다(이모지 금지).
-  merc_deploy:{ path:'/KayKit_Adventurers_2.0_FREE/Assets/gltf/sword_1handed.gltf', rot:[0.15,-0.5,0.35] },
+  merc_deploy:{ path:'/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/sword_1handed.gltf', rot:[0.15,-0.5,0.35] },
 };
 // 🏛️ 거점 건물 썸네일 — BUG-A3(사령관 "특수건물 ui 실제 glb 불러와서 보여줘야함").
 //   이모지 대신 실제 건물 FBX를 렌더한다. settlement.js가 쓰는 것과 같은 에셋(KayKit Medieval Hexagon,
 //   단일 아틀라스 hexagons_medieval.png) — cfg.tex 경로가 이미 아틀라스 주입을 지원하므로 그대로 얹는다.
 //   ★썸네일 렌더러는 _iconRenderer() 공유 1개 — 항목마다 새 WebGLRenderer를 만들면 컨텍스트 한도를 넘겨
 //     메인 렌더러가 Context Lost(흰 화면)로 죽는다(build.js가 이미 겪은 함정).
-const _HEXB='/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings/yellow/';
+const _HEXB='/tomob-deploy/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings/yellow/';
 for(const [_id, _b] of Object.entries(SETTLE_BUILDINGS)){
   ICON_MODELS['settle_'+_id] = { path:_HEXB+_b.file+'_yellow.fbx', tex:_HEXB+'hexagons_medieval.png' };
 }
 // ⚓🚢 항구·배 썸네일(BUG-A4) — 배는 shipyard SSOT의 실제 GLB를 그대로 쓴다(제작 항목 = 실제 건조물 일치).
 //   항구는 현재 선술집 모델을 재활용 중이라 그 모델로 표시(부두 모델 교체 시 이 경로만 바꾸면 됨).
 // ⚓ 항구 = 실제 부두 모델(the-wharf OBJ). wharf.js가 배치하는 것과 같은 에셋 — 제작 항목과 결과물 일치.
-ICON_MODELS['wharf_build'] = { path:'/the-wharf/source/model/Untitled 1.obj', tex:'/the-wharf/textures/Untitled_1_Mat_1_BaseColor.png' };
+ICON_MODELS['wharf_build'] = { path:'/tomob-deploy/the-wharf/source/model/Untitled 1.obj', tex:'/tomob-deploy/the-wharf/textures/Untitled_1_Mat_1_BaseColor.png' };
 for(const _s of SHIPYARD_SHIPS){
   if(_s && _s.ship && _s.ship.objUrl) ICON_MODELS['ship_'+_s.key] = { path:_s.ship.objUrl, rot:[0.22, Math.PI*0.18, 0] };
 }
@@ -172,9 +172,9 @@ export function initInvui(ctx){
 
   // ── 2단 탭(팰월드식): 상단 1뎁스 [인벤토리][제작][보유배] + 인벤토리 서브 [재료][화물] ──
   const TOP_TABS=[
-    { key:'inv',   label:'인벤토리', img:'/ui/cat_mat.png',   icon:'🎒' },
-    { key:'craft', label:'제작',     img:'/ui/cat_craft.png', icon:'🔨' },
-    { key:'ship',  label:'보유배',   img:'/ui/icons/icon_sail.png', icon:'⚓' },
+    { key:'inv',   label:'인벤토리', img:'/tomob-deploy/ui/cat_mat.png',   icon:'🎒' },
+    { key:'craft', label:'제작',     img:'/tomob-deploy/ui/cat_craft.png', icon:'🔨' },
+    { key:'ship',  label:'보유배',   img:'/tomob-deploy/ui/icons/icon_sail.png', icon:'⚓' },
   ];
   // ★화물은 배에 실리는 것 → '보유배' 화면으로 이동. 인벤토리 = 재료(개인)만.
   const SUB_TABS=[
@@ -864,7 +864,7 @@ export function initInvui(ctx){
   // ── 중앙 실시간 3D 캐릭터 뷰어 (팰월드 인벤 중앙). player.js와 동일 모델/스케일/Idle_A. ──
   const CHAR_GLB={ knight:KAY_CHARS.knight, barbarian:KAY_CHARS.barbarian, mage:KAY_CHARS.mage, ranger:KAY_CHARS.ranger,
     rogue:KAY_CHARS.rogue_hooded, rogue_hooded:KAY_CHARS.rogue_hooded, default:KAY_CHARS.knight };
-  const IDLE_GLB='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Rig_Medium_General.glb';
+  const IDLE_GLB='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Rig_Medium_General.glb';
   let cv=null;   // {canvas,renderer,scene,camera,mixer,clock,model,idleClip,cls,raf,running}
   const _cvLoad=u=>new Promise((res,rej)=>new GLTFLoader().load(encodeURI(u),res,undefined,rej));
   let _cvInit=null;
@@ -924,7 +924,7 @@ export function initInvui(ctx){
     const rows=[
       ['공격', atk!=null?('×'+atk.toFixed(2)):'—'],
       // ★소지중량 제거 — 개인 인벤 무게 제한 폐지(사령관: 무게는 배 화물칸에나). 배 화물칸 무게는 보유배 화면에서 표시.
-      ['토모브의 영혼', String(soul), '#ffe6a0', '/tomobsoul.png'],
+      ['토모브의 영혼', String(soul), '#ffe6a0', '/tomob-deploy/tomobsoul.png'],
       ['◎ 소지금', gold.toLocaleString(), '#f3d978'],
     ];
     statsEl.innerHTML=`
@@ -965,7 +965,7 @@ export function initInvui(ctx){
         <div class="shipRowInfo"><div class="shipRowName">${s.name||'—'}</div>
           <div class="shipDur"><div class="shipDurFill" style="width:${pct}%;background:${dcol}"></div></div>
           <div class="shipRowType">${SHIP_TYPE[s.key]||'배'} · 내구도 ${pct}%</div></div>
-        <div class="shipRowThumb"><img src="/ui/icons/icon_sail.png" alt=""></div></div>`; }).join('');
+        <div class="shipRowThumb"><img src="/tomob-deploy/ui/icons/icon_sail.png" alt=""></div></div>`; }).join('');
     const sel=ships[shipSel], pct=Math.round(sel.dur/durMax*100), dcol=pct>60?'#7fdc9a':pct>30?'#e2c46a':'#dc7f7f';
     // ── 이 배에 실린 화물 (현재 화물칸 = inv.cargo) ──
     const cargoIds=cargoItems();
@@ -986,7 +986,7 @@ export function initInvui(ctx){
       <div class="shipViewCol">
         <div class="shipStage" id="iv_shipstage">
           <div class="shipStageHd"><b>${sel.name||'—'}</b><span>${SHIP_TYPE[sel.key]||'배'} · 내구도 <b style="color:${dcol}">${pct}%</b></span></div>
-          <div class="shipStagePlaceholder" id="iv_shipph"><img src="/ui/icons/icon_sail.png" alt=""></div>
+          <div class="shipStagePlaceholder" id="iv_shipph"><img src="/tomob-deploy/ui/icons/icon_sail.png" alt=""></div>
         </div>
         <div class="shipStats">${statsHtml}</div>
         <div class="shipCargo">
@@ -1002,8 +1002,8 @@ export function initInvui(ctx){
 
   // ── 보유배 3D 뷰어 (persistent 캔버스를 스테이지에 재부착). 배별 모델: caravel=GLB(draco), 그 외=oseberg OBJ. ──
   const SHIP_MODELS={
-    caravel:{ url:'/obj/caravel-ship/optimized.glb', type:'glb' },
-    _default:{ url:'/obj/oseberg-ship/_ex/oseberg.1.8.obj', tex:'/obj/oseberg-ship/textures/Body-wood-texture.png', type:'obj' },
+    caravel:{ url:'/tomob-deploy/obj/caravel-ship/optimized.glb', type:'glb' },
+    _default:{ url:'/tomob-deploy/obj/oseberg-ship/_ex/oseberg.1.8.obj', tex:'/tomob-deploy/obj/oseberg-ship/textures/Body-wood-texture.png', type:'obj' },
   };
   let sv=null, _svInit=null;
   function ensureShipViewer(){

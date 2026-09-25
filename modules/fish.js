@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-const BASE='/monter/optimized/';
+const BASE='/tomob-deploy/monter/optimized/';
 // len=목표 몸길이(m). count=최대 마릿수. school=스쿨당 마리. 상어는 단독 배회.
 const TYPES=[
   { file:'fish_v1', len:0.55, count:24, school:8 },

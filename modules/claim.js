@@ -10,7 +10,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (구조물 HP)
 import { WORLD_SCALE } from './islands.js';   // 🧭 canon↔3D 좌표 변환(축5 세력선언 교역로 조건 — 점령섬↔canon id 매칭용)
 
-const FLAG = encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
+const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
 
 // 점령 건물 재료(정본 16번 §3-1 / 25번 §2-2). [확정 출처: 25_빌딩_건축.md]
 const HARBOR_COST = BAL.structures.harborCost;   // 항구(점령 핵심) — balance.js SSOT. ※G 건설은 wharf.js 전담, 여기선 디버그헬퍼용 잔존
@@ -104,7 +104,7 @@ export function initClaim(ctx){
 
   // ── 실제 대포 모델 (pirateship 키트) — 타워 상단에 얹음 ──
   let _cannonProto = null;
-  new FBXLoader().load('/obj/pirateship/Cannon_00.fbx', obj=>{   // FBX 임베드 원본 '.vox' 참조 404는 core.js 전역 URLModifier가 빈 이미지로 교정
+  new FBXLoader().load('/tomob-deploy/obj/pirateship/Cannon_00.fbx', obj=>{   // FBX 임베드 원본 '.vox' 참조 404는 core.js 전역 URLModifier가 빈 이미지로 교정
     obj.updateMatrixWorld(true);
     const box=new THREE.Box3().setFromObject(obj), sz=new THREE.Vector3(); box.getSize(sz);
     obj.scale.setScalar(2.6/(Math.max(sz.x,sz.y,sz.z)||1));   // 높이 ~2.6m 정규화

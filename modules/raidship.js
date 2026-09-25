@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const SHIP = '/obj/queen-annes-revenge/optimized.glb';   // 해적 갤리온(습격선)
+const SHIP = '/tomob-deploy/obj/queen-annes-revenge/optimized.glb';   // 해적 갤리온(습격선)
 const SHIP_LEN = 22;   // 정규화 길이(m)
 
 export function initRaidship(ctx){

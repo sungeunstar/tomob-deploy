@@ -16,7 +16,7 @@ import { toast as ukToast } from './uikit.js';   // ⚓ 닻 알림
 import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (배 내구도·속도·마모)
 
 // ── ⚓ 조타수(헬름 잡는 NPC) — 모든 배 공용. KayKit 캐릭터를 헬름에 세워 player.js와 같은 'Fishing_Struggling' 재생 ──
-const HELM_ANIM_URL='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Rig_Medium_Simulation.glb';
+const HELM_ANIM_URL='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Rig_Medium_Simulation.glb';
 let _helmRig=null;   // 캐시(전 배 공용 1회 로드 후 클론)
 
 // 🌊 승선감(ride) — 부력을 '수면 위치추종(글루)'에서 '스프링댐퍼(관성)'로. 마루서 관성으로 슈우웅 뜨고 골로 무게있게 착지(SoT/ref 파도1·2).
@@ -287,7 +287,7 @@ function stripRigging(obj){
 }
 
 export async function initShip(ctx, { spawn={x:40,z:40}, length=22, deckBoxes=null, helmX=null, helmScale=1.6, showSides=false, tone=null, stripRig=false, center=false, useModelHelm=false, albedoDir=null, rawPBR=null, flip=false, standUp=false, bakeFrame=false, calmBuoy=false, flatDeck=false, flatDeckY=null, deckLevels=null, deckLadders=null, ovDeckW=null, ovDeckL=null, deckCx=0, deckCz=0, clothSail=false,
-  mtlUrl=null, objUrl='/obj/oseberg-ship/_ex/oseberg.1.8.obj', texUrl='/obj/oseberg-ship/textures/Body-wood-texture.png',
+  mtlUrl=null, objUrl='/tomob-deploy/obj/oseberg-ship/_ex/oseberg.1.8.obj', texUrl='/tomob-deploy/obj/oseberg-ship/textures/Body-wood-texture.png',
   helmsman=false, current=true, cannonStations=false }={}){   // helmsman = 헬름에 조타수 NPC · current=false = ctx.ship 안 덮음(적선) · cannonStations = 원본 대포 메시 제거 후 우리 cannon.glb 설치(플레이어 배 스테이션)
   const { THREE, scene, RAPIER, world } = ctx; ctx.ships = ctx.ships || [];
 
@@ -584,7 +584,7 @@ export async function initShip(ctx, { spawn={x:40,z:40}, length=22, deckBoxes=nu
     for(const h of _hrc.intersectObject(mesh,true)){ const up=h.face&&h.face.normal.clone().transformDirection(h.object.matrixWorld).y>0.5;
       if(up){ const ly=h.point.y-mesh.position.y; if(ly>1 && ly<sz.y*0.75){ _helmDeckY=ly; break; } } }   // 그 지점 실제 갑판 윗면
     bs.helmLocal=new THREE.Vector3(_helmX, _helmDeckY, 0);
-    new GLTFLoader().load('/ship_helm.glb', g=>{ const h=g.scene;
+    new GLTFLoader().load('/tomob-deploy/ship_helm.glb', g=>{ const h=g.scene;
       const hb=new THREE.Box3().setFromObject(h), hs=new THREE.Vector3(); hb.getSize(hs);
       h.scale.setScalar(helmScale/Math.max(hs.y,0.01));            // 사람 키 정도(helmScale로 조정)
       const hb2=new THREE.Box3().setFromObject(h);
@@ -613,7 +613,7 @@ export async function initShip(ctx, { spawn={x:40,z:40}, length=22, deckBoxes=nu
     if(!bs.cannonSlots.length){ bs.cannonSlots.push(
       { x:deckCx, y:deckLocalY, z:deckCz-deckL*0.42, size:2 }, { x:deckCx, y:deckLocalY, z:deckCz+deckL*0.42, size:2 }); }
     // 우리 cannon.glb 설치(각 슬롯에 클론) — 현측 바깥 향함(z<0=좌현/z>0=우현). 크기는 원본 대포 크기에 맞춤.
-    new GLTFLoader().load('/intro/ship-cannon/cannon.glb', g=>{
+    new GLTFLoader().load('/tomob-deploy/intro/ship-cannon/cannon.glb', g=>{
       for(const slot of bs.cannonSlots){ const c=g.scene.clone(true);
         c.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; } });
         const cb=new THREE.Box3().setFromObject(c), cs=new THREE.Vector3(); cb.getSize(cs);

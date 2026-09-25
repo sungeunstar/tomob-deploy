@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const KW='/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
+const KW='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
 
 // ── magic.js EL(속성색) verbatim ──
 const EL = {
@@ -297,9 +297,9 @@ export function initShowcaseFx(ctx){
   // ════════ 마법사 셰이더 파이어볼 — magic.js makeFireball verbatim ════════
   const _tl = new THREE.TextureLoader();
   const _fbN = {
-    perlin:_tl.load('/vfx/pizza3/noise9.jpg'),
-    spark:_tl.load('/vfx/pizza3/sparklenoise.jpg'),
-    water:_tl.load('/vfx/pizza3/water-min.jpg') };
+    perlin:_tl.load('/tomob-deploy/vfx/pizza3/noise9.jpg'),
+    spark:_tl.load('/tomob-deploy/vfx/pizza3/sparklenoise.jpg'),
+    water:_tl.load('/tomob-deploy/vfx/pizza3/water-min.jpg') };
   const FB_VERT=`varying vec3 vNormal; varying vec3 camPos; varying vec2 vUv;
     void main(){ vNormal=normal; vUv=uv; camPos=cameraPosition; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`;
   const FB_FRAG=`uniform vec4 resolution; varying vec3 vNormal; uniform sampler2D perlinnoise; uniform sampler2D sparknoise;
@@ -356,7 +356,7 @@ export function initShowcaseFx(ctx){
   }
 
   // ════════ 마법사 기본 마법화살 — magic.js magicArrow verbatim ════════
-  const TEX_GLOW = (()=>{ const t=_tl.load('/vfx/particles/radial1.png'); t.colorSpace=THREE.SRGBColorSpace; return t; })();
+  const TEX_GLOW = (()=>{ const t=_tl.load('/tomob-deploy/vfx/particles/radial1.png'); t.colorSpace=THREE.SRGBColorSpace; return t; })();
   function sprite(texture, color, size){
     const m = new THREE.Sprite(new THREE.SpriteMaterial({ map:texture, color, blending:THREE.AdditiveBlending, depthWrite:false, transparent:true }));
     m.scale.setScalar(size); return m;

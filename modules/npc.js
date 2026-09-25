@@ -113,7 +113,7 @@ export async function initNpc(ctx){
   //   (T-03) sandbox 는 worldmap 을 로드하지 않으므로 npc 가 정본을 직접 읽어 자급. ctx.worldmap 비었을 때만 채움.
   let worldMap = ctx.worldmap;
   if(!worldMap){
-    try { worldMap = await fetch('/worldmap.canon.json?t='+Date.now()).then(r=>r.json()); }
+    try { worldMap = await fetch('/tomob-deploy/worldmap.canon.json?t='+Date.now()).then(r=>r.json()); }
     catch(e){ console.error('[npc] worldmap 로드 실패 — 중단', e && e.message); return null; }
     if(ctx) ctx.worldmap = worldMap;   // ctx 콘센트 슬롯 채움(파일 수정 아님). 게임 통합 시엔 이미 채워져 있어 건너뜀.
   }
@@ -432,10 +432,10 @@ export async function initNpc(ctx){
   //   enemyKey = navalencounter ENEMY_POOL 매핑(약탈 전투배가 이 상선과 같은 크기로 스폰되게 — seaevents.startPiracy).
   //   ★2026-07-13: oseberg 전용 ENEMY_POOL 항목 추가됨(navalencounter.js) — 이전엔 'egyptian' 폴백이라 때리면 모양이 바뀌어 보였음.
   const NPC_MODELS = [
-    { url:'/obj/oseberg-ship/_ex/oseberg.1.8.obj', type:'obj', enemyKey:'oseberg' },   // 바이킹 롱십(기존)
-    { url:'/obj/caravel-ship/optimized.glb',       type:'glb', enemyKey:'caravel' },    // 캐러벨
-    { url:'/obj/empty-ship/optimized.glb',         type:'glb', enemyKey:'empty' },      // 범선
-    { url:'/obj/egyptian-ship/optimized.glb',      type:'glb', enemyKey:'egyptian' },   // 이집트풍
+    { url:'/tomob-deploy/obj/oseberg-ship/_ex/oseberg.1.8.obj', type:'obj', enemyKey:'oseberg' },   // 바이킹 롱십(기존)
+    { url:'/tomob-deploy/obj/caravel-ship/optimized.glb',       type:'glb', enemyKey:'caravel' },    // 캐러벨
+    { url:'/tomob-deploy/obj/empty-ship/optimized.glb',         type:'glb', enemyKey:'empty' },      // 범선
+    { url:'/tomob-deploy/obj/egyptian-ship/optimized.glb',      type:'glb', enemyKey:'egyptian' },   // 이집트풍
   ];
   let template = null, templateReady = false, templates = [];      // templates[]={tpl,hullHL,hullHW,draft} · template=대표(빌보드/폴백)
   let hullHL = SHIP_LEN * 0.5, hullHW = SHIP_LEN * 0.25;   // 대표 프로브 반길이/반폭(모델별 값은 templates[].에)

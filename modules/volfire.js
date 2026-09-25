@@ -9,7 +9,7 @@ import * as THREE from 'three';
 let _tex = null;
 function fireTex(){
   if(_tex) return _tex;
-  _tex = new THREE.TextureLoader().load('/_fire_mattatz2.png');
+  _tex = new THREE.TextureLoader().load('/tomob-deploy/_fire_mattatz2.png');
   _tex.magFilter = _tex.minFilter = THREE.LinearFilter;
   _tex.wrapS = _tex.wrapT = THREE.ClampToEdgeWrapping;
   _tex.colorSpace = THREE.SRGBColorSpace;

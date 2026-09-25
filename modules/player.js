@@ -6,24 +6,24 @@ import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (무기 데미지
 import { comboHit, comboEnd } from './uikit.js';   // 그로기 난타 콤보 카운터 UI
 
 // KayKit 캐릭터 + Rig_Medium 공용 애니(전 캐릭터 공유). 캐릭터 교체는 charUrl 한 줄.
-const KAY_ANIM_BASE='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+const KAY_ANIM_BASE='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
 const KAY_ANIM_SETS=['Rig_Medium_General.glb','Rig_Medium_MovementBasic.glb','Rig_Medium_MovementAdvanced.glb',
   'Rig_Medium_Tools.glb','Rig_Medium_CombatMelee.glb','Rig_Medium_CombatRanged.glb','Rig_Medium_Simulation.glb'];   // 전 모션(idle/이동/점프/도구/전투/마법/생활)
-const PICK_URL='/assets/kenney_survival-kit/Models/GLB format/tool-pickaxe.glb';
-const PICK_COLORMAP='/assets/kenney_survival-kit/Models/GLB format/Textures/colormap.png';
-const HAMMER_URL='/assets/kenney_survival-kit/Models/GLB format/tool-hammer-upgraded.glb';   // 🔨 철거 도구(kenney 생존킷, colormap 공유)
+const PICK_URL='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/tool-pickaxe.glb';
+const PICK_COLORMAP='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/Textures/colormap.png';
+const HAMMER_URL='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/tool-hammer-upgraded.glb';   // 🔨 철거 도구(kenney 생존킷, colormap 공유)
 // 선택 가능한 플레이어 캐릭터(전부 Rig_Medium 공유 — 동일 애니/도구 설정). 캐릭터 선택 화면에서 이 중 택1.
 export const KAY_CHARS = {
-  knight:      '/KayKit_Adventurers_2.0_FREE/Characters/gltf/Knight.glb',       // 아른(남) — 균형·제작
-  rogue_hooded:'/KayKit_Adventurers_2.0_FREE/Characters/gltf/Rogue_Hooded.glb', // 아른(여) — 기민·채집
-  barbarian:   '/KayKit_Adventurers_2.0_FREE/Characters/gltf/Barbarian.glb',    // 켈드 — 전투·야간생존
-  mage:        '/KayKit_Adventurers_2.0_FREE/Characters/gltf/Mage.glb',         // 고른 — 채굴·공장
-  ranger:      '/KayKit_Adventurers_2.0_FREE/Characters/gltf/Ranger.glb',       // 베른 — 항해·점령
+  knight:      '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Knight.glb',       // 아른(남) — 균형·제작
+  rogue_hooded:'/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Rogue_Hooded.glb', // 아른(여) — 기민·채집
+  barbarian:   '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Barbarian.glb',    // 켈드 — 전투·야간생존
+  mage:        '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Mage.glb',         // 고른 — 채굴·공장
+  ranger:      '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Ranger.glb',       // 베른 — 항해·점령
 };
 // 직업→전투 무기(스킬은 캐릭터 고정. 퀵슬롯 무기와 무관하게 직업 무기로 전투). ?char= 로 선택.
 export const CLASS_WEAPON = { knight:'sword', barbarian:'axe2h', mage:'staff', ranger:'bow', rogue_hooded:'duals', rogue:'duals' };
 // ── 퀵슬롯 장착표(설정표 — voyage _PROJECT.md / _GAME_DESIGN §7-B) ──
-const KW='/KayKit_Adventurers_2.0_FREE/Assets/gltf/';   // KayKit 무기
+const KW='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/';   // KayKit 무기
 // ── 무기 클래스별 콤보(공격 순서)·점프공격·공격속도 ── (KayKit CombatMelee)
 // ★밸런스 숫자(speed/dmg/stam/hit) = balance.js(BAL.weapons) 단일 소스. 여기선 콤보/점프 애니만.
 const COMBOS = {
@@ -38,7 +38,7 @@ export const LOADOUT = {
   none:    { key:'0', label:'빈손', cls:'unarmed' },   // 좌클릭=펀치/킥 콤보, 우클릭=박치기(useRight)
   pickaxe: { key:'1', label:'곡괭이', url:PICK_URL, slot:'r', kenney:true, scale:5, rot:[0,Math.PI,0], anim:'Pickaxing', cycle:true, timeScale:1.8, swing:'chop' },
   axe:     { key:'2', label:'도끼',  url:KW+'axe_1handed.gltf', slot:'r', rot:[0,Math.PI,0], anim:'Chopping', swing:'chop' },   // 벌목 도구
-  torch:   { key:'3', label:'횃불',  url:'/torch_simple.glb', slot:'r', scale:0.4, rot:[0,0,0] },   // 🔥 생산도구 = 밤 조명(torch.js가 불빛). 전투무기 아님(cls 없음). ★torch_simple=Y축 세로 1.57m → scale0.4≈0.63m.
+  torch:   { key:'3', label:'횃불',  url:'/tomob-deploy/torch_simple.glb', slot:'r', scale:0.4, rot:[0,0,0] },   // 🔥 생산도구 = 밤 조명(torch.js가 불빛). 전투무기 아님(cls 없음). ★torch_simple=Y축 세로 1.57m → scale0.4≈0.63m.
   hammer:  { key:'4', label:'망치',  url:HAMMER_URL, slot:'r', kenney:true, scale:5, rot:[0,Math.PI,0], anim:'Chopping', swing:'chop' },   // 🔨 철거 도구 — 내가 지은 축성블록/던전건축물을 조준·좌클릭으로 부숨(재료 1개 환급). 전투무기 아님(cls 없음).
   sword:   { key:'3', label:'검+방패', url:KW+'sword_1handed.gltf', slot:'r', cls:'1h', offhand:KW+'shield_round.gltf', offhandPos:[0,0.039,0.145], swing:'slash' },
   sword2h: { key:'4', label:'양손검', url:KW+'sword_2handed.gltf', slot:'r', cls:'2h', swing:'heavy' },
@@ -79,7 +79,7 @@ const VM_SWINGS={
   draw:  { qUp:_qe(0,0.15,0), qStrike:_qe(0,0.22,0), pUp:new THREE.Vector3(0,0,0.04), pStrike:new THREE.Vector3(0,0,0.10), tUp:0.4,tStrike:0.6,tHold:0.72,speed:2.6 }, // 활/석궁(임시 — 당기기는 활 작업서 정식)
 };
 
-export function initPlayer(ctx, { spawn={x:0,y:60,z:0}, charUrl='/KayKit_Adventurers_2.0_FREE/Characters/gltf/Knight.glb' }={}){
+export function initPlayer(ctx, { spawn={x:0,y:60,z:0}, charUrl='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Knight.glb' }={}){
   if(ctx.player) return ctx.player;   // ★중복 init 방지 — sandbox가 자동 init하므로 ?sys=player 중복 시 아바타·viewmodel·핫바·입력이 두 번 생기는 버그 차단
   const { THREE, scene, camera, renderer, RAPIER, world } = ctx;
   const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(spawn.x,spawn.y,spawn.z));

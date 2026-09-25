@@ -65,9 +65,9 @@
   .lcard .lnote{margin-top:16px;font-size:10px;letter-spacing:.06em;color:#5a7d90;text-align:center;line-height:1.5}
 </style></head>
 <body>
-  <iframe class="layer" id="lIntro" src="/intro/index.html?embed=1" title="intro"></iframe>
-  <iframe class="layer" id="lWarp"  src="/intro/_infinitetubes/warp.html?embed=1" title="warp"></iframe>
-  <iframe class="layer" id="lDim"   src="/intro/_dimension.html?embed=1" title="dimension"></iframe>
+  <iframe class="layer" id="lIntro" src="/tomob-deploy/intro/index.html?embed=1" title="intro"></iframe>
+  <iframe class="layer" id="lWarp"  src="/tomob-deploy/intro/_infinitetubes/warp.html?embed=1" title="warp"></iframe>
+  <iframe class="layer" id="lDim"   src="/tomob-deploy/intro/_dimension.html?embed=1" title="dimension"></iframe>
 
   <div id="hint">SCROLL TO BEGIN<span class="c">⌄</span></div>
 
@@ -156,7 +156,7 @@
   addEventListener('mousemove', e=>{ if(mode!=='intro') return;
     try{ fIntro.contentWindow.dispatchEvent(new MouseEvent('mousemove',{clientX:e.clientX,clientY:e.clientY,bubbles:true})); }catch(_){} });
   // ── 좌클릭 전달: intro 메뉴(START GAME/포트폴리오/문의) 클릭 → iframe이 pointer-events:none이라 부모가 좌표 아래 요소를 찾아 대신 클릭.
-  //   START GAME은 index.html에서 window.top.location='/select.html'(캐릭터 선택)로 이동. (사령관: 스타트→캐릭터선택 연결)
+  //   START GAME은 index.html에서 window.top.location='/tomob-deploy/select.html'(캐릭터 선택)로 이동. (사령관: 스타트→캐릭터선택 연결)
   addEventListener('click', e=>{ if(mode!=='intro' || e.button!==0) return;
     try{ const doc=fIntro.contentDocument; if(!doc) return; const el=doc.elementFromPoint(e.clientX,e.clientY);
       if(el && typeof el.click==='function') el.click(); }catch(_){} });
@@ -219,7 +219,7 @@
                      seq(v){ mode='seq'; seqP=clamp(v); seqDir=1; } };
 
   // ── BGM (bgm_intro = 캐릭터·추종자·진영 선택 페이지 select.html과 동일 곡) + 우상단 ON/OFF 토글 ──
-  const bgm=new Audio('/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
+  const bgm=new Audio('/tomob-deploy/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
   const sndBtn=document.getElementById('sndBtn'), sndLbl=document.getElementById('sndLbl');
   let sndOn=(localStorage.getItem('mas_bgm')!=='off');   // 기본 ON, 사용자 선택 기억(select.html과 키 공유)
   function applySnd(){

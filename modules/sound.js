@@ -2,16 +2,16 @@
 // 출처: mas game.html <audio> 요소(bgm/sfxWave/sfxBoat/sfxSwim/sfxSplash) + main.js sfxToggle(1277)/sfxBoat(6863)/sfxOne(1283).
 // 브라우저 정책: 첫 클릭/키 입력 후 재생 시작.
 import { setUiSound, nowPlaying } from './uikit.js';   // 패널 사운드 훅 + 데스스트랜딩식 now-playing 위젯
-const RPG=encodeURI('/kenney_rpg-audio/Audio/');
+const RPG=encodeURI('/tomob-deploy/kenney_rpg-audio/Audio/');
 
 export function initSound(ctx){
   const mk=(src,loop,vol)=>{ const a=new Audio(encodeURI(src)); a.loop=loop; a.volume=vol; a.preload='auto'; return a; };
   // ── BGM 매니저 — 상황별 배경음악(노래) 크로스페이드(우선순위 battle>cave>home>항해풀). 예전 voxel 게임 이식(사령관) ──
   //   home(smithbgm)=집/안전지대 · cave=동굴 · battle=해상전투 · 항해풀(sail/viking…)=배 1분+ 랜덤 · intro=타이틀. ※폭풍=빗소리(wind.js), 노래 아님.
   // ★storm(폭풍)은 시네마틱 BGM 아님 — 노래가 아니라 빗소리(ambient)라서 wind.js가 /sfx/storm.mp3 루프로 처리. now-playing 위젯은 '노래'에만.
-  const BGM_SRC={ sail:'/bgm_main.mp3', viking:'/bgm_viking.mp3', silence:'/bgm_silence.mp3', cave:'/sfx/bgm_cave.mp3', home:'/sfx/bgm_home.mp3', battle:'/bgm_battle.mp3', intro:'/bgm_intro.mp3',
+  const BGM_SRC={ sail:'/tomob-deploy/bgm_main.mp3', viking:'/tomob-deploy/bgm_viking.mp3', silence:'/tomob-deploy/bgm_silence.mp3', cave:'/tomob-deploy/sfx/bgm_cave.mp3', home:'/tomob-deploy/sfx/bgm_home.mp3', battle:'/tomob-deploy/bgm_battle.mp3', intro:'/tomob-deploy/bgm_intro.mp3',
     // ★2026-07-16(사령관): 던전 BGM = 동굴 음원(bgm_cave) 재사용 · dnd1/dnd2 = 상시 기본 앰비언트(순환)
-    dungeon:'/sfx/bgm_cave.mp3', dnd1:'/dnd1.mp3', dnd2:'/dnd2.mp3' };
+    dungeon:'/tomob-deploy/sfx/bgm_cave.mp3', dnd1:'/tomob-deploy/dnd1.mp3', dnd2:'/tomob-deploy/dnd2.mp3' };
   const BGM_VOL={ sail:0.30, viking:0.30, silence:0.30, cave:0.32, home:0.34, battle:0.40, intro:0.40,
     dungeon:0.34, dnd1:0.24, dnd2:0.24 };
   const SAIL_POOL=['sail','viking','silence'];   // 항해 랜덤 풀 — 1분+ 항해 후 arm 시 이 중 1곡 랜덤. 곡 추가 시 여기만 늘리면 됨.
@@ -71,13 +71,13 @@ export function initSound(ctx){
   AMBIENT.forEach(nm=>{ const a=bgmAudio(nm); a.addEventListener('ended', ()=>{
     if(_bgmCur===nm){ _ambState='cooldown'; _ambT = AMB_COOL.min + Math.random()*(AMB_COOL.max-AMB_COOL.min);
       _ambIdx=(_ambIdx+1)%AMBIENT.length; try{ a.currentTime=0; }catch(_){} } }); });
-  const ocean = mk('/suimo_ocean.wav', true, 0.28);  // 바다 ambient(파도) — loop
-  const boat  = mk('/sfx/boat.mp3', true, 0);        // 배 항해 소리 — 속도 비례
-  const swim  = mk('/sfx/swim.mp3', true, 0);        // 수영 중 — loop
+  const ocean = mk('/tomob-deploy/suimo_ocean.wav', true, 0.28);  // 바다 ambient(파도) — loop
+  const boat  = mk('/tomob-deploy/sfx/boat.mp3', true, 0);        // 배 항해 소리 — 속도 비례
+  const swim  = mk('/tomob-deploy/sfx/swim.mp3', true, 0);        // 수영 중 — loop
   // ── 지속(loop) 상태음 — volume 0/양수로 페이드 인·아웃. 트리거는 각 모듈이 API로 켬. (사령관 신규 mp3) ──
-  const heart   = mk('/sfx_heartbeat.mp3', true, 0);  // 위험존(추위/더위) 체력 드레인 중 심장박동
-  const dive    = mk('/sfx_diving.mp3', true, 0);     // 머리까지 잠긴 수중
-  const iceWind = mk('/sfx_icewind.mp3', true, 0);    // 얼음섬 지역 ambient
+  const heart   = mk('/tomob-deploy/sfx_heartbeat.mp3', true, 0);  // 위험존(추위/더위) 체력 드레인 중 심장박동
+  const dive    = mk('/tomob-deploy/sfx_diving.mp3', true, 0);     // 머리까지 잠긴 수중
+  const iceWind = mk('/tomob-deploy/sfx_icewind.mp3', true, 0);    // 얼음섬 지역 ambient
   const LOOPS=[heart,dive,iceWind];
 
   let started=false, sailSecs=0;
@@ -103,7 +103,7 @@ export function initSound(ctx){
   function stopPath(path){ const p=pools[path]; if(!p) return; p.arr.forEach(a=>{ try{ a.pause(); a.currentTime=0; }catch(_){} }); }
 
   // ── 게임 이벤트 사운드 테이블 (사령관 선별 WAV) — play(event)로 호출 ──
-  const W='/WAV Files/';
+  const W='/tomob-deploy/WAV Files/';
   const SFX_DIR={  // 이벤트 → {files:[상대경로…], vol}. 변형 여럿이면 랜덤 1개.
     // 마법(스펠)
     spell_fire:      { files:['SFX/Spells/Fireball 1.wav','SFX/Spells/Fireball 3.wav'], vol:0.55 },
@@ -126,59 +126,59 @@ export function initSound(ctx){
     chest_close: { files:['SFX/Doors Gates and Chests/Chest Close 1.wav'], vol:0.6 },
     door_open:   { files:['SFX/Doors Gates and Chests/Door Open 1.wav'], vol:0.6 },
     door_close:  { files:['SFX/Doors Gates and Chests/Door Close 1.wav'], vol:0.6 },
-    coin:        { files:['/kenney_rpg-audio/Audio/handleCoins.ogg','/kenney_rpg-audio/Audio/handleCoins2.ogg'], vol:0.5 },   // 아이템/재화 획득(무음이던 것 — 커버리지 채움)
+    coin:        { files:['/tomob-deploy/kenney_rpg-audio/Audio/handleCoins.ogg','/tomob-deploy/kenney_rpg-audio/Audio/handleCoins2.ogg'], vol:0.5 },   // 아이템/재화 획득(무음이던 것 — 커버리지 채움)
     // ── 대포·선박·구조물 (구 하드코딩 경로 흡수 — 볼륨은 호출부 opts.vol로 조정) ──
-    cannon_fire: { files:['/canon.mp3'], vol:0.55 },              // 대포 발사
-    ship_crash:  { files:['/crash.mp3'], vol:0.5 },               // 선체 피격/격침
-    big_splash:  { files:['/suimo_bigsplash.wav'], vol:0.7 },     // 대형 물기둥(격침)
-    destroy:     { files:['/w2.mp3'], vol:0.6 },           // 구조물 파괴
-    fortTower:   { files:['/타워부서짐.mp3'], vol:0.7 },   // 🏰 요새 방어탑 파괴(사령관 신규)
-    fortCastle:  { files:['/성부서짐.mp3'], vol:0.8 },     // 🏰 요새 본성 파괴(사령관 신규)
+    cannon_fire: { files:['/tomob-deploy/canon.mp3'], vol:0.55 },              // 대포 발사
+    ship_crash:  { files:['/tomob-deploy/crash.mp3'], vol:0.5 },               // 선체 피격/격침
+    big_splash:  { files:['/tomob-deploy/suimo_bigsplash.wav'], vol:0.7 },     // 대형 물기둥(격침)
+    destroy:     { files:['/tomob-deploy/w2.mp3'], vol:0.6 },           // 구조물 파괴
+    fortTower:   { files:['/tomob-deploy/타워부서짐.mp3'], vol:0.7 },   // 🏰 요새 방어탑 파괴(사령관 신규)
+    fortCastle:  { files:['/tomob-deploy/성부서짐.mp3'], vol:0.8 },     // 🏰 요새 본성 파괴(사령관 신규)
     build_place: { files:['SFX/Footsteps/Wood/Wood Land.wav'], vol:0.6 },   // 구조물 배치(나무 쿵)
     // ── 사령관 신규 mp3 (voyage 루트 절대경로 — '/'로 시작하면 W 접두 안 붙음) ──
-    crit_hit:    { files:['/sfx_crit.mp3'], vol:0.7 },              // 크리티컬(근접·화살·마법 공통 통로 damageMonster)
-    melee_miss:  { files:['/sfx_miss.mp3'], vol:0.4 },              // 근접 헛스윙(명중 0)
-    punch:       { files:['/펀치.mp3'], vol:0.55 },                 // 🥊 맨손 공격(사령관 — 칼 소리 대신 펀치)
-    rogue_attack:{ files:['/sfx_rogue_attack.mp3'], vol:0.5 },      // 도적(단검) 좌클릭 공격
-    stealth_on:  { files:['/sfx_stealth_on.mp3'], vol:0.55 },       // 로그 은신 진입(투명)
-    stealth_off: { files:['/sfx_stealth_off.mp3'], vol:0.55 },      // 로그 은신 해제(투명 풀림)
-    ranger_aim:  { files:['/sfx_ranger_aim.mp3'], vol:0.55 },       // 레인저 특수키(활 조준 진입)
-    shockwave:   { files:['/충격파.mp3'], vol:0.8 },                // 기사 궁극기(방패 충격파) 발동 음성 — 사령관 지정
+    crit_hit:    { files:['/tomob-deploy/sfx_crit.mp3'], vol:0.7 },              // 크리티컬(근접·화살·마법 공통 통로 damageMonster)
+    melee_miss:  { files:['/tomob-deploy/sfx_miss.mp3'], vol:0.4 },              // 근접 헛스윙(명중 0)
+    punch:       { files:['/tomob-deploy/펀치.mp3'], vol:0.55 },                 // 🥊 맨손 공격(사령관 — 칼 소리 대신 펀치)
+    rogue_attack:{ files:['/tomob-deploy/sfx_rogue_attack.mp3'], vol:0.5 },      // 도적(단검) 좌클릭 공격
+    stealth_on:  { files:['/tomob-deploy/sfx_stealth_on.mp3'], vol:0.55 },       // 로그 은신 진입(투명)
+    stealth_off: { files:['/tomob-deploy/sfx_stealth_off.mp3'], vol:0.55 },      // 로그 은신 해제(투명 풀림)
+    ranger_aim:  { files:['/tomob-deploy/sfx_ranger_aim.mp3'], vol:0.55 },       // 레인저 특수키(활 조준 진입)
+    shockwave:   { files:['/tomob-deploy/충격파.mp3'], vol:0.8 },                // 기사 궁극기(방패 충격파) 발동 음성 — 사령관 지정
     // 구르기/공격 기합 — 원본에서 앞 5개 그런트 컷(매 재생 랜덤). 구르기=매번 · 공격=1/3(호출부 확률).
-    dodge_roll:  { files:['/sfx_dodge_f1.mp3','/sfx_dodge_f2.mp3','/sfx_dodge_f3.mp3','/sfx_dodge_f4.mp3','/sfx_dodge_f5.mp3'], vol:0.5 },   // 여캐(도적)
-    dodge_roll_m:{ files:['/sfx_dodge_m1.mp3','/sfx_dodge_m2.mp3','/sfx_dodge_m3.mp3','/sfx_dodge_m4.mp3','/sfx_dodge_m5.mp3'], vol:0.5 },   // 남캐(기사·전사·마법사·레인저)
-    levelup:     { files:['/sfx_levelup.mp3'], vol:0.6 },           // 레벨업
-    buff:        { files:['/sfx_buff.mp3'], vol:0.55 },             // 버프 스킬 발동
-    success:     { files:['/sfx_success.mp3'], vol:0.55 },          // 거래·대장간 성공(공용)
-    ui_click:    { files:['/button.mp3'], vol:0.4 },                // UI 버튼 클릭
-    craft_done:  { files:['/제작완료.mp3'], vol:0.6 },              // ★제작 완료 전용(사령관 신규)
-    reward:      { files:['/보상획득.mp3'], vol:0.6 },              // ★보상·금화 획득(사령관 신규)
-    item_in:     { files:['/아이템들어오는소리.mp3'], vol:0.5 },     // ★아이템 흡수(채광·벌목 조각/영혼 개당 1소리, 사령관 신규)
-    anchor:      { files:['/닻내릴떄.mp3'], vol:0.6 },               // ★닻 내림(T, ship.js, 사령관 신규)
-    boom:        { files:['/boom.mp3'], vol:0.6 },                  // 폭발
-    fall:        { files:['/fall.mp3'], vol:0.5 },                  // 낙하/추락 피해
-    drown:       { files:['/sfx_drown.mp3'], vol:0.5 },             // 물에 빠짐
-    mon_ghost:   { files:['/sfx_ghost.mp3'], vol:0.5 },             // 유령 몹
+    dodge_roll:  { files:['/tomob-deploy/sfx_dodge_f1.mp3','/tomob-deploy/sfx_dodge_f2.mp3','/tomob-deploy/sfx_dodge_f3.mp3','/tomob-deploy/sfx_dodge_f4.mp3','/tomob-deploy/sfx_dodge_f5.mp3'], vol:0.5 },   // 여캐(도적)
+    dodge_roll_m:{ files:['/tomob-deploy/sfx_dodge_m1.mp3','/tomob-deploy/sfx_dodge_m2.mp3','/tomob-deploy/sfx_dodge_m3.mp3','/tomob-deploy/sfx_dodge_m4.mp3','/tomob-deploy/sfx_dodge_m5.mp3'], vol:0.5 },   // 남캐(기사·전사·마법사·레인저)
+    levelup:     { files:['/tomob-deploy/sfx_levelup.mp3'], vol:0.6 },           // 레벨업
+    buff:        { files:['/tomob-deploy/sfx_buff.mp3'], vol:0.55 },             // 버프 스킬 발동
+    success:     { files:['/tomob-deploy/sfx_success.mp3'], vol:0.55 },          // 거래·대장간 성공(공용)
+    ui_click:    { files:['/tomob-deploy/button.mp3'], vol:0.4 },                // UI 버튼 클릭
+    craft_done:  { files:['/tomob-deploy/제작완료.mp3'], vol:0.6 },              // ★제작 완료 전용(사령관 신규)
+    reward:      { files:['/tomob-deploy/보상획득.mp3'], vol:0.6 },              // ★보상·금화 획득(사령관 신규)
+    item_in:     { files:['/tomob-deploy/아이템들어오는소리.mp3'], vol:0.5 },     // ★아이템 흡수(채광·벌목 조각/영혼 개당 1소리, 사령관 신규)
+    anchor:      { files:['/tomob-deploy/닻내릴떄.mp3'], vol:0.6 },               // ★닻 내림(T, ship.js, 사령관 신규)
+    boom:        { files:['/tomob-deploy/boom.mp3'], vol:0.6 },                  // 폭발
+    fall:        { files:['/tomob-deploy/fall.mp3'], vol:0.5 },                  // 낙하/추락 피해
+    drown:       { files:['/tomob-deploy/sfx_drown.mp3'], vol:0.5 },             // 물에 빠짐
+    mon_ghost:   { files:['/tomob-deploy/sfx_ghost.mp3'], vol:0.5 },             // 유령 몹
     // ── 기존 몬스터 사운드 (mas/sfx/mon/ — 통합 흡수, 변형 여럿=랜덤) ──
-    mon_death:   { files:['/sfx/mon/death1.wav','/sfx/mon/death2.wav'], vol:0.5 },   // 사망
-    mon_growl:   { files:['/sfx/mon/growl1.wav','/sfx/mon/growl2.wav'], vol:0.5 },   // 추격 개시
-    mon_atk:     { files:['/sfx/mon/atk1.wav','/sfx/mon/atk2.wav'], vol:0.6 },       // 공격 명중
-    mon_grunt:   { files:['/sfx/mon/grunt1.wav'], vol:0.5 },   // 미사용 자산 — 둔중한 몹(골렘/거북) 배정 후보
-    mon_hiss:    { files:['/sfx/mon/hiss1.wav'], vol:0.5 },    // 미사용 자산 — 뱀파이어/슬라임 후보
-    mon_moan:    { files:['/sfx/mon/moan1.wav'], vol:0.5 },    // 미사용 자산 — 좀비 후보
+    mon_death:   { files:['/tomob-deploy/sfx/mon/death1.wav','/tomob-deploy/sfx/mon/death2.wav'], vol:0.5 },   // 사망
+    mon_growl:   { files:['/tomob-deploy/sfx/mon/growl1.wav','/tomob-deploy/sfx/mon/growl2.wav'], vol:0.5 },   // 추격 개시
+    mon_atk:     { files:['/tomob-deploy/sfx/mon/atk1.wav','/tomob-deploy/sfx/mon/atk2.wav'], vol:0.6 },       // 공격 명중
+    mon_grunt:   { files:['/tomob-deploy/sfx/mon/grunt1.wav'], vol:0.5 },   // 미사용 자산 — 둔중한 몹(골렘/거북) 배정 후보
+    mon_hiss:    { files:['/tomob-deploy/sfx/mon/hiss1.wav'], vol:0.5 },    // 미사용 자산 — 뱀파이어/슬라임 후보
+    mon_moan:    { files:['/tomob-deploy/sfx/mon/moan1.wav'], vol:0.5 },    // 미사용 자산 — 좀비 후보
     // ── 드래곤 보스 (DRG_SFX 흡수 — 거리감쇠는 호출부 drgVol이 opts.vol로 전달) ──
-    drg_breath:  { files:['/dragon_breath.mp3'], vol:0.95 },   // 브레스
-    drg_roar:    { files:['/dragon_roar.mp3'], vol:0.7 },   // 헤비/착지 포효
-    drg_epicroar:{ files:['/dragon_epicroar.mp3'], vol:1.0 },   // 진입/페이즈2
-    drg_growl:   { files:['/dragon_growl.mp3'], vol:0.6 },   // 근접 예비동작
-    drg_claw:    { files:['/dragon_claw.mp3'], vol:0.7 },   // 발톱 명중
-    drg_wings:   { files:['/dragon_wings.mp3'], vol:0.85 },   // 상승/비행
-    drg_hurt:    { files:['/dragon_hurt.mp3'], vol:0.75 },   // 피격
-    drg_roar2:   { files:['/dragon_roar2.mp3'], vol:0.7 },   // ⏸백로그 — roar 변형(현재 미사용, 등록만)
-    drg_wings2:  { files:['/dragon_wings2.mp3'], vol:0.85 },   // ⏸백로그 — 날갯짓 변형(현재 미사용, 등록만)
+    drg_breath:  { files:['/tomob-deploy/dragon_breath.mp3'], vol:0.95 },   // 브레스
+    drg_roar:    { files:['/tomob-deploy/dragon_roar.mp3'], vol:0.7 },   // 헤비/착지 포효
+    drg_epicroar:{ files:['/tomob-deploy/dragon_epicroar.mp3'], vol:1.0 },   // 진입/페이즈2
+    drg_growl:   { files:['/tomob-deploy/dragon_growl.mp3'], vol:0.6 },   // 근접 예비동작
+    drg_claw:    { files:['/tomob-deploy/dragon_claw.mp3'], vol:0.7 },   // 발톱 명중
+    drg_wings:   { files:['/tomob-deploy/dragon_wings.mp3'], vol:0.85 },   // 상승/비행
+    drg_hurt:    { files:['/tomob-deploy/dragon_hurt.mp3'], vol:0.75 },   // 피격
+    drg_roar2:   { files:['/tomob-deploy/dragon_roar2.mp3'], vol:0.7 },   // ⏸백로그 — roar 변형(현재 미사용, 등록만)
+    drg_wings2:  { files:['/tomob-deploy/dragon_wings2.mp3'], vol:0.85 },   // ⏸백로그 — 날갯짓 변형(현재 미사용, 등록만)
     // ⏸ 보류 — 게임(monsters.js) 미편입 몹. 편입 시 트리거 연결.
-    mon_creep:   { files:['/sfx_creep.mp3'], vol:0.5 },             // 크립(monter/out/mon1) — 미편입
-    mon_woman:   { files:['/sfx_woman_mob.mp3'], vol:0.5 },         // 여성형 몹 — 미편입
+    mon_creep:   { files:['/tomob-deploy/sfx_creep.mp3'], vol:0.5 },             // 크립(monter/out/mon1) — 미편입
+    mon_woman:   { files:['/tomob-deploy/sfx_woman_mob.mp3'], vol:0.5 },         // 여성형 몹 — 미편입
   };
   // 이벤트 사운드 1회 재생. opts.vol로 볼륨 덮어쓰기. files 경로가 '/'로 시작하면 절대(신규 mp3), 아니면 W(WAV Files) 접두.
   function play(event, opts={}){ const e=SFX_DIR[event]; if(!e) return; const rel=e.files[(Math.random()*e.files.length)|0]; const src=rel[0]==='/'?rel:W+rel; play1(src, opts.vol ?? e.vol ?? 0.5, opts.rate ?? e.rate); }
@@ -202,7 +202,7 @@ export function initSound(ctx){
 
   const FOOT=1.15; let stepT=0, wasInWater=false;
   // ── 지면별 발걸음 (물→Water·갑판→Wood·동굴→Stone·지상→Dirt) + 걷기/달리기, 변형 1~5 랜덤 ──
-  const FS='/WAV Files/SFX/Footsteps/';
+  const FS='/tomob-deploy/WAV Files/SFX/Footsteps/';
   function surfaceOf(pl, onShip){
     if(onShip) return 'Wood';
     if(ctx.cave && ctx.cave.inside && ctx.cave.inside()) return 'Stone';   // 동굴(모듈 있을 때만)

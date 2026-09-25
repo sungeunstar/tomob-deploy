@@ -3,8 +3,8 @@
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 
-const MODEL = '/island/sea-keep-lonely-watcher/source/Stronghold.fbx';
-const TEXTURES = '/island/sea-keep-lonely-watcher/textures/';
+const MODEL = '/tomob-deploy/island/sea-keep-lonely-watcher/source/Stronghold.fbx';
+const TEXTURES = '/tomob-deploy/island/sea-keep-lonely-watcher/textures/';
 const TARGET_SPAN = 520;
 
 function materialsOf(mesh){

@@ -15,9 +15,9 @@
 //                 조작 문구는 **코드에서 직접 확인한 것만** 넣는다.
 //   톤: 서사는 확정 로어 원문이라 평서체 / 조작 안내는 존댓말.
 
-const BG   = '/ui/loading_bg.png';
-const ICON = '/ui/loading_lantern_icon.png';
-const LOGO = '/intro/logo.png';
+const BG   = '/tomob-deploy/ui/loading_bg.png';
+const ICON = '/tomob-deploy/ui/loading_lantern_icon.png';
+const LOGO = '/tomob-deploy/intro/logo.png';
 
 export const LOAD_TIPS = [
   // ── 세계 ──

@@ -8,7 +8,7 @@ export function initCore({ sky=0x8fc1e3 }={}){
   const _BLANK_PNG='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/pLvAAAAAElFTkSuQmCC';
   THREE.DefaultLoadingManager.setURLModifier(u=>{
     if(/\.vox(\?|$)/i.test(u)) return _BLANK_PNG;                                                   // 대포 등 원본 MagicaVoxel 참조(미사용) → 빈 이미지
-    if(/LowPolyDungeonsLite.*Texture_01\.png/i.test(u)) return '/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';   // 던전 아틀라스 실경로
+    if(/LowPolyDungeonsLite.*Texture_01\.png/i.test(u)) return '/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';   // 던전 아틀라스 실경로
     return u.replace(/\/Meshes\/Rocks\/([^\/?#]+\.png)/i, '/Textures/$1');                          // Polytope 바위: Meshes/Rocks → Textures (실텍스처 연결)
   });
 

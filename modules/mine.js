@@ -34,7 +34,7 @@ export async function initMine(ctx, opts={}){
     const s=target/Math.max(sz.x,sz.y,sz.z); geo.translate(-c.x,-c.y,-c.z); geo.scale(s,s,s); geo.computeVertexNormals(); geo.computeBoundingBox(); geo.translate(0,-geo.boundingBox.min.y,0); return geo; }
 
   // ── 광물 정의 (인벤 item: 철광석→iron, 나머지→stone) ──
-  const O='/obj/', U='/unity/Polytope Studio/Lowpoly_Environments/Sources/Meshes/Rocks/';
+  const O='/tomob-deploy/obj/', U='/tomob-deploy/unity/Polytope Studio/Lowpoly_Environments/Sources/Meshes/Rocks/';
   // ── geo 소스(메시) 6종 — 광물 9종이 공유. 사령관: "기존 거 텍스처 느낌·색만 변경" ──
   const GEO_SRC = {
     ruda:    { type:'objmtl', dir:O+'minerals/source/_unr/',       obj:'Ruda_final.obj', mtl:'Ruda_final.mtl' },  // 금속 결정질
@@ -107,7 +107,7 @@ export async function initMine(ctx, opts={}){
     const f=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.30),sl);f.position.set(0,0,0.08); const h=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.12,0.11),sk);h.position.set(0,0,-0.13); g.add(f);g.add(h); return g; })();
   armG.position.set(0.22,-0.36,-0.6); armG.rotation.set(0.55,-0.5,0.12);
   const toolG=new THREE.Group(); inner.add(armG); inner.add(toolG); swingGroup.add(inner); heldGroup.add(swingGroup); camera.add(heldGroup); if(!camera.parent) scene.add(camera);
-  new GLTFLoader().load(encodeURI('/assets/kenney_survival-kit/Models/GLB format/tool-pickaxe.glb'), g=>{ armG.visible=false;
+  new GLTFLoader().load(encodeURI('/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/tool-pickaxe.glb'), g=>{ armG.visible=false;
     const m=g.scene.clone(true); m.traverse(o=>{ if(o.isMesh){ o.frustumCulled=false; const s=Array.isArray(o.material)?o.material[0]:o.material;
       o.material=new THREE.MeshLambertMaterial({map:(s&&s.map)?s.map:null,color:(s&&s.map)?0xffffff:0xb9b9b9}); }});
     const bb=new THREE.Box3().setFromObject(m); const bs=Math.max(bb.max.x-bb.min.x,bb.max.y-bb.min.y,bb.max.z-bb.min.z)||1;
@@ -120,8 +120,8 @@ export async function initMine(ctx, opts={}){
   // ── 칩(광물색)/sfx ──
   function sfx(u,v){ let a=null; try{a=new Audio(u);a.volume=v;}catch(e){} return ()=>{try{if(a){const n=a.cloneNode();n.volume=v;n.play().catch(()=>{});}}catch(e){}}; }
   // 곡괭이 광석 타격음 — a-pickaxe-hitting-an-ore.wav에서 3개 잘라 랜덤 재생(단조로움 방지)
-  const _hits=['/ore_hit1.mp3','/ore_hit2.mp3','/ore_hit3.mp3'].map(u=>sfx(u,0.75));
-  const sfxHit=()=>_hits[(Math.random()*_hits.length)|0](); const sfxBreak=sfx('/ore_break.mp3',0.9);   // 광석 깨짐=rubble crash
+  const _hits=['/tomob-deploy/ore_hit1.mp3','/tomob-deploy/ore_hit2.mp3','/tomob-deploy/ore_hit3.mp3'].map(u=>sfx(u,0.75));
+  const sfxHit=()=>_hits[(Math.random()*_hits.length)|0](); const sfxBreak=sfx('/tomob-deploy/ore_break.mp3',0.9);   // 광석 깨짐=rubble crash
   const chips=[]; const chipGeo=new THREE.BoxGeometry(0.12,0.08,0.14); const _chipMat=new Map();
   function chipMatFor(c){ const k=(c==null)?'def':c; if(_chipMat.has(k))return _chipMat.get(k); const m=new THREE.MeshStandardMaterial({color:(c==null)?0x8d8a86:c,roughness:0.85,flatShading:true}); _chipMat.set(k,m); return m; }
   function spawnChips(p,n=8,color){ const mat=chipMatFor(color); for(let i=0;i<n;i++){ const m=new THREE.Mesh(chipGeo,mat); m.position.copy(p); m.castShadow=true; scene.add(m);

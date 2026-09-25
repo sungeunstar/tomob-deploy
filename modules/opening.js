@@ -79,24 +79,24 @@ const TUTO_STEPS = {
   steer: { title:'추종자 — "키를 잡아보세요"',
     text:`<p>"바람이 좋아요. 우선 <b style="color:#f0d9a8">조타륜</b>부터 잡아보세요."</p><p>"선미의 조타륜 앞으로 가서 키를 잡으면, 이 배는 선장님 것이 됩니다."</p>`,
     keys:[['Z','조타륜을 잡는다 / 놓는다']],
-    img:'/ui/tuto_steer.png',
+    img:'/tomob-deploy/ui/tuto_steer.png',
     foot:'갑판을 걸어 조타륜으로 — [Z]' },
   sail: { title:'추종자 — "돛을 펴보세요"',
     text:`<p>"좋아요, 키를 잡으셨네요. 이제 <b style="color:#f0d9a8">돛</b>을 펴서 바람을 받아보세요."</p><p>"활짝 펼수록 빨라져요. 멈추고 싶으면 접으면 됩니다."</p>`,
     keys:[['W','돛을 편다'],['S','돛을 접는다']],
-    img:'/ui/tuto_sail.png',
+    img:'/tomob-deploy/ui/tuto_sail.png',
     foot:'W를 눌러 돛을 끝까지 펴 보세요' },
   navigate: { title:'추종자 — "방향을 틀어보세요"',
     text:`<p>"바람을 탔어요! 이제 원하는 곳으로 방향을 틀어보세요."</p><p>"키는 <b style="color:#f0d9a8">A/D</b>로 돌립니다. 배는 천천히 도니까 미리미리 트세요."</p>`,
     keys:[['A','왼쪽으로 조타'],['D','오른쪽으로 조타'],['Z','키를 놓는다']],
-    img:'/ui/tuto_navigate.png',
+    img:'/tomob-deploy/ui/tuto_navigate.png',
     foot:'A/D로 자유롭게 항해해 보세요' },
   combat: { title:'추종자 — "직접 쏘세요!"',
     // ★2026-07-15(사령관): 옛 '우클릭 조준' 스킴 → 실제 조작인 Q/E 현측 조준 스킴으로 교체.
     //   현재 발사 경로는 Q/E 조준 중이 아니면 발사 자체가 안 됨(navalcombat.js) → 우클릭 안내는 오조작.
     text:`<p>"<span style="color:#ff9a8a">적 해적선이에요!</span> <b style="color:#f0d9a8">Q</b>(좌현)·<b style="color:#f0d9a8">E</b>(우현)로 겨눌 현측을 정하면 조준선(탄도 곡선)이 나타나요."</p><p>"마우스로 겨누고 <b style="color:#f0d9a8">좌클릭</b>이면 그쪽 현측 대포가 일제사격해요. <b>A/D</b>로 뱃머리를 돌려 적 옆구리를 노리고, 급하면 <b>Shift</b>로 전력항해하세요. <span style="color:#ff9a8a">적도 쏩니다 — 오래 끌지 마세요!</span>"</p>`,
     keys:[['Q','E','좌·우현 조준 시점'],['좌클릭','현측 일제사격'],['A','D','조타(뱃머리)'],['Shift','전력 항해']],
-    img:'/ui/tuto_combat.png',
+    img:'/tomob-deploy/ui/tuto_combat.png',
     foot:'Q·E로 현측 조준 · 좌클릭 발사 · A/D로 적 옆구리를 노려라' },
 };
 
@@ -156,7 +156,7 @@ export async function initOpening(ctx, opts={}){
   try { initShipwreck(ctx); } catch(e){ console.warn('[opening] shipwreck 실패(격침=폴백)', e&&e.message); }
   // ⚡ 적선(queen GLB+DRACO wasm)·조타수 리그 백그라운드 프리로드 — 전투 개시 순간 콜드 로드 히칫 제거.
   //   (await 안 함 = 로딩 비차단. 인카운트는 navigate 10초 뒤라 시간 충분 — 캐시 적중으로 즉시 스폰)
-  preloadShip('/obj/queen-annes-revenge/optimized.glb').catch(e=>console.warn('[opening] queen 프리로드 실패(전투 시 로드)', e&&e.message));
+  preloadShip('/tomob-deploy/obj/queen-annes-revenge/optimized.glb').catch(e=>console.warn('[opening] queen 프리로드 실패(전투 시 로드)', e&&e.message));
   preloadHelmRig().catch(e=>console.warn('[opening] 조타수 프리로드 실패(전투 시 로드)', e&&e.message));
 
   // ── caravel — open water에. game 모드는 이미 로딩된 섬(카브)에서 멀리 떨어진 먼 바다에 띄운다(원점 겹침 방지). ──
@@ -164,7 +164,7 @@ export async function initOpening(ctx, opts={}){
   const _isSp = (ctx.terrain && ctx.terrain.spawn) ? ctx.terrain.spawn : { x:0, z:0 };
   const shipSpawn = M ? { x:_isSp.x + 1500, z:_isSp.z + 1500 } : { x:0, z:0 };
   const ship = await initShip(ctx, {
-    spawn:shipSpawn, objUrl:'/obj/caravel-ship/source/model.fbx', length:56,
+    spawn:shipSpawn, objUrl:'/tomob-deploy/obj/caravel-ship/source/model.fbx', length:56,
     albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true,
     useModelHelm:true, flip:true, clothSail:true,
     cannonStations:true,   // ★2026-07-10(사령관 "Z눌러도 대포조준 안됨") — 빠져있어서 시작 캐러벨엔 대포 스테이션 자체가 없었음(shipyard 건조배만 true였음).
@@ -334,7 +334,7 @@ export async function initOpening(ctx, opts={}){
     function stormFlash(strength){
       vig.style.transition='opacity .09s ease'; vig.style.opacity=String(Math.min(1,strength));
       setTimeout(()=>{ vig.style.transition='opacity .42s ease'; vig.style.opacity='0'; }, 100);
-      try { ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/w2.mp3', 0.28*strength); } catch(_){}
+      try { ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/w2.mp3', 0.28*strength); } catch(_){}
     }
     let broke=false, _flashAcc=0;
     ctx.onUpdate(dt=>{
@@ -351,7 +351,7 @@ export async function initOpening(ctx, opts={}){
         stormFlash(1);
         setActorHidden(true);
         try { if(ctx.ship){ ctx.ship.boarded=false; ctx.ship.speed=0; ctx.ship.furl=1; } } catch(_){}
-        try { ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/storm.mp3', 0.7); } catch(_){}
+        try { ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/storm.mp3', 0.7); } catch(_){}
         try { ctx.shipwreck && ctx.shipwreck.sink(s); } catch(e){ console.warn('[opening] 배 부서짐 실패', e&&e.message); }
         setTimeout(()=>{ vig.remove(); dg.el.classList.remove('show'); setTimeout(()=>dg.dispose(), 600); }, 1200);
         setTimeout(()=> driftWake('win'), 3000);
@@ -390,7 +390,7 @@ export async function initOpening(ctx, opts={}){
     rain.stop();
     // ★버그 수정(2026-07-14): 배 부서짐 시 stormDecay가 튼 storm.mp3(60초 폭풍 굉음)는 fire-and-forget 1회 재생이라
     //   rain.stop()으로는 안 꺼짐 — 게임오버 진입 시 확실히 정지.
-    try { ctx.sound && ctx.sound.stopPath && ctx.sound.stopPath('/storm.mp3'); } catch(_){}
+    try { ctx.sound && ctx.sound.stopPath && ctx.sound.stopPath('/tomob-deploy/storm.mp3'); } catch(_){}
     ['helmDbg','fps','boatHud','windHud','hotbar','cross','badge','tuto','tuto-toast'].forEach(id=>{const e=document.getElementById(id); if(e)e.style.display='none';});
     const st=document.createElement('style'); st.id='goStyle';
     st.textContent=`
@@ -399,7 +399,7 @@ export async function initOpening(ctx, opts={}){
         font-family:'Pretendard',system-ui,sans-serif;text-align:center;opacity:0;transition:opacity 1.6s ease;}
       #gameOver.on{opacity:1;}
       #gameOver .goEmblem{position:relative;width:min(480px,66vw);aspect-ratio:1/1;
-        background:url('/GAMEOVER.png') center/contain no-repeat;
+        background:url('/tomob-deploy/GAMEOVER.png') center/contain no-repeat;
         animation:goPulse 3.6s ease-in-out infinite;}
       @keyframes goPulse{0%,100%{filter:brightness(1.18) saturate(1.28) drop-shadow(0 0 18px rgba(220,34,28,.5)) drop-shadow(0 0 7px rgba(255,90,66,.5));}
         50%{filter:brightness(1.26) saturate(1.35) drop-shadow(0 0 34px rgba(240,46,40,.72)) drop-shadow(0 0 13px rgba(255,100,76,.6));}}
@@ -465,10 +465,10 @@ export async function initOpening(ctx, opts={}){
     ctx.noPointerLock=true;
     try { document.exitPointerLock && document.exitPointerLock(); } catch(_){}
     rain.stop();
-    // ★버그 수정(2026-07-14): stormDecay(onWin 배 부서짐)에서 sfxPath('/storm.mp3')로 튼 60초 폭풍 굉음은
+    // ★버그 수정(2026-07-14): stormDecay(onWin 배 부서짐)에서 sfxPath('/tomob-deploy/storm.mp3')로 튼 60초 폭풍 굉음은
     //   fire-and-forget 1회 재생이라 rain.stop()(시각 VFX만 정지)으로는 안 꺼짐 → 표류→깨어남 전환 시 상륙 후에도
     //   비/폭풍 소리가 계속 들리던 원인. 표류 컷신 진입 시 확실히 정지.
-    try { ctx.sound && ctx.sound.stopPath && ctx.sound.stopPath('/storm.mp3'); } catch(_){}
+    try { ctx.sound && ctx.sound.stopPath && ctx.sound.stopPath('/tomob-deploy/storm.mp3'); } catch(_){}
     try { if(ctx.ship){ ctx.ship.boarded=false; ctx.ship.speed=0; ctx.ship.furl=1; ctx.ship.rudder=0; } } catch(_){}
     try { if(ctx.sound){ ['boat','swim'].forEach(k=>{ if(ctx.sound[k]){ ctx.sound[k].muted=true; ctx.sound[k].pause(); } }); } } catch(_){}
     const _aRamp=(a,to,ms)=>{ if(!a)return; const from=a.volume||0, t0=performance.now();
@@ -595,7 +595,7 @@ export async function initOpening(ctx, opts={}){
 
   // 추종자 id→모델 (select.html FOLLOWER_ROSTER와 1:1) — ★KayKit 클래스 6종 한정(사령관 지시 2026-07-05).
   //   구 id(keeper·tinyhero 등)는 아래 폴백(KAY_CHARS.ranger)으로 흡수. 전부 KayKit = loadCutChar Rig_Medium 리타깃 경로 공통.
-  const _KAY_DIR = '/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
+  const _KAY_DIR = '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
   const FOLLOWER_MODELS = {
     rogue:        _KAY_DIR+'Rogue.glb',
     knight:       _KAY_DIR+'Knight.glb',
@@ -804,7 +804,7 @@ export async function initOpening(ctx, opts={}){
 
   // ★우리 맵 실제 섬(voyage_islands_backup.json 프리팹) — 소형 중 랜덤
   async function loadRealIsland(IX, IZ, sea){
-    const data = await fetch('/voyage_islands_backup.json').then(r=>r.json());
+    const data = await fetch('/tomob-deploy/voyage_islands_backup.json').then(r=>r.json());
     const keys = Object.keys(data.sessions||{});
     const small = keys.filter(k=>/소형/.test(k));
     const pool = small.length ? small : keys.filter(k=>!/얼음/.test(k));
@@ -813,9 +813,9 @@ export async function initOpening(ctx, opts={}){
     const pick = (_forced && pool.includes(_forced)) ? _forced : pool[Math.floor(Math.random()*pool.length)];
     const sess = data.sessions[pick]; if(!sess || !Array.isArray(sess.objs)) return null;
     console.log('[cutscene] 표류 섬 =', pick);
-    const atlas = new THREE.TextureLoader().load('/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png');
+    const atlas = new THREE.TextureLoader().load('/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png');
     atlas.colorSpace = THREE.SRGBColorSpace;
-    const fbx = new _CutFBX(); fbx.setResourcePath('/obj/lowpoly_terrain/Terrain_Assets/Textures/');
+    const fbx = new _CutFBX(); fbx.setResourcePath('/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/');
     const group = new THREE.Group();
     const isleMeshes=[], roots=[]; let bigArea=0, spawnX=0, spawnZ=0, isleR=40;
     for(const o of sess.objs){
@@ -873,7 +873,7 @@ export async function initOpening(ctx, opts={}){
     let bb=new THREE.Box3().setFromObject(model), sz=new THREE.Vector3(); bb.getSize(sz);
     model.scale.setScalar(1.35/(sz.y||1)); bb=new THREE.Box3().setFromObject(model); model.position.y-=bb.min.y;
     const group=new THREE.Group(); group.add(model);
-    let clip=null; const base='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+    let clip=null; const base='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
     for(const set of ['Rig_Medium_General.glb','Rig_Medium_Simulation.glb']){
       try{ const ag=await load(base+set); const c=ag.animations.find(a=>new RegExp(clipName,'i').test(a.name)); if(c){ clip=c; break; } }catch(_){}
     }

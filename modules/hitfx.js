@@ -543,7 +543,7 @@ export function initHitfx(ctx){
   const _arcTL = new THREE.TextureLoader();
   let _arcTex=null;
   function arcTex(){ if(_arcTex) return _arcTex;
-    _arcTex=_arcTL.load(encodeURI('/ref/마법진.webp'));   // dev서버가 voyage 서빙
+    _arcTex=_arcTL.load(encodeURI('/tomob-deploy/ref/마법진.webp'));   // dev서버가 voyage 서빙
     _arcTex.colorSpace=THREE.SRGBColorSpace; return _arcTex; }
   let _arcMesh=null, _arcMat=null, _arcState=null;   // _arcState={mn, op, spin, holdUntil}
   const _arcHit=new THREE.Vector3();   // ★원거리 아케인 볼트 원점(몹 중심) 스크래치 — contactPull 당김 배제용

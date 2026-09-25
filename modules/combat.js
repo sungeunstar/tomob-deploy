@@ -9,7 +9,7 @@ import { SOUL_PTS } from './_soulpts.js';        // firelings 굽기 좌표(영�
 import { UI, keycapHtml, keycap, compass as ukCompass, keyhints as ukKeyhints, toast } from './uikit.js';   // ★디자인 시스템 토큰 + 나침반 + 단축키힌트 + 토스트
 import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (레벨 성장·플레이어 스탯)
 
-const KW='/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
+const KW='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
 // 원거리 화살 설정(활/석궁) — 모델·속도·데미지·사거리. [수치 제안]
 const ARROW = {
   bow:      { model:KW+'arrow_bow.gltf',      ...BAL.ranged.bow,      scale:1 },
@@ -125,7 +125,7 @@ export function initCombat(ctx){
         <div class="cb-track hp"><div class="cb-fill" id="_cb_fill" style="width:100%;background:${UI.gauge.hp}"></div><span class="cb-num" id="_cb_num">100<i>/ 100</i></span></div></div>
       <div class="cb-row"><span class="cb-ic">${STAM_SVG}</span>
         <div class="cb-track stam"><div class="cb-fill" id="_cb_stam" style="width:100%;background:${UI.gauge.stamina}"></div></div></div>
-      <div class="cb-soul"><img class="cb-soulic" src="/tomobsoul.png" alt=""><span class="cb-soullbl">토모브의 영혼</span> <b id="_cb_soul" style="color:${UI.role.gold.ink}">0</b></div>
+      <div class="cb-soul"><img class="cb-soulic" src="/tomob-deploy/tomobsoul.png" alt=""><span class="cb-soullbl">토모브의 영혼</span> <b id="_cb_soul" style="color:${UI.role.gold.ink}">0</b></div>
     </div>
     <div class="cb-dials">
       ${TEMP_HTML}
@@ -311,7 +311,7 @@ export function initCombat(ctx){
   const _hpLayer = _el('div','position:fixed;inset:0;z-index:22;pointer-events:none;overflow:hidden;font:700 11px Pretendard,system-ui,sans-serif');
   document.body.appendChild(_hpLayer);
   const _hpMap = new Map(); const _hpV = new THREE.Vector3();
-  const _AGGRO_SRC = encodeURI('/어그로.png');
+  const _AGGRO_SRC = encodeURI('/tomob-deploy/어그로.png');
   function _makeHpBar(){
     const wrap=_el('div','position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;gap:2px;will-change:left,top');
     const aggro=_el('img','width:24px;height:24px;object-fit:contain;display:none;margin-bottom:1px;filter:drop-shadow(0 0 7px rgba(255,45,25,1)) drop-shadow(0 0 15px rgba(255,20,8,.9)) drop-shadow(0 0 24px rgba(255,0,0,.6))'); aggro.src=_AGGRO_SRC;
@@ -393,7 +393,7 @@ export function initCombat(ctx){
     _soulCoreF[i]=Math.max(0,1-r/0.55); _soulSeed[i]=Math.random()*6.283; }
   const _soulMat = new THREE.PointsMaterial({ size:0.22, vertexColors:true, transparent:true,
     depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true });
-  new THREE.TextureLoader().load('/spellfx/textures/gradient_radial_01.png',
+  new THREE.TextureLoader().load('/tomob-deploy/spellfx/textures/gradient_radial_01.png',
     t=>{ t.colorSpace=THREE.SRGBColorSpace; _soulMat.map=t; _soulMat.needsUpdate=true; });
   const soulDrops = [];         // {pts, gy, t, age, n, vac}
   function spawnSoulDrop(pos, n){
@@ -924,7 +924,7 @@ export function initCombat(ctx){
         font-family:'Pretendard',system-ui,sans-serif;text-align:center;opacity:0;transition:opacity 1.6s ease;}
       #gameOver.on{opacity:1;}
       #gameOver .goEmblem{position:relative;width:min(480px,66vw);aspect-ratio:1/1;
-        background:url('/GAMEOVER.png') center/contain no-repeat;animation:goPulse 3.6s ease-in-out infinite;}
+        background:url('/tomob-deploy/GAMEOVER.png') center/contain no-repeat;animation:goPulse 3.6s ease-in-out infinite;}
       @keyframes goPulse{0%,100%{filter:brightness(1.18) saturate(1.28) drop-shadow(0 0 18px rgba(220,34,28,.5)) drop-shadow(0 0 7px rgba(255,90,66,.5));}
         50%{filter:brightness(1.26) saturate(1.35) drop-shadow(0 0 34px rgba(240,46,40,.72)) drop-shadow(0 0 13px rgba(255,100,76,.6));}}
       #gameOver .goCtr{position:absolute;left:0;right:0;top:51%;transform:translateY(-50%);}

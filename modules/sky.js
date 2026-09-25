@@ -126,7 +126,7 @@ export function initSky(ctx){
   // 🌌 밤하늘 스카이박스 — sky/StarSkybox041~046.png 6면, 밤에 페이드인, 카메라 추종
   const _tl=new THREE.TextureLoader();
   const _starboxMats=['StarSkybox041','StarSkybox042','StarSkybox043','StarSkybox044','StarSkybox045','StarSkybox046']
-    .map(n=>{ const t=_tl.load('/sky/'+n+'.png'); t.colorSpace=THREE.SRGBColorSpace;
+    .map(n=>{ const t=_tl.load('/tomob-deploy/sky/'+n+'.png'); t.colorSpace=THREE.SRGBColorSpace;
       // ★재작업2: AdditiveBlending — 별 스카이박스의 검은 배경이 하늘 돔을 occlude하지 않게(박명 상단 검정 급락 원인).
       //   color scalar(=_starFade)로 페이드. 검정 픽셀은 가산 0 → 하늘 그대로 비침. 별만 더해짐.
       return new THREE.MeshBasicMaterial({ map:t, side:THREE.BackSide, depthWrite:false, fog:false, color:0x000000, transparent:true, blending:THREE.AdditiveBlending }); });

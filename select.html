@@ -29,7 +29,7 @@
   #stage{position:fixed;inset:0;z-index:1}
   #ui{position:fixed;inset:0;z-index:5;pointer-events:none}
   /* 🏮 내용은 modules/loadscreen.js가 채운다. 여기 배경은 모듈 로드 전 첫 프레임용. */
-  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/tomob-deploy/ui/loading_bg.png') center/cover no-repeat}
 
   .logo{position:fixed;left:34px;top:24px;z-index:7;font-size:19px;letter-spacing:.16em;font-weight:300;text-shadow:0 2px 14px rgba(0,0,0,.7)}
   .logo b{font-weight:800;color:#41c6e0;letter-spacing:.07em}
@@ -153,7 +153,7 @@
 <div id="bg"></div>
 <div id="stage"></div>
 <div id="ui">
-  <div class="logo"><img src="/intro/logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
+  <div class="logo"><img src="/tomob-deploy/intro/logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
   <div class="back" id="btnBack">‹ BACK</div>
   <div class="snd on" id="sndBtn" title="배경음 켜기/끄기">
     <svg viewBox="0 0 24 24" fill="none">
@@ -233,23 +233,23 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skClone } from 'three/addons/utils/SkeletonUtils.js';
-import { initShowcaseFx } from '/modules/showcasefx.js';
-import { initLoadScreen } from '/modules/loadscreen.js';   // 🏮 공용 로딩 화면(game.html과 동일)
-import { CLASSES, normalizeClassId } from '/modules/class-progression.js';
+import { initShowcaseFx } from '/tomob-deploy/modules/showcasefx.js';
+import { initLoadScreen } from '/tomob-deploy/modules/loadscreen.js';   // 🏮 공용 로딩 화면(game.html과 동일)
+import { CLASSES, normalizeClassId } from '/tomob-deploy/modules/class-progression.js';
 
 // 여기선 실제 진행도를 알 수 없어 불확정 모드 — 등불이 반복해 차오른다.
 //   #load의 display 토글은 아래 기존 코드가 그대로 담당하므로 LS.hide()는 쓰지 않는다.
 initLoadScreen();
 
-const CHAR_DIR='/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
-const SKEL_DIR='/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';   // 추가 캐릭터(해골단)
-const KEN_MINI='/assets/kenney_mini-characters/Models/GLB format/';
-const KEN_DUN='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
+const CHAR_DIR='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
+const SKEL_DIR='/tomob-deploy/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';   // 추가 캐릭터(해골단)
+const KEN_MINI='/tomob-deploy/assets/kenney_mini-characters/Models/GLB format/';
+const KEN_DUN='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
 const KEN_GRV='/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/';
-const KEN_ARN='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';
-const KW='/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
+const KEN_ARN='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';
+const KW='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
 const SK='/';
-const ANIM_BASE='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+const ANIM_BASE='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
 const ANIM_PACKS=['Rig_Medium_General.glb','Rig_Medium_CombatMelee.glb','Rig_Medium_CombatRanged.glb'];
 
 const WCFG = {
@@ -293,10 +293,10 @@ const FOLLOWER_ROSTER = [
 ];
 // 진영 = 시작 시 2택(부족과 별개 축). 문양 = MAS-D 배너 에셋(assets/sigils). 세계관: 남은 자=파괴/귀환, 파수꾼=수호/심판.
 const FACTIONS = [
-  { id:'remnant', img:'/assets/sigils/remnant.png', nm:'남은 자', en:'The Remnant', tag:'파괴 · 귀환',
+  { id:'remnant', img:'/tomob-deploy/assets/sigils/remnant.png', nm:'남은 자', en:'The Remnant', tag:'파괴 · 귀환',
     line:'별을 부숴 대륙을 되돌린다',
     desc:'열두 분깃을 모아 별을 깨뜨리고 잠긴 대륙을 되돌리는 쪽. 차오르는 바다와 시간을 다툰다.' },
-  { id:'watch', img:'/assets/sigils/watch.png', nm:'파수꾼', en:'The Watchmen', tag:'수호 · 심판',
+  { id:'watch', img:'/tomob-deploy/assets/sigils/watch.png', nm:'파수꾼', en:'The Watchmen', tag:'수호 · 심판',
     line:'별을 지켜 심판을 기다린다',
     desc:'별을 지키고 둘째 별의 심판을 기다리는 쪽. 파괴 장치를 막고 분깃을 흩으며 종말을 받아들인다.' },
 ];
@@ -659,7 +659,7 @@ function loop(){
 addEventListener('resize',()=>{ cam.aspect=innerWidth/innerHeight; cam.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 
 // ── BGM (intro_mas) + 우상단 ON/OFF 토글 ──
-const bgm=new Audio('/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
+const bgm=new Audio('/tomob-deploy/bgm_intro.mp3'); bgm.loop=true; bgm.volume=0.45; bgm.preload='auto';
 const sndBtn=document.getElementById('sndBtn'), sndLbl=document.getElementById('sndLbl');
 let sndOn = (localStorage.getItem('mas_bgm')!=='off');   // 기본 ON, 사용자 선택 기억
 function applySnd(){

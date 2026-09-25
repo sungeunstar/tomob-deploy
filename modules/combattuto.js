@@ -13,11 +13,11 @@ const TUTO_STEPS = {
   attack: { title:'전투 — 무기를 들어라',
     text:`<p>적이 다가온다. <b style="color:#f0d9a8">좌클릭</b>으로 공격하라.</p><p>정면 부채꼴 안의 적을 벤다. 무기마다 사거리와 위력이 다르니 거리를 재며 휘둘러라.</p>`,
     keys:[['LMB','근접 공격 / 마법탄']],
-    img:'/ui/tuto_atk.png', foot:'좌클릭으로 적을 공격하라' },
+    img:'/tomob-deploy/ui/tuto_atk.png', foot:'좌클릭으로 적을 공격하라' },
   dodge: { title:'구르기로 피하라',
     text:`<p>적의 공격엔 <b>예비동작</b>이 있다. 그 틈에 굴러 피하라.</p><p>이동키를 <b style="color:#f0d9a8">두 번 빠르게</b> 누르면 그 방향으로 구르며 잠깐 <b style="color:#f0d9a8">무적</b>이 된다.</p>`,
     keys:[['W','A','S','D','두 번 탭 = 회피 구르기(무적)']],
-    img:'/ui/tuto_dodge.png', foot:'WASD 더블탭으로 굴러 회피하라' },
+    img:'/tomob-deploy/ui/tuto_dodge.png', foot:'WASD 더블탭으로 굴러 회피하라' },
   // skill 단계는 initCombatTuto 안에서 ?char= 직업에 맞춰 런타임 조립(아래 buildSkillStep)
   skill: null,
   // ★E4(2026-07-15) ④그로기 게이지 안내 — 계속 공격하면 체력바 밑 보라 게이지가 차오르고 가득 차면 그로기(무력화+머리 위 별).
@@ -211,7 +211,7 @@ function buildSkillStep(cls){
     return { title:'방패로 막아라',
       text:`<p>기사의 힘은 <b style="color:#f0d9a8">방패</b>에 있다. <b>우클릭</b>을 눌러 막으면 적의 공격을 흘려낸다.</p><p>막을수록 방패 게이지가 차오르고, 가득 차면 <b style="color:#f0d9a8">Q</b>로 충격파를 터뜨려 반격한다.</p>`,
       keys:[['RMB','방패로 막기(가드)'],['Q','충격파 반격(게이지 충전 시)']],
-      img:'/ui/tuto_guard.png', foot:'우클릭으로 막고, 게이지가 차면 Q로 반격하라' };
+      img:'/tomob-deploy/ui/tuto_guard.png', foot:'우클릭으로 막고, 게이지가 차면 Q로 반격하라' };
   }
   if(cls==='mage'){
     return { title:'마법을 시전하라',

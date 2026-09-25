@@ -15,7 +15,7 @@ export function initQuestFx(ctx){
 
   // ══════════ ① 동료 머리 위 느낌표(!) 빌보드 ══════════
   let _texOK=null;
-  const tex = new THREE.TextureLoader().load('/ui/quest_mark.png',
+  const tex = new THREE.TextureLoader().load('/tomob-deploy/ui/quest_mark.png',
     ()=>{ _texOK=true; console.log('[questfx] ! 텍스처 로드 OK (/ui/quest_mark.png)'); },
     undefined,
     (e)=>{ _texOK=false; console.warn('[questfx] ⚠️ ! 텍스처 로드 실패 — /ui/quest_mark.png 404? 서버 재시작 필요할 수 있음', e); });

@@ -17,7 +17,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { BAL } from './balance.js';
 import { toast as ukToast } from './uikit.js';
 
-const FLAG_MODEL = encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Castle Kit/Models/GLB format/flag.glb');
+const FLAG_MODEL = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Castle Kit/Models/GLB format/flag.glb');
 const FLAG_H = 5.2;            // 깃대 목표 높이(m) — 멀리서도 내 거점이 보이게 랜드마크 크기
 const RING_SEG = 96;           // 경계 링 분할 수(지형 따라 샘플링)
 const RING_LIFT = 0.35;        // 지면에서 살짝 띄움(z-fighting 방지)

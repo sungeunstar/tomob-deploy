@@ -50,7 +50,7 @@ export function initWater(ctx, { waveAmp=1.0, size=8000 }={}){
         //   ★제안값: Gerstner 0.55→0.38 — 레퍼런스 마루는 뾰족한 스파이크가 아니라 둥글게 굴러오고, 뾰족함 대신 포말이 마루를 정의.
         //   Foam 0.6→0.85 — 레퍼런스는 마루 포말 + 바람결 줄무늬 포말이 표면을 넓게 덮음(폭풍 바다 질감의 핵심).
         uGerstner:{value:0.38}, uFoam:{value:0.85},
-        uNormA:{value:wl('/water_normal_calm.png')}, uNormB:{value:wl('/water_normal_roll.png')}, uNormC:{value:wl('/water_normal_turb.png')},
+        uNormA:{value:wl('/tomob-deploy/water_normal_calm.png')}, uNormB:{value:wl('/tomob-deploy/water_normal_roll.png')}, uNormC:{value:wl('/tomob-deploy/water_normal_turb.png')},
         uSunDir:{value:new THREE.Vector3(0.45,0.8,0.35).normalize()},
         // ☀️ 낮 모아나 팔레트 — 밝은 터쿼이즈 얕음 + 딥블루. wind.js가 _wsh/_wdp/_wsk로 이 3색을 소유(폭풍 lerp).
         //   ★낮 채도 복구: 얕음 비비드 터쿼이즈, 딥은 살짝 더 푸르게(직전 너프 복원).

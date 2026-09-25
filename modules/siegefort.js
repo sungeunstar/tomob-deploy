@@ -12,7 +12,7 @@ import { DestructibleMesh, FractureOptions } from 'three-pinata';
 import { tribeById } from './tribes.js';
 import { toast as ukToast, locationReveal as ukLocation } from './uikit.js';
 
-const HXBASE = '/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';
+const HXBASE = '/tomob-deploy/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';
 const hxDir = (col)=>`${HXBASE}/${col}/`;
 const COL_BY_LEAN = { watch:'blue', remnant:'red', neutral:'yellow' };
 // 사령관 확정 수치(샌드박스): 성 크기·탑 수/크기·반경·호각도
@@ -51,7 +51,7 @@ export function initSiegeFort(ctx){
   // 성벽 대포(투석기 대신) — 단위정규화 프로토
   let _cannonProto=null;
   function loadCannon(){ if(_cannonProto!==null) return Promise.resolve(_cannonProto);
-    return new Promise(res=>{ new GLTFLoader().load('/intro/ship-cannon/cannon.glb', g=>{
+    return new Promise(res=>{ new GLTFLoader().load('/tomob-deploy/intro/ship-cannon/cannon.glb', g=>{
       const s=g.scene; s.traverse(o=>{ if(o.isMesh){ o.castShadow=true; } });
       let bb=new THREE.Box3().setFromObject(s), sz=bb.getSize(new THREE.Vector3()); const md=Math.max(sz.x,sz.y,sz.z)||1; s.scale.setScalar(1/md);
       bb=new THREE.Box3().setFromObject(s); const c2=bb.getCenter(new THREE.Vector3()), mn=bb.min.clone(); s.position.set(-c2.x,-mn.y,-c2.z);

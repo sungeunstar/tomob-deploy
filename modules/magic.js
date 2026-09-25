@@ -13,7 +13,7 @@ import { createLightPool } from './fxpool.js';   // R1: 라이트 풀 공용화(
 
 const BLOOM_LAYER = 1;   // 이 레이어 객체(마법 VFX)만 블룸. 하늘·지형·물은 제외.
 
-const TEX='/spellfx/textures/';
+const TEX='/tomob-deploy/spellfx/textures/';
 const EL = {  // 속성별 색(텍스처는 흰색 → color 곱). [제안]
   fire: { core:0xffd27a, glow:0xff5a14, light:0xff7a30 },
   ice:  { core:0xcaf4ff, glow:0x39c8e6, light:0x57d0ee },
@@ -89,7 +89,7 @@ export function initMagic(ctx){
   const T = { flare:tex('flare_01'), glow:tex('gradient_radial_01'), trail:tex('trail_01'), impact:tex('impact_01'), noise:tex('noise_03') };
 
   // ── 스프라이트시트 애니메이션(brackeys) — 진짜 타오르는 불꽃/폭발 ──
-  const VFX='/vfx/sheets/';
+  const VFX='/tomob-deploy/vfx/sheets/';
   const SHEET = {   // file + 그리드(cols×rows)
     fire_point:{file:'fire_point_6x5.png',c:6,r:5}, fire_ring:{file:'fire_ring_6x5.png',c:6,r:5},
     explosion:{file:'explosion_6x5.png',c:6,r:5},   star:{file:'star_explosion_6x5.png',c:6,r:5},
@@ -148,7 +148,7 @@ export function initMagic(ctx){
   }
 
   // ── GPU 파티클 시스템 (THREE.Points + 셰이더, additive 발광) — 트레일/폭발 ember ──
-  const PT='/vfx/particles/';
+  const PT='/tomob-deploy/vfx/particles/';
   const ptex = n => { const t=_tl.load(encodeURI(PT+n+'.png')); t.colorSpace=THREE.SRGBColorSpace; return t; };
   const TEX_EMBER=ptex('embers'), TEX_FLARE=ptex('flare'), TEX_GLOW=ptex('radial1'), TEX_SHAPE=ptex('radial2');
   function makeParticles(tex, max){
@@ -215,9 +215,9 @@ export function initMagic(ctx){
       if(gl_FragColor.r>=0.44){ gl_FragColor=vec4(rgbcol(color4),gl_FragColor.r); } else { gl_FragColor=vec4(0.); }
       gl_FragColor*=vec4(smoothstep(0.2,0.628,vUv.y)); }`;
   const _fbN = {   // 노이즈 텍스처(pizza3 asset). 셰이더 노이즈 스크롤용.
-    perlin:_tl.load('/vfx/pizza3/noise9.jpg'),       // 로컬화(외부 GitHub 400 방지 + 파이어볼 디테일 안정)
-    spark:_tl.load('/vfx/pizza3/sparklenoise.jpg'),
-    water:_tl.load('/vfx/pizza3/water-min.jpg') };
+    perlin:_tl.load('/tomob-deploy/vfx/pizza3/noise9.jpg'),       // 로컬화(외부 GitHub 400 방지 + 파이어볼 디테일 안정)
+    spark:_tl.load('/tomob-deploy/vfx/pizza3/sparklenoise.jpg'),
+    water:_tl.load('/tomob-deploy/vfx/pizza3/water-min.jpg') };
   // 속성별 셰이더볼 색 (color2=코어밝음, color1=중간, color4=꼬리불꽃, color5=꼬리바깥)
   const FB_OPT_EL={
     fire:{ color0:[0,0,0], color1:[120,28,8],  color2:[235,180,45],  color3:[66,66,66], color4:[245,150,55], color5:[95,38,6] },

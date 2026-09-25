@@ -5,15 +5,15 @@
 //   모션 검증(_follower_anim_chk): 8종=내장 애니(idle/walk/attack/die) / 밀수꾼=외부 Rig_Medium(kaykit) / Polyart 3종=roles 매핑.
 //   데이터 전용. raiders/capture/worldstream 이 import. 콘센트: ctx.tribes 노출(호환 위해 이름 유지).
 
-const CHAR='/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
+const CHAR='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
 const GRV ='/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/';
-const DUN ='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
-const MINI='/assets/kenney_mini-characters/Models/GLB format/';
-const ARN ='/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';
+const DUN ='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
+const MINI='/tomob-deploy/assets/kenney_mini-characters/Models/GLB format/';
+const ARN ='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';
 
 // 진영별 색·문양(섬 깃발/배지). neutral은 전용 문양 없음(모델이 정체성).
 const FCOL  = { remnant:'#9cc46a', watch:'#6aa0d8', neutral:'#b0a494' };
-const FCREST= { remnant:'/assets/sigils/remnant.png', watch:'/assets/sigils/watch.png', neutral:null };
+const FCREST= { remnant:'/tomob-deploy/assets/sigils/remnant.png', watch:'/tomob-deploy/assets/sigils/watch.png', neutral:null };
 
 // Polyart 커스텀 클립명 → 표준명(monsters.js roles). 검증된 실제 클립명.
 const RL_TINY = { idle:'Idle_Normal_SwordAndShield', walk:'MoveFWD_Normal_InPlace_SwordAndShield', attack:'Attack01_SwordAndShiled', die:'Die01_SwordAndShield' };
@@ -26,9 +26,9 @@ const _P = [
     desc:'후드를 벗은 밧모의 밀수꾼. 어둠 속 거래에 능하다. 남은 자의 물길을 잇는다.' },
   { id:'outlander',  ko:'이방 용병',      en:'Outlander',       model:DUN+'character-orc.glb',    anim:'kenney',                 lean:'remnant', icon:'🪓', trait:'무기·용병',    role:'raider',
     desc:'먼 봉우리에서 온 이방인 용병. 갑판의 방패이자 앞장서는 창이다.' },
-  { id:'brawler',    ko:'봉우리 투사',    en:'Peak Brawler',    model:'/GruntPolyart.glb',        anim:'polyart', roles:RL_GRUNT,lean:'remnant', icon:'💪', trait:'전투물자',     role:'raider',
+  { id:'brawler',    ko:'봉우리 투사',    en:'Peak Brawler',    model:'/tomob-deploy/GruntPolyart.glb',        anim:'polyart', roles:RL_GRUNT,lean:'remnant', icon:'💪', trait:'전투물자',     role:'raider',
     desc:'먼 봉우리에서 온 거친 전사. 앞장서 적을 들이받는다.' },
-  { id:'drifter',    ko:'떠돌이 검사',    en:'Drifter',         model:'/TinyHero.glb',            anim:'polyart', roles:RL_TINY, lean:'remnant', icon:'🌫', trait:'잡화·용병',    role:'raider',
+  { id:'drifter',    ko:'떠돌이 검사',    en:'Drifter',         model:'/tomob-deploy/TinyHero.glb',            anim:'polyart', roles:RL_TINY, lean:'remnant', icon:'🌫', trait:'잡화·용병',    role:'raider',
     desc:'아라랏으로 흘러든 이름 없는 떠돌이. 어디에도 매이지 않는다.' },
   { id:'trader',     ko:'봉우리 상인',    en:'Peak Trader',     model:DUN+'character-human.glb',  anim:'kenney',                 lean:'neutral', icon:'⚖', trait:'교역품·시세',  role:'trade',
     desc:'밧모 해역을 떠도는 봉우리 상인. 시세를 읽어 값을 매긴다.' },
@@ -36,7 +36,7 @@ const _P = [
     desc:'차오르는 바다를 피해 아라랏으로 온 피난민. 살아남는 법을 판다.' },
   { id:'warden',     ko:'스올 문지기',    en:'Sheol Warden',    model:GRV+'character-keeper.glb', anim:'kenney',                 lean:'watch',   icon:'🔗', trait:'유물·영혼',    role:'guard',
     desc:'스올의 문을 지키던 자. 망자의 길과 안개를 안다. 별을 지키는 파수꾼.' },
-  { id:'strayknight',ko:'들개 기사',      en:'Stray Knight',    model:'/DogPolyart.glb',          anim:'polyart', roles:RL_DOG,  lean:'watch',   icon:'🐕', trait:'방어구·충성',  role:'guard',
+  { id:'strayknight',ko:'들개 기사',      en:'Stray Knight',    model:'/tomob-deploy/DogPolyart.glb',          anim:'polyart', roles:RL_DOG,  lean:'watch',   icon:'🐕', trait:'방어구·충성',  role:'guard',
     desc:'주인 잃은 봉우리의 충직한 기사. 맡은 봉우리를 끝까지 지킨다.' },
   { id:'sunkenguard',ko:'잠긴 왕국 병사', en:'Sunken Guard',    model:ARN+'character-soldier.glb',anim:'kenney',                 lean:'watch',   icon:'⚔', trait:'무기·갑옷',    role:'guard',
     desc:'바다에 잠긴 봉우리 왕국의 최후 병사. 무너진 맹세를 아직 지킨다.' },

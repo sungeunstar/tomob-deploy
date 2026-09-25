@@ -29,15 +29,15 @@ export async function initTerrain(ctx, { session=null, offset=null, targetSpan=n
     console.log('[terrain] 이전 지형', ctx.terrain._allObjs.length, '개 정리(겹침 방지)');
   }
   const [t,a]=await Promise.all([
-    fetch('/terrain-index.json').then(r=>r.json()).catch(()=>[]),
-    fetch('/asset-index.json').then(r=>r.json()).catch(()=>[]),
+    fetch('/tomob-deploy/terrain-index.json').then(r=>r.json()).catch(()=>[]),
+    fetch('/tomob-deploy/asset-index.json').then(r=>r.json()).catch(()=>[]),
   ]);
   const byUrl=new Map(); [...t,...a].forEach(m=>byUrl.set(m.url,m));
 
   const tl=new THREE.TextureLoader();
-  const atlas=tl.load('/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png');
+  const atlas=tl.load('/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png');
   atlas.colorSpace=THREE.SRGBColorSpace; atlas.flipY=false;   // 텍스처 못 잡은 지형 폴백
-  const fbx=new FBXLoader(); fbx.setResourcePath('/obj/lowpoly_terrain/Terrain_Assets/Textures/');
+  const fbx=new FBXLoader(); fbx.setResourcePath('/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/');
   const cache=new Map();
   function normalize(root,fmt,cat){ root.traverse(o=>{ if(o.isMesh){ const ms=Array.isArray(o.material)?o.material:[o.material];
     o.receiveShadow=true;   // 🌑 Phase 1: 세션/홈섬 지형이 나무·캐릭터 그림자를 받게(구름은 아래에서 예외 아님 — 하늘이라 그림자 안 닿음)

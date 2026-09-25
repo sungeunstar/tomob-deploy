@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const _B='/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/';
+const _B='/tomob-deploy/KayKit_BlockBits_1.0_FREE/KayKit_BlockBits_1.0_FREE/Assets/gltf/';
 const TYPES={
   woodblock:{ url:_B+'wood.gltf',  hp:15 },   // 나무방책 — 싸고 약함
   wallblock:{ url:_B+'stone.gltf', hp:30 },   // 돌벽 — 중간

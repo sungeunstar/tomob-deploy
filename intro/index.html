@@ -125,7 +125,7 @@
 
   /* ── 로딩 ── 🏮 내용은 /modules/loadscreen.js가 채운다(game·select와 동일 화면).
      여기 배경은 모듈 로드 전 첫 프레임에 남색이 번쩍이지 않게 하려는 것. */
-  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/tomob-deploy/ui/loading_bg.png') center/cover no-repeat}
 </style></head>
 <body>
 <div id="load"></div>
@@ -135,13 +135,13 @@
 
 <!-- HUD -->
 <div class="frame tl"></div><div class="frame tr"></div><div class="frame bl"></div><div class="frame br"></div>
-<div class="logo"><img src="/intro/logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
+<div class="logo"><img src="/tomob-deploy/intro/logo.png" alt="tomob" style="height:74px;vertical-align:middle;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))"></div>
 <div class="telem">//NAV/STATUS<br>DEPTH&nbsp;&nbsp;<b id="tDepth">00.0</b> M<br>SECTOR&nbsp;<b>01 / 05</b></div>
 
 <div id="ui">
   <div class="hero" id="hero">
     <div class="kicker">THE FIRST STAR · 첫 번째 별</div>
-    <img class="gemblem" src="/intro/logo.png" alt="tomob" style="width:min(44vw,420px);margin:4px auto 0;display:block;filter:drop-shadow(0 8px 40px rgba(0,18,30,.95))">
+    <img class="gemblem" src="/tomob-deploy/intro/logo.png" alt="tomob" style="width:min(44vw,420px);margin:4px auto 0;display:block;filter:drop-shadow(0 8px 40px rgba(0,18,30,.95))">
     <p class="gsub">별이 떨어진 뒤 바다가 차오른 세계, 토모브. 가라앉지 않은 마지막 바다 위에서 배를 짓고 항해합니다.</p>
     <div class="menu">
       <button class="mbtn primary" id="btnStart">▸ START GAME</button>
@@ -203,7 +203,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const L = document.getElementById('load');
 // 🏮 공용 로딩 화면. 여기는 PRELOAD 개수로 실제 진행률을 알 수 있어 setProgress를 직접 준다.
-const LS = (await import('/modules/loadscreen.js')).initLoadScreen();
+const LS = (await import('/tomob-deploy/modules/loadscreen.js')).initLoadScreen();
 try{
   // ───────────────────────── 씬 ─────────────────────────
   const ctx = initCore({ sky:0x8fc1e3 });
@@ -234,7 +234,7 @@ try{
 
   // ── 배(게임 모듈 그대로) ──
   const SHIP = {
-    caravel:{ objUrl:'/obj/caravel-ship/source/model.fbx', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true },
+    caravel:{ objUrl:'/tomob-deploy/obj/caravel-ship/source/model.fbx', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true },
     empty:  { objUrl:'/obj/empty-ship/source/TexturedShip2.fbx', length:56, helmX:-17 },
     oseberg:{},
   };
@@ -261,13 +261,13 @@ try{
   const SECTIONS=[
     { key:'sailing', en:'SAILING', ko:'항해', tag:'우클릭 드래그로 타륜 회전', snapP:0.24,
       desc:'바람과 해류를 읽어 돛을 조율하고, 배를 몰아 바다를 건넙니다. 이동과 탐험, 전투와 교역 — 이 세계의 모든 여정은 배에서 시작됩니다.',
-      y:OBJ_Y, cx:0, cz:0, objs:[{url:'/ship_helm.glb', type:'glb', scale:13}] },
+      y:OBJ_Y, cx:0, cz:0, objs:[{url:'/tomob-deploy/ship_helm.glb', type:'glb', scale:13}] },
     { key:'trade', en:'TRADE', ko:'교역', tag:'사서 옮겨, 비싼 곳에 판다', snapP:0.42,
       desc:'항구마다 물자의 시세가 다릅니다. 값이 싼 곳에서 사들여 비싼 곳에 내다 팔며, 항해로 차익을 남깁니다. 모아 온 금화는 곧 이 바다에서의 힘이 됩니다.',
-      y:-104, cx:0, cz:0, objs:[{url:'/intro/barrel-pirate-ship/barrel.glb', type:'glb', scale:17, pos:[0,-9,0], albedo:'/intro/barrel-pirate-ship/source/model/textures/lambert1_albedo.jpg'}] },
+      y:-104, cx:0, cz:0, objs:[{url:'/tomob-deploy/intro/barrel-pirate-ship/barrel.glb', type:'glb', scale:17, pos:[0,-9,0], albedo:'/tomob-deploy/intro/barrel-pirate-ship/source/model/textures/lambert1_albedo.jpg'}] },
     { key:'battle', en:'BATTLE', ko:'전투', tag:'현측을 적에게 돌려라', snapP:0.58,
       desc:'바람을 등지고 배의 현측을 적에게 돌려 대포를 정렬합니다. 무자비한 해전에서는, 잘 맞춘 일제사격 한 번이 승부를 가릅니다.',
-      y:-119, cx:52, cz:-120, objs:[{url:'/intro/ship-cannon/cannon.glb', type:'glb', scale:20, albedo:'/intro/ship-cannon/source/extracted/lambert1_albedo.jpg'}] },   // ★대포 — 사령관 페이더 위치(전투 카메라 정렬)
+      y:-119, cx:52, cz:-120, objs:[{url:'/tomob-deploy/intro/ship-cannon/cannon.glb', type:'glb', scale:20, albedo:'/tomob-deploy/intro/ship-cannon/source/extracted/lambert1_albedo.jpg'}] },   // ★대포 — 사령관 페이더 위치(전투 카메라 정렬)
     // ★탐험 = 나침반 단독(introCompass, 중앙). 진영 = 테이블 단독(introTable, 동굴 바로 앞). 둘 분리(사령관). objs는 비움 — 독립 오브젝트가 _vis로 페이드.
     { key:'explore', en:'EXPLORE', ko:'탐험', tag:'미지의 해역으로', snapP:0.79,
       desc:'나침반이 가리키는 곳에는 해도에 없는 섬과 항로가 있습니다. 아직 아무도 닿지 않은 해역으로 나아가, 먼저 발견하는 자가 그곳을 차지합니다.',
@@ -456,7 +456,7 @@ try{
 
     // ── 동굴 안 터널 (low_poly_mine_cave.glb, 사령관 교체) — 아치 안쪽에 배치, 나침반/테이블이 터널 안에. ──
     const TUN = window.__TUN = { scale:1.0, x:-5, y:-125, z:-225, rotY:Math.PI };
-    PRELOAD.push(_gltf.loadAsync('/intro/low_poly_mine_cave.glb').then(gltf=>{
+    PRELOAD.push(_gltf.loadAsync('/tomob-deploy/intro/low_poly_mine_cave.glb').then(gltf=>{
       const tun = gltf.scene;
       stripLights(tun);
       const wrap=new THREE.Group();
@@ -480,7 +480,7 @@ try{
 
     // ── 탐험 = 나침반 단독(동굴 앞 코리도 중앙) / 진영 = 테이블 단독(동굴 바로 앞). 사령관: 둘 분리. ──
     // 나침반(탐험 전용)
-    PRELOAD.push(loadOne({ url:'/intro/fantasy-compass/source/extracted/Sketchfab/Sketchfab_showcase.fbx', type:'fbx', scale:11, albedo:'/intro/fantasy-compass/source/extracted/Sketchfab/Textures/V1/Compass_Base_color_V1.png' })   // ★크기 줄임(사령관: 너무 큼, 테이블 기준)
+    PRELOAD.push(loadOne({ url:'/intro/fantasy-compass/source/extracted/Sketchfab/Sketchfab_showcase.fbx', type:'fbx', scale:11, albedo:'/tomob-deploy/intro/fantasy-compass/source/extracted/Sketchfab/Textures/V1/Compass_Base_color_V1.png' })   // ★크기 줄임(사령관: 너무 큼, 테이블 기준)
     .then(compass=>{
       // ★단색 금색 덮기 제거(사령관: 원본 glb가 온통 금색 아님). loadOne 원본 텍스처 유지 + 유리덮개 투명 → 나침반 면(장미) 보이게 + 흰 반사 줄임.
       compass.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
@@ -1317,7 +1317,7 @@ try{
   window.__ctx=ctx; window.__helm=helm;   // 검증/디버그 계약
   // ── [1] GAME START → 캐릭터·추종자 선택(select.html) → 튜토리얼 ──
   { const bs=document.getElementById('btnStart');
-    if(bs) bs.addEventListener('click', ()=>{ (window.top||window).location.href='/select.html'; }); }  // ★_journey iframe 안에서도 최상위 창을 이동 → 선택(클래스→추종자→진영) 전체화면 진입
+    if(bs) bs.addEventListener('click', ()=>{ (window.top||window).location.href='/tomob-deploy/select.html'; }); }  // ★_journey iframe 안에서도 최상위 창을 이동 → 선택(클래스→추종자→진영) 전체화면 진입
   // ★게임식 메뉴 선택 커서(호버 아님): 항상 하나 활성 · 위/아래 키 이동 · 마우스 올리면 선택 · 엔터 실행
   { const _mb=[...document.querySelectorAll('.menu .mbtn')]; let _msel=0;
     const _mrender=()=>_mb.forEach((b,i)=>b.classList.toggle('active', i===_msel));

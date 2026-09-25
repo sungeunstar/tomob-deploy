@@ -11,15 +11,15 @@ import { createLightPool, createSlotPool, radialTexture } from './fxpool.js';   
 import { locationReveal as ukLocation } from './uikit.js';   // 🔥 던전 보스 전멸기(Ⓖ) 경고 배너
 
 const MON_DIR=encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/');
-const KK_SK='/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';
-const KK_ADV='/KayKit_Adventurers_2.0_FREE/Characters/gltf/';   // 부족 습격병 몸(살아있는 사람) — Rig_Medium 공용 애니 호환
-const KK_ANIM='/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
+const KK_SK='/tomob-deploy/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';
+const KK_ADV='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';   // 부족 습격병 몸(살아있는 사람) — Rig_Medium 공용 애니 호환
+const KK_ANIM='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';
 const KK_ANIM_SETS=['Rig_Medium_General.glb','Rig_Medium_MovementBasic.glb','Rig_Medium_CombatMelee.glb'];
-const SKEL_ANIM='/unity_glb/skel/';   // 어둠해골(Skeleton_110) — 자체 idle만 → 외부 walk/attack/die 클립(같은 rig)
+const SKEL_ANIM='/tomob-deploy/unity_glb/skel/';   // 어둠해골(Skeleton_110) — 자체 idle만 → 외부 walk/attack/die 클립(같은 rig)
 const SKEL_SETS=[['idle.glb','idle'],['walk.glb','walk'],['attack.glb','attack'],['die.glb','die']];
 // ── 신규 FBX 몹 에셋 경로 ──
-const MON_FBX='/monter/out/', BOMB_DIR='/monter/assets_out/', IMP_DIR='/Diablillo/';
-const OPT='/monter/optimized/';   // meshopt 감축 glb (_mob_convert.html 산출물)
+const MON_FBX='/tomob-deploy/monter/out/', BOMB_DIR='/tomob-deploy/monter/assets_out/', IMP_DIR='/tomob-deploy/Diablillo/';
+const OPT='/tomob-deploy/monter/optimized/';   // meshopt 감축 glb (_mob_convert.html 산출물)
 // ★드래곤 보스 사운드(사령관 추가, voyage/ 루트)
 // ★드래곤 사운드 = sound.js SFX_DIR 통합 테이블의 이벤트키(경로는 테이블 한 곳에서만 관리·사령관). 거리감쇠는 drgVol이 opts.vol로 전달.
 const DRG_SFX={ breath:'drg_breath', roar:'drg_roar', epicRoar:'drg_epicroar', growl:'drg_growl', claw:'drg_claw', wings:'drg_wings', hurt:'drg_hurt' };
@@ -41,9 +41,9 @@ const MONSTERS=[
   {k:'ghost',    ko:'떠도는 원혼',     ...S('ghost'),    scale:1.7,  url:MON_DIR+'character-ghost.glb'},
   {k:'vampire',  ko:'피주린 뱀파이어', ...S('vampire'),  scale:1.8,  url:MON_DIR+'character-vampire.glb'},
   // ── mas 루트 Polyart ──
-  {k:'golem',    ko:'몰록의 우상',     ...S('golem'),    scale:5.0,  url:'/HP_Golem.glb'},          // Tier4 준보스 (5m)
-  {k:'slime',    ko:'오염된 슬라임',   ...S('slime'),    scale:1.5,  url:'/SlimePolyart.glb'},
-  {k:'turtle',   ko:'라합의 갑주귀',   ...S('turtle'),   scale:1.8,  url:'/TurtleShellPolyart.glb'},
+  {k:'golem',    ko:'몰록의 우상',     ...S('golem'),    scale:5.0,  url:'/tomob-deploy/HP_Golem.glb'},          // Tier4 준보스 (5m)
+  {k:'slime',    ko:'오염된 슬라임',   ...S('slime'),    scale:1.5,  url:'/tomob-deploy/SlimePolyart.glb'},
+  {k:'turtle',   ko:'라합의 갑주귀',   ...S('turtle'),   scale:1.8,  url:'/tomob-deploy/TurtleShellPolyart.glb'},
   // ── KayKit Skeletons (외부 Rig_Medium 애니) ──
   {k:'sk_warrior',ko:'아바돈의 백골검사',   ...S('sk_warrior'), scale:1.9, type:'kaykit', url:KK_SK+'Skeleton_Warrior.glb'},
   {k:'sk_rogue',  ko:'아바돈의 무덤 도굴꾼', ...S('sk_rogue'),   scale:1.8, type:'kaykit', url:KK_SK+'Skeleton_Rogue.glb'},
@@ -51,7 +51,7 @@ const MONSTERS=[
   {k:'sk_minion', ko:'해골 졸개',          ...S('sk_minion'), scale:1.6, type:'kaykit', url:KK_SK+'Skeleton_Minion.glb'},
   // ※부족 습격병은 MONSTERS 로스터에 안 넣음 — raiders.js가 종족 모델로 opts.def 스폰(야생 랜덤스폰 오염 방지). 스탯=BAL.raider_warrior.
   // ── Unity 어둠해골 (Skeleton_110 외형 + skel/ 외부 클립) ──
-  {k:'darkskel',  ko:'스올의 흑골 파수병', ...S('darkskel'), scale:2.2, type:'unityskel', url:'/Skeleton_110.glb'},
+  {k:'darkskel',  ko:'스올의 흑골 파수병', ...S('darkskel'), scale:2.2, type:'unityskel', url:'/tomob-deploy/Skeleton_110.glb'},
   // ── 신규 FBX 몹 (패치 FBXLoader) ── roles=클립명→표준명(idle/walk/attack) 매핑
   // ★최적화 glb (meshopt 감축 + 재질/클립 구움, 표준 GLTFLoader). 원본 FBX는 _mob_convert.html로 재생성 가능.
   {k:'creep',  ko:'아바돈의 포식귀', ...S('creep'), scale:2.2,  url:OPT+'creep.glb'},               // 15.8k→5.5k
@@ -62,7 +62,7 @@ const MONSTERS=[
   {k:'imp',    ko:'붉은 세이림',     ...S('imp'),   scale:1.1,  type:'fbx', fly:true, vc:true, fbxUrl:IMP_DIR+'Treading Water.fbx', clipFiles:[{f:IMP_DIR+'Standing Melee Attack Backhand.fbx', role:'attack'}]},   // Tripo 수프=감축불가, fbx 유지
   {k:'boom',   ko:'폭렬 감시안',     ...S('boom'),  scale:1.4,  url:OPT+'boom.glb'},                // 재질/drop 구움
   // ── Tier5 보스 ──
-  {k:'dragon',    ko:'레비아탄, 첫 별의 짐승', ...S('dragon'),   scale:30.0, type:'dragonboss', url:'/dragon_boss.glb'},   // 비행 보스
+  {k:'dragon',    ko:'레비아탄, 첫 별의 짐승', ...S('dragon'),   scale:30.0, type:'dragonboss', url:'/tomob-deploy/dragon_boss.glb'},   // 비행 보스
 ];
 // dog(마수견)·keeper(묘지기) = 추종자로 이전 → 몬스터 로스터 제외 (2026-07-01)
 const MAX=BAL.monsters.spawn.max, SPAWN_MIN=BAL.monsters.spawn.min, SPAWN_MAX=BAL.monsters.spawn.max_dist, DESPAWN=BAL.monsters.spawn.despawn;
@@ -385,7 +385,7 @@ export function initMonsters(ctx){
     onEnd:(m)=>setAnim(m,'idle',0.25) }; }
 
   // ═══════ 신규 몹 공격 VFX (게임 magic 스펠 텍스처 + 플립북 — 값싼 Points 아님) ═══════
-  const SPT='/spellfx/textures/', VFXS='/vfx/sheets/';
+  const SPT='/tomob-deploy/spellfx/textures/', VFXS='/tomob-deploy/vfx/sheets/';
   const _mt=(u)=>{ const t=texLoader.load(encodeURI(u)); t.colorSpace=THREE.SRGBColorSpace; return t; };
   const MT_GLOW=_mt(SPT+'gradient_radial_01.png'), MT_FLARE=_mt(SPT+'flare_01.png');
   const monFx=[];
@@ -526,7 +526,7 @@ export function initMonsters(ctx){
             }catch(_){}
             dgNukeBurst(g.position.x, g.position.y, g.position.z);   // ☄️ 팽창 불돔+중심 오브(ref/boss/전멸기.jpg)
             if(!safe) ctx.combat?.hitPlayer?.(9999);   // 차폐 실패 = 즉사급
-            try{ ctx.sound?.sfxPath?.('/crash.mp3', 0.4); }catch(_){}
+            try{ ctx.sound?.sfxPath?.('/tomob-deploy/crash.mp3', 0.4); }catch(_){}
           } },
         onEnd:(mm)=>{ mm._nuke=null; setAnim(mm,'idle',0.25); } }; },
   });
@@ -1030,7 +1030,7 @@ export function initMonsters(ctx){
     _shockRings.push({ disc, U, mat, t:0, dur:0.42 });
     spawnFireBurst(x, y, z, 2.2, 44);                                     // 잉걸불 방사
     monLight({ x, y:y+1.4, z }, 0xff7a2a, 26, 0.28);                      // ⚡풀 광원 플래시(add/remove 금지)
-    try{ ctx.sound?.sfxPath?.('/crash.mp3', 0.3); }catch(_){}
+    try{ ctx.sound?.sfxPath?.('/tomob-deploy/crash.mp3', 0.3); }catch(_){}
   }
 
   // 💥 도약 착지 임팩트 — 레퍼런스 ref/boss/도약.jpg 재현. 정본 규율(/vfx): 리본/파티클/셰이더 조합, 민짜 금지.
@@ -1170,7 +1170,7 @@ export function initMonsters(ctx){
     fireColumn(x, y, z, { n:110, up:20, spread:1.1, size:0.6, color:0xff7a20, life:1.0 });
     fireColumn(x, y, z, { n:60,  up:24, spread:0.5, size:0.4, color:0xffe090, life:0.9 });
     monLight({ x, y:y+2.5, z }, 0xffa040, 40, 0.5);
-    try{ ctx.sound?.sfxPath?.('/crash.mp3', 0.22); }catch(_){}
+    try{ ctx.sound?.sfxPath?.('/tomob-deploy/crash.mp3', 0.22); }catch(_){}
   }
 
   // ☄️ 전멸기(Ⓖ) — 팽창하는 불 돔/링 + 중심 충전 오브(ref/boss/전멸기.jpg).
@@ -1209,7 +1209,7 @@ export function initMonsters(ctx){
       const pts=new THREE.Points(geo,em); pts.frustumCulled=false; pts.renderOrder=6; pts.layers.enable(1); scene.add(pts);
       _sparkCols.push({ pts, geo, mat:em, vel, life, n, t:0, max:1.0 }); }
     for(let a=0;a<8;a++){ const an=a*Math.PI/4; monLight({ x:x+Math.cos(an)*8, y:y+2, z:z+Math.sin(an)*8 }, 0xff7a2a, 30, 0.5); }
-    try{ ctx.sound?.sfxPath?.('/crash.mp3', 0.4); }catch(_){}
+    try{ ctx.sound?.sfxPath?.('/tomob-deploy/crash.mp3', 0.4); }catch(_){}
   }
 
   // 🔧 VFX 렌더 검수 훅(/vfx) — 4개 스킬 VFX를 한 줄로 나란히 발생(montage). 게임 로직 무영향.
@@ -1240,7 +1240,7 @@ export function initMonsters(ctx){
           if(pp){ const dd = Math.hypot(pp.x-zn.x, pp.z-zn.z); if(dd <= zn.R) ctx.combat?.hitPlayer?.(zn.dmg); }   // 벗어났으면 회피
           spawnFireBurst(zn.x, zn.y, zn.z, zn.R*0.85, 80);               // 🔥 용암 분출
           monLight({ x:zn.x, y:zn.y+1.6, z:zn.z }, 0xff8a30, 30, 0.32);  // ⚡풀 광원 플래시
-          try{ ctx.sound?.sfxPath?.('/crash.mp3', 0.24); }catch(_){}
+          try{ ctx.sound?.sfxPath?.('/tomob-deploy/crash.mp3', 0.24); }catch(_){}
         }
       } else if(zn.scar){   // 🩸 도약 임팩트 균열 흉터 — 백열이 서서히 식으며 1.6s 후 소멸
         zn.U.uBlow.value = Math.max(0, 0.6 - zn.t*0.5);

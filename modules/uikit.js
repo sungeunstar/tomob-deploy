@@ -418,7 +418,7 @@ function ensureLocCss(){
   if(document.getElementById('uikit-loc-css')) return;
   const s=document.createElement('style'); s.id='uikit-loc-css';
   s.textContent=`
-  @font-face{ font-family:'ChosunNm'; src:url('/ChosunNm.ttf') format('truetype'); font-display:swap; }
+  @font-face{ font-family:'ChosunNm'; src:url('/tomob-deploy/ChosunNm.ttf') format('truetype'); font-display:swap; }
   @keyframes uk-loc-in{0%{opacity:0;transform:translateY(-16px)}14%{opacity:1;transform:none}78%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
   @keyframes uk-loc-name{0%{letter-spacing:.5em}16%{letter-spacing:.04em}100%{letter-spacing:.04em}}
   #uk-loc{position:fixed;top:17vh;left:0;right:0;text-align:center;z-index:604;pointer-events:none;opacity:0;

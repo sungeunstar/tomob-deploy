@@ -28,7 +28,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';   /
 //   프로토타입 메시엔 _kaykitShared 플래그 → clone에 전파 → disposeArena가 공유 geometry/material을
 //   건드리지 않음(재입장 시 클론 원본 파괴 금지). 던전 전용 생성물(불꽃/포탈)만 dispose.
 // ══════════════════════════════════════════════════════════════════════════
-const KIT_BASE = '/KayKit_DungeonRemastered_1.1_FREE/KayKit_DungeonRemastered_1.1_FREE/Assets/gltf/';
+const KIT_BASE = '/tomob-deploy/KayKit_DungeonRemastered_1.1_FREE/KayKit_DungeonRemastered_1.1_FREE/Assets/gltf/';
 const KIT_NAMES = ['floor_tile_large', 'floor_dirt_large_rocky', 'wall', 'wall_doorway',
                    'pillar', 'column', 'chest_gold', 'barrel_small', 'banner_red', 'torch_mounted',
                    // ★2026-07-16(사령관 개선): 계단(상하 이동)·상자더미(오를 수 있는 블럭)·스파이크 함정 타일
@@ -84,7 +84,7 @@ let _kitPromise = null;
 let _gatePromise = null;
 export function loadBossGate(){
   if(_gatePromise) return _gatePromise;
-  _gatePromise = new GLTFLoader().loadAsync('/bossgate.glb')
+  _gatePromise = new GLTFLoader().loadAsync('/tomob-deploy/bossgate.glb')
     .then(g => {
       // 개구부 실측 — 문짝 4장의 합친 bbox가 곧 통로 구멍이다(코드로 추정하지 않는다).
       // ⚠️GLTFLoader는 노드 이름의 **공백을 `_`로 치환**한다(PropertyBinding.sanitizeNodeName).
@@ -3093,7 +3093,7 @@ export function initDungeonRun(ctx){
       m.position.set(t.x + (Math.random()-0.5)*2.2, center.y + 0.1, t.z + (Math.random()-0.5)*2.2); ctx.scene.add(m);
       dbg.push({ m, vx:(Math.random()-0.5)*2.4, vy:-1-Math.random()*2, vz:(Math.random()-0.5)*2.4, rx:(Math.random()-0.5)*7, rz:(Math.random()-0.5)*7, life:2.2 }); }
     lower.debris = dbg;
-    try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/crash.mp3', 0.7); }catch(_){}
+    try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/crash.mp3', 0.7); }catch(_){}
     toast('바닥이 무너진다!', { accent:'red', ms:2400 });
   }
 
@@ -3145,7 +3145,7 @@ export function initDungeonRun(ctx){
         // ── 타이머형: 자동으로 솟았다 들어감(주기 2.4s, ~45% 솟음). 타이밍 맞춰 통과 ──
         if(t.mode === 'timed'){
           t.phase += dt; const p = (t.phase % 2.4) / 2.4; const up = p < 0.45;
-          if(up && !t._snd){ t._snd = true; const d = Math.hypot(pp.x-t.x, pp.z-t.z); if(d < 20){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/가시함정.mp3', Math.max(0.12, 0.5*(1-d/20))); }catch(_){} } }
+          if(up && !t._snd){ t._snd = true; const d = Math.hypot(pp.x-t.x, pp.z-t.z); if(d < 20){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/가시함정.mp3', Math.max(0.12, 0.5*(1-d/20))); }catch(_){} } }
           else if(!up) t._snd = false;
           if(my) my.y += ((up ? t.upY : t.downY) - my.y) * Math.min(1, dt * 12);
           if(up && my && my.y > t.upY - 0.15 && dxz < t.r && grounded && (feetY - (t.baseY || 0)) < t.spikeH * 0.7 && trapCd <= 0){
@@ -3158,7 +3158,7 @@ export function initDungeonRun(ctx){
         if(t.state === 'idle'){
           if(my) my.y += (t.downY - my.y) * Math.min(1, dt * 10);
           if(dxz < t.triggerR && grounded){ t.state = 'rising'; t.t = 0;   // ★밟으면(압력) 발동
-            const d = Math.hypot(pp.x-t.x, pp.z-t.z); if(d < 20){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/가시함정.mp3', Math.max(0.12, 0.5*(1-d/20))); }catch(_){} } }
+            const d = Math.hypot(pp.x-t.x, pp.z-t.z); if(d < 20){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/가시함정.mp3', Math.max(0.12, 0.5*(1-d/20))); }catch(_){} } }
         } else if(t.state === 'rising'){
           t.t += dt; if(my) my.y += (t.upY - my.y) * Math.min(1, dt * 16);    // 빠르게 솟음(telegraph ~0.2s)
           if(!my || my.y > t.upY - 0.05){ t.state = 'up'; t.t = 0; }
@@ -3193,7 +3193,7 @@ export function initDungeonRun(ctx){
         if(f.light) f.light.intensity = 16 * k * (0.8 + 0.2 * Math.sin(flickerT * 26));
         // ★화염 분출음(엣지 1회, 거리 볼륨) — 드래곤 브레스 음원 재사용(사령관 힌트)
         if(dmgOn && !f._fired){ f._fired = true; const d = Math.hypot(pp.x - f.ex, pp.z - f.ez);
-          if(d < 24){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/dragon_breath.mp3', Math.max(0.12, 0.5 * (1 - d / 24))); }catch(_){} } }
+          if(d < 24){ try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/dragon_breath.mp3', Math.max(0.12, 0.5 * (1 - d / 24))); }catch(_){} } }
         else if(!dmgOn && p < 0.5) f._fired = false;
         // 피해: 화염 경로(분출점→진행축 len, 폭≈0.9m) 안 + 분출 중 + 쿨다운
         if(dmgOn && fireCd <= 0){
@@ -3239,7 +3239,7 @@ export function initDungeonRun(ctx){
             const gv = near.gold || 60, sv = near.soul || 3;
             if(ctx.inventory && ctx.inventory.addGold) ctx.inventory.addGold(gv);
             if(ctx.combat && ctx.combat.addSoul) ctx.combat.addSoul(sv);
-            try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/상자오픈.mp3', 0.7); }catch(_){}
+            try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/상자오픈.mp3', 0.7); }catch(_){}
             _chestDlg = ukDialog({ speaker:'보물상자', accent:'gold', advanceKey:'KeyE',
               lines:['금화 +'+gv+' · 영혼 +'+sv], onDone:()=>{ _chestDlg = null; } });
           }
@@ -3292,7 +3292,7 @@ export function initDungeonRun(ctx){
         }catch(_){}
         try{ if(bossDoor && ctx.terrain && ctx.terrain.removeTrimesh && bossDoor.owner) ctx.terrain.removeTrimesh(bossDoor.owner); }catch(_){}
         if(bossDoor) for(const m of bossDoor.meshes) m.visible = false;
-        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/crash.mp3', 0.5); }catch(_){}
+        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/crash.mp3', 0.5); }catch(_){}
         try{ ctx.player.setSpawn(bossEnter.to.x, bossEnter.to.y, bossEnter.to.z); }catch(_){}
         toast('보스방', { accent:'red', ms:2600, emphasis:true, speaker:'광산 던전' });
       }
@@ -3368,7 +3368,7 @@ export function initDungeonRun(ctx){
           }
           alcoveDebris = deb;
         }
-        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/crash.mp3', 0.5); }catch(_){}
+        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/crash.mp3', 0.5); }catch(_){}
         toast(alcoveDoor ? '레버를 당기자 엘리베이터가 깨어난다 — 지상 어딘가의 벽이 무너지는 소리'
                          : (elevator ? '멀리서 보스문이 열리는 소리가 들린다 — 엘리베이터가 가동되기 시작했다'
                                      : '멀리서 보스문이 열리는 소리가 들린다 — 입구로 가는 지름길도 뚫렸다'),
@@ -3395,7 +3395,7 @@ export function initDungeonRun(ctx){
       const eNow2 = !!(ctx.player && ctx.player.keysSet && ctx.player.keysSet.has('KeyE'));
       if(nearE && eNow2 && !_elevEPrev){
         elevRiding = true; elevT = 0;
-        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/crash.mp3', 0.3); }catch(_){}
+        try{ ctx.sound && ctx.sound.sfxPath && ctx.sound.sfxPath('/tomob-deploy/crash.mp3', 0.3); }catch(_){}
         toast('엘리베이터가 올라가기 시작한다', { accent:'cyan', ms:2000 });
       }
       _elevEPrev = eNow2;

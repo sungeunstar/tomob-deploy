@@ -43,7 +43,7 @@ export function initWind(ctx){
   rain.visible=false; scene.add(rain);
   // 빗줄기 색: 낮=밝은 회청(0xc2d4e4), 밤=은청빛(0x8fb4e0, 더 밝게) → 밤 어둠 속에서도 보이게.
   const _rainDay=new THREE.Color(0xc2d4e4), _rainNight=new THREE.Color(0xaecdf2);
-  const storm=new Audio('/sfx/storm.mp3'); storm.loop=true; storm.volume=0; storm.preload='auto';   // mas 폭풍 소리
+  const storm=new Audio('/tomob-deploy/sfx/storm.mp3'); storm.loop=true; storm.volume=0; storm.preload='auto';   // mas 폭풍 소리
   // 비 시 어두운 폭풍 효과(하늘/안개/햇빛) — 초기값 저장
   const _sky0=scene.background.clone(), _fogC0=scene.fog?scene.fog.color.clone():null, _fn0=scene.fog?scene.fog.near:600, _ff0=scene.fog?scene.fog.far:4000, _sun0=ctx.sun?ctx.sun.intensity:1.6, _hemi0=ctx.hemi?ctx.hemi.intensity:1.15;
   const _dark=new THREE.Color(0x232a31);   // 폭풍 하늘(많이 어둡게)

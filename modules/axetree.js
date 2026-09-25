@@ -21,7 +21,7 @@ export async function initAxetree(ctx, opts={}){
   //   KayKit = 텍스처 아틀라스(UV) 메쉬 → three-pinata 슬라이스가 UV 보존 → 쓰러진 조각도 텍스처 유지.
   //   (LPW의 vertex-color 최근접 이식 땜빵 불필요 — 검증 _axe_kaykit.html)
   const TREE_H=8, TREE_R=0.5;   // 높이 정규화(KayKit 원본 ~4m → 게임 8m) / 줄기 충돌반경(잎폭 아닌 줄기 기준)
-  const _gltf=await new GLTFLoader().loadAsync('/kaykit_nature/Tree_1_A_Color1.gltf');
+  const _gltf=await new GLTFLoader().loadAsync('/tomob-deploy/kaykit_nature/Tree_1_A_Color1.gltf');
   let _src=null; _gltf.scene.updateMatrixWorld(true); _gltf.scene.traverse(o=>{ if(o.isMesh && !_src) _src=o; });
   let baseGeo=_src.geometry.index?_src.geometry.toNonIndexed():_src.geometry.clone();
   _src.updateMatrixWorld(true); baseGeo.applyMatrix4(_src.matrixWorld);   // gltf 노드 변환 베이크
@@ -115,7 +115,7 @@ export async function initAxetree(ctx, opts={}){
   camera.add(heldGroup);
   if(!camera.parent) scene.add(camera);       // 카메라가 씬에 없으면(자식 렌더 위해)
   // 도끼 GLB
-  new GLTFLoader().load(encodeURI('/assets/kenney_survival-kit/Models/GLB format/tool-axe.glb'), g=>{
+  new GLTFLoader().load(encodeURI('/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/tool-axe.glb'), g=>{
     armGroup.visible=false; const m=g.scene.clone(true);
     m.traverse(o=>{ if(o.isMesh){ o.frustumCulled=false; const src=Array.isArray(o.material)?o.material[0]:o.material;
       o.material=new THREE.MeshLambertMaterial({ map:(src&&src.map)?src.map:null, color:(src&&src.map)?0xffffff:0xb9b9b9 }); }});
@@ -126,7 +126,7 @@ export async function initAxetree(ctx, opts={}){
   }, undefined, ()=>{ armGroup.visible=true; });
 
   function sfx(url,vol){ let a=null; try{a=new Audio(url);a.volume=vol;}catch(e){} return ()=>{try{if(a){const n=a.cloneNode();n.volume=vol;n.play().catch(()=>{});}}catch(e){}}; }
-  const sfxChop=sfx('/w1.mp3',0.7), sfxFall=sfx('/w2.mp3',0.85);   // w1=타격, w2=쓰러짐(원래 물리 벌목 데모 음원)
+  const sfxChop=sfx('/tomob-deploy/w1.mp3',0.7), sfxFall=sfx('/tomob-deploy/w2.mp3',0.85);   // w1=타격, w2=쓰러짐(원래 물리 벌목 데모 음원)
   const chips=[]; const chipGeo=new THREE.BoxGeometry(0.1,0.06,0.16), chipMat=new THREE.MeshStandardMaterial({color:0x8a5a2a,roughness:1});
   function spawnChips(p){ for(let i=0;i<6;i++){ const m=new THREE.Mesh(chipGeo,chipMat); m.position.copy(p); scene.add(m);
     chips.push({m,v:new THREE.Vector3((Math.random()-0.5)*3,2+Math.random()*2,(Math.random()-0.5)*3),life:1.2}); } }

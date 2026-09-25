@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-const FLAG = encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
+const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
 const HARBOR_SCALE = 2.2;   // 항구 건물 크기 배율(settlement 기본 6m × 2.2 ≈ 13m 랜드마크). 사령관 "너무 작음" — 여기서 튜닝.
 const GHOST_FWD = 11;       // 고스트를 시야(카메라 정면) 앞으로 밀어내는 거리(m) — 발밑 파묻힘 방지 + 화면에 보이게(사령관).
 
@@ -36,8 +36,8 @@ export function initWharf(ctx){
   //     Mat.1_1·Mat_1 = 파일명이 그대로 대응(확실). 나머지 둘은 대응 텍스처가 없어 DefaultMaterial로 채운다.
   //   ★교체 지점을 placeHarborMesh 한 곳으로 둔 이유: 신규건설·고스트·세이브 재건이 전부 이 경로를 지나므로
   //     여기만 바꾸면 나머지가 자동으로 따라온다(선술집 모델은 다른 거점 건물에서 계속 사용 — 제거 아님).
-  const WHARF_OBJ = '/the-wharf/source/model/Untitled 1.obj';
-  const WHARF_TEX = '/the-wharf/textures/';
+  const WHARF_OBJ = '/tomob-deploy/the-wharf/source/model/Untitled 1.obj';
+  const WHARF_TEX = '/tomob-deploy/the-wharf/textures/';
   // ★실측 교정(2026-08-07): OBJLoader는 mtl이 없으면 메시 name에 **usemtl 값이 아니라 오브젝트 이름**을 넣는다.
   //   실제 메시 이름 = `Null`,`Null.1`~`Null.4`(목조 잔교 5개) + `tire`,`tire02`(고무 범퍼 2개).
   //   1차 구현은 usemtl 이름(`Mat.1_1` 등)으로 매칭해 **전부 실패 → 폴백 하나로 통일**되고 있었다.

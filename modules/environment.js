@@ -37,8 +37,8 @@ export async function initEnvironment(ctx){
   const mountains=[];                             // {x,z,r} 산 footprint
   try{
     const [ti,ai]=await Promise.all([
-      fetch('/terrain-index.json').then(r=>r.json()).catch(()=>[]),
-      fetch('/asset-index.json').then(r=>r.json()).catch(()=>[]),
+      fetch('/tomob-deploy/terrain-index.json').then(r=>r.json()).catch(()=>[]),
+      fetch('/tomob-deploy/asset-index.json').then(r=>r.json()).catch(()=>[]),
     ]);
     const byUrl=new Map(); [...ti,...ai].forEach(m=>byUrl.set(m.url,m));
     const isTerr=o=>{ const it=byUrl.get(o.url); return it && LOWPOLY_TERRAIN.has(it.category); };
@@ -65,7 +65,7 @@ export async function initEnvironment(ctx){
 
   // 지형 아틀라스 색 샘플 → 초록(잔디)에만 (노란 모래·회색 바위 제외)
   let _ac=null, FLIPV=true;
-  await new Promise(res=>{ const im=new Image(); im.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=im.width; cv.height=im.height; const cx=cv.getContext('2d',{willReadFrequently:true}); cx.drawImage(im,0,0); _ac={cx,w:cv.width,h:cv.height}; }catch(e){} res(); }; im.onerror=()=>res(); im.src='/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png'; });
+  await new Promise(res=>{ const im=new Image(); im.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=im.width; cv.height=im.height; const cx=cv.getContext('2d',{willReadFrequently:true}); cx.drawImage(im,0,0); _ac={cx,w:cv.width,h:cv.height}; }catch(e){} res(); }; im.onerror=()=>res(); im.src='/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png'; });
   function isGreen(h){ if(!_ac || !h || !h.uv) return true; let u=h.uv.x-Math.floor(h.uv.x), v=h.uv.y-Math.floor(h.uv.y); if(FLIPV) v=1-v;
     const px=Math.min(_ac.w-1,Math.max(0,(u*_ac.w)|0)), py=Math.min(_ac.h-1,Math.max(0,(v*_ac.h)|0));
     const d=_ac.cx.getImageData(px,py,1,1).data; return d[1]>d[0]+8 && d[1]>d[2]+14 && d[1]>60; }
@@ -75,7 +75,7 @@ export async function initEnvironment(ctx){
     'Tree_3_A','Tree_3_B','Tree_3_C','Tree_4_A','Tree_4_B','Tree_4_C',
     'Tree_Bare_1_A','Tree_Bare_1_B','Tree_Bare_1_C','Tree_Bare_2_A','Tree_Bare_2_B','Tree_Bare_2_C'];
   const gl=new GLTFLoader(); const PROTOS=[];
-  await Promise.all(TYPES.map(name=> gl.loadAsync(`/kaykit_nature/${name}_Color1.gltf`).then(g=>{
+  await Promise.all(TYPES.map(name=> gl.loadAsync(`/tomob-deploy/kaykit_nature/${name}_Color1.gltf`).then(g=>{
     let src=null; g.scene.updateMatrixWorld(true); g.scene.traverse(o=>{ if(o.isMesh && !src) src=o; });
     let geo=src.geometry.index?src.geometry.toNonIndexed():src.geometry.clone();
     src.updateMatrixWorld(true); geo.applyMatrix4(src.matrixWorld);
@@ -88,7 +88,7 @@ export async function initEnvironment(ctx){
   // ── 🪨 배경 돌 프로토타입(KayKit Rock, 최대변 1로 정규화) ──
   const ROCKS_T=['Rock_1_A','Rock_1_D','Rock_1_H','Rock_2_A','Rock_2_C','Rock_3_A','Rock_3_D','Rock_3_H'];
   const ROCKS=[];
-  await Promise.all(ROCKS_T.map(name=> gl.loadAsync(`/kaykit_nature/${name}_Color1.gltf`).then(g=>{
+  await Promise.all(ROCKS_T.map(name=> gl.loadAsync(`/tomob-deploy/kaykit_nature/${name}_Color1.gltf`).then(g=>{
     let src=null; g.scene.updateMatrixWorld(true); g.scene.traverse(o=>{ if(o.isMesh && !src) src=o; });
     let geo=src.geometry.index?src.geometry.toNonIndexed():src.geometry.clone();
     src.updateMatrixWorld(true); geo.applyMatrix4(src.matrixWorld);
@@ -238,7 +238,7 @@ export async function initEnvironment(ctx){
 
   // ── ⛏️ 광물(광석) 9종 — 산 근처에만 배치 ──
   await (async function buildOres(){
-    const O='/obj/', U='/unity/Polytope Studio/Lowpoly_Environments/Sources/Meshes/Rocks/';
+    const O='/tomob-deploy/obj/', U='/tomob-deploy/unity/Polytope Studio/Lowpoly_Environments/Sources/Meshes/Rocks/';
     const GEO_SRC={ ruda:{type:'objmtl',dir:O+'minerals/source/_unr/',obj:'Ruda_final.obj',mtl:'Ruda_final.mtl'},
       crystal:{type:'obj',dir:O+'stylized-crystals/source/',obj:'ChristalUV.obj'},
       limonite:{type:'objmtl',dir:O+'limonite/source/_unz/',obj:'model.obj',mtl:'model.mtl'},

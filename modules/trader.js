@@ -6,8 +6,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skClone } from 'three/addons/utils/SkeletonUtils.js';
 
-const CHAR = '/KayKit_Adventurers_2.0_FREE/Characters/gltf/Mage.glb';            // 상인 = 로브 입은 메이지(상인 느낌)
-const ANIM = '/KayKit_Adventurers_2.0_FREE/Animations/gltf/Rig_Medium/Rig_Medium_General.glb';   // idle 애니(같은 Rig_Medium)
+const CHAR = '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/Mage.glb';            // 상인 = 로브 입은 메이지(상인 느낌)
+const ANIM = '/tomob-deploy/KayKit_Adventurers_2.0_FREE/Animations/gltf/Rig_Medium/Rig_Medium_General.glb';   // idle 애니(같은 Rig_Medium)
 const TALK_RANGE = 5.0;   // 상호작용 반경(m)
 const NPC_HEIGHT = 1.8;   // 캐릭터 키 정규화(m)
 

@@ -1104,7 +1104,7 @@
   "fmt": "fbx"
  },
  {
-  "url": "/obj/low-poly-desert-rock/source/Rocky_The_LowPoly_Rock.obj",
+  "url": "/tomob-deploy/obj/low-poly-desert-rock/source/Rocky_The_LowPoly_Rock.obj",
   "name": "DesertRock",
   "category": "Minerals",
   "fmt": "obj"
@@ -1116,19 +1116,19 @@
   "fmt": "fbx"
  },
  {
-  "url": "/obj/stylized-crystals/source/ChristalUV.obj",
+  "url": "/tomob-deploy/obj/stylized-crystals/source/ChristalUV.obj",
   "name": "Crystals",
   "category": "Minerals",
   "fmt": "obj"
  },
  {
-  "url": "/obj/limonite/source/_unz/model.obj",
+  "url": "/tomob-deploy/obj/limonite/source/_unz/model.obj",
   "name": "Limonite",
   "category": "Minerals",
   "fmt": "obj"
  },
  {
-  "url": "/obj/pyrite/source/_unz/model.obj",
+  "url": "/tomob-deploy/obj/pyrite/source/_unz/model.obj",
   "name": "Pyrite",
   "category": "Minerals",
   "fmt": "obj"
@@ -1140,13 +1140,13 @@
   "fmt": "dae"
  },
  {
-  "url": "/obj/minerals/source/_unr/Ruda_final.obj",
+  "url": "/tomob-deploy/obj/minerals/source/_unr/Ruda_final.obj",
   "name": "OreRuda",
   "category": "Minerals",
   "fmt": "obj"
  },
  {
-  "url": "/rock-mountain-with-cave-realistic-version/source/Rock Mountain with cave realistic 85k by JJ_FBX_still.fbx",
+  "url": "/tomob-deploy/rock-mountain-with-cave-realistic-version/source/Rock Mountain with cave realistic 85k by JJ_FBX_still.fbx",
   "name": "동굴입구(광산)",
   "category": "Mountains",
   "fmt": "fbx",

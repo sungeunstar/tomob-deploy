@@ -9,7 +9,7 @@ import { BAL } from './balance.js';
 import { tribeById } from './tribes.js';   // 섬 소유 진영(lean) → 건물 색
 
 // 건물 색 = 섬 소유 진영(사령관 확정 2026-07-04, 얼라이언스/호드式): 파수꾼=blue / 남은자=red / 중립=yellow. green=예비.
-const HXBASE = '/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';
+const HXBASE = '/tomob-deploy/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';
 const COL_BY_LEAN = { watch:'blue', remnant:'red', neutral:'yellow' };
 const DEF_COL = 'yellow';   // 중립/미상 기본
 const hxDir = (col)=>`${HXBASE}/${col}/`;

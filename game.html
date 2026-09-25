@@ -8,7 +8,7 @@
   #fps{position:fixed;right:12px;top:10px;z-index:6;font:12px/1.4 ui-monospace,Consolas,monospace;color:#9fe;background:rgba(0,0,0,.5);padding:5px 9px;border-radius:5px;pointer-events:none;text-shadow:0 1px 2px #000}
   /* 🏮 로딩 화면 — 실제 내용은 modules/loadscreen.js가 채운다.
      여기 배경을 미리 깔아두는 건 모듈 로드 전 첫 프레임에 남색 화면이 번쩍이지 않게 하려는 것. */
-  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/ui/loading_bg.png') center/cover no-repeat}
+  #load{position:fixed;inset:0;z-index:9999;background:#050505 url('/tomob-deploy/ui/loading_bg.png') center/cover no-repeat}
   #hint{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);z-index:5;color:#fff;background:rgba(0,0,0,.45);padding:8px 16px;border-radius:8px}
 </style>
 <script type="importmap">{"imports":{
@@ -154,7 +154,7 @@ try{
     try{ _sd=(JSON.parse(localStorage.getItem('voyageSessions')||'{}'))[_name]; }catch(e){}
     // ★localStorage에 없으면 backup.json(에디터 Ctrl+E 백업 = 사령관이 만든 시드섬 풀)에서 로드.
     //   → 세션 소실·새 브라우저·다른 시드섬 시작에도 항상 지형 보장(멀티플레이 전제: 시작섬=시드섬 데이터 파일 기반).
-    if(!_sd){ try{ const _bk=await fetch('/voyage_islands_backup.json').then(r=>r.json());
+    if(!_sd){ try{ const _bk=await fetch('/tomob-deploy/voyage_islands_backup.json').then(r=>r.json());
       _sd=_bk.sessions && _bk.sessions[_name];
       if(_sd) console.log('[game] 시작 섬 세션 backup.json에서 로드:', _name); }
       catch(e){ console.warn('[game] backup.json 시작섬 로드 실패', e&&e.message); } }
@@ -165,7 +165,7 @@ try{
   let _homeOffset = null;
   let _homeTargetSpan = null;
   if(_homeId){ try{
-    const canon = await fetch('/worldmap.canon.json').then(r=>r.json());
+    const canon = await fetch('/tomob-deploy/worldmap.canon.json').then(r=>r.json());
     const isle = canon.islands && canon.islands.find(i=>i.id===_homeId);
     // 🏝️ 홈섬 목표폭 = BAL.island SSOT(worldstream 스트리밍 섬과 같은 손잡이). sizeMul 1.0 = 구 동작(너무 작음).
     // 🏝️ 홈섬도 canon 반경에 맞춘다(2026-08-07 맵 재생성 — canon r = 실제 목표 반경). worldstream 스트리밍 섬과 동일 규칙.

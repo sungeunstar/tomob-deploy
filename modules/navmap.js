@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { filterCanonIslands } from './islands.js';   // 🧭 R6 — worldstream과 동일 필터 공유(지도엔 있는데 실제론 없는 섬 방지, 사령관 2026-07-09)
 
 // ── UI 자산 경로(voyage/ui/) ──
-const UI = '/ui/';
+const UI = '/tomob-deploy/ui/';
 const ASSET = (n)=> UI + n;
 const IMG_LIST = {
   bg:ASSET('map_bg.png'), fog:ASSET('map_fog.png'),
@@ -482,8 +482,8 @@ class MapWindow{
     try{
       // 1) 정본 맵 + 경제
       const [res, bres] = await Promise.all([
-        fetch('/worldmap.canon.json?t='+Date.now()),
-        fetch('/voyage_islands_backup.json?t='+Date.now())
+        fetch('/tomob-deploy/worldmap.canon.json?t='+Date.now()),
+        fetch('/tomob-deploy/voyage_islands_backup.json?t='+Date.now())
       ]);
       this.data = await res.json();
       // R6: worldstream(3D 렌더)과 동일 필터 적용 — 원본 203섬 그대로 쓰면 실제 게임엔 없는 섬(~106개)이 지도에 표시됨(사령관 2026-07-09)

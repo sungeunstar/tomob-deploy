@@ -15,9 +15,9 @@ import { locationReveal } from './uikit.js';   // 해역 진입 배너(P3)
 import { BAL } from './balance.js';   // 🏝️ 섬 크기 손잡이(BAL.island) — 홈섬(game.html)과 같은 SSOT
 import { TRIBES, tribeById } from './tribes.js';   // 🏴 섬 = 12부족 소유(사령관: 섬은 이미 중립 부족이 점령 중)
 
-const CANON_URL  = '/worldmap.canon.json';
-const BACKUP_URL = '/voyage_islands_backup.json';
-const TERRAIN_TEX= '/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png';
+const CANON_URL  = '/tomob-deploy/worldmap.canon.json';
+const BACKUP_URL = '/tomob-deploy/voyage_islands_backup.json';
+const TERRAIN_TEX= '/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/CPT_Terrain_Texture_Atlas_01.png';
 // ★2026-07-10(사령관 "산이없음/모양이다르다"): terrain.js(홈섬 로더)는 lowpoly_terrain 카테고리 FBX에
 //   0.01 베이스 스케일을 곱한다(원본 FBX가 ~수만 유닛짜리라 실 게임 단위로 줄여야 함). 여기 스트리밍 로더는
 //   이 보정이 없어서 섬 원본 지오메트리가 100배 큰 채로 로드 → canon.r 맞춤 축소가 그만큼 더 세게 걸려
@@ -41,7 +41,7 @@ export async function initWorldstream(ctx){
   // ★terrain.js와 동일한 카테고리(byUrl) 인덱스 — lowpoly_terrain 에셋 0.01 베이스 스케일 판정용(위 주석 참조).
   const _byUrlCat = new Map();
   try {
-    const [ti,ai] = await Promise.all([ fetch('/terrain-index.json').then(r=>r.json()).catch(()=>[]), fetch('/asset-index.json').then(r=>r.json()).catch(()=>[]) ]);
+    const [ti,ai] = await Promise.all([ fetch('/tomob-deploy/terrain-index.json').then(r=>r.json()).catch(()=>[]), fetch('/tomob-deploy/asset-index.json').then(r=>r.json()).catch(()=>[]) ]);
     [...ti,...ai].forEach(m=>_byUrlCat.set(m.url, m.category));
   } catch(_){}
   //   ⚠️ 원점(0,0) 섬 제외: isle0이 canon 생성 아티팩트로 (0,0)에 박혀 있어(유일) 월드 중앙에 유령 부족섬('이방용병의섬')이
@@ -49,7 +49,7 @@ export async function initWorldstream(ctx){
   //   필터 로직 본체 = islands.js filterCanonIslands() (R6, navmap.js와 공유 SSOT — 사령관 2026-07-09)
   const islands = filterCanonIslands(canon.islands, backup.sessions);
   const tl = new THREE.TextureLoader(); const atlas = tl.load(encodeURI(TERRAIN_TEX)); atlas.colorSpace=THREE.SRGBColorSpace; atlas.flipY=false;
-  const fbxL = new FBXLoader(); fbxL.setResourcePath('/obj/lowpoly_terrain/Terrain_Assets/Textures/');
+  const fbxL = new FBXLoader(); fbxL.setResourcePath('/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/');
   const _fbxCache={};
   const loadFBX = url => _fbxCache[url] || (_fbxCache[url]=new Promise((res,rej)=>fbxL.load(encodeURI(url),res,undefined,rej)));
   // ★2026-07-13 공유 지오메트리 참조카운트(사령관 버그#1): 같은 FBX를 쓰는 섬이 여러 개일 때(예: '소형섬2'가 13개 섬 재사용,
@@ -64,7 +64,7 @@ export async function initWorldstream(ctx){
   //   통일해야 DestructibleMesh 벌목이 됨. (environment.js:78-86과 동일 절차) ──
   const capMat=new THREE.MeshStandardMaterial({color:0xcea463,roughness:0.85,side:THREE.DoubleSide});   // 절단면(벌목 그루터기 단면)
   const glL=new GLTFLoader(); const TREE_PROTOS=[];
-  await Promise.all(TREE_TYPES.map(n=> glL.loadAsync(`/kaykit_nature/${n}_Color1.gltf`).then(g=>{
+  await Promise.all(TREE_TYPES.map(n=> glL.loadAsync(`/tomob-deploy/kaykit_nature/${n}_Color1.gltf`).then(g=>{
     let src=null; g.scene.updateMatrixWorld(true); g.scene.traverse(o=>{ if(o.isMesh && !src) src=o; });
     if(!src) return;
     let geo=src.geometry.index?src.geometry.toNonIndexed():src.geometry.clone();
@@ -76,7 +76,7 @@ export async function initWorldstream(ctx){
   }).catch(()=>{})));
   // ⛏️ 광석용 돌 프로토(kaykit Rock 1종) — mine.registerNode가 채광 가능 Brush 광맥으로 교체하므로 시각 모델은 간단해도 됨(#20).
   let ORE_PROTO=null;
-  await glL.loadAsync('/kaykit_nature/Rock_1_A_Color1.gltf').then(g=>{
+  await glL.loadAsync('/tomob-deploy/kaykit_nature/Rock_1_A_Color1.gltf').then(g=>{
     let src=null; g.scene.traverse(o=>{ if(o.isMesh&&!src)src=o; }); if(!src)return;
     let geo=src.geometry.index?src.geometry.toNonIndexed():src.geometry.clone();
     src.updateMatrixWorld(true); geo.applyMatrix4(src.matrixWorld);

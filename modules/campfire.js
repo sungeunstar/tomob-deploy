@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { makeVolFire } from './volfire.js';
 
-const MODEL='/assets/kenney_survival-kit/Models/GLB format/campfire-pit.glb';
+const MODEL='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/campfire-pit.glb';
 
 export async function initCampfire(ctx){
   const { scene, camera } = ctx;

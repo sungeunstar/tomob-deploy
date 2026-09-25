@@ -17,10 +17,10 @@ import { initShip } from './ship.js';
 // ★export(2026-08-07, BUG-A4): 배 건조를 제작탭으로 옮기면서 invui가 카탈로그(이름·가격·모델경로)를 읽는다.
 //   수치는 여기가 SSOT — invui는 비추기만 하고 값을 복제하지 않는다.
 export const SHIPS = [
-  { key:'caravel', name:'캐러벨',   gold:600,  ship:{ objUrl:'/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
+  { key:'caravel', name:'캐러벨',   gold:600,  ship:{ objUrl:'/tomob-deploy/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
   // ★empty·queen 설정 = sandbox.html 검증된 GLB 프로파일 계승(플레이어 항해+갑판보행 확인된 값). length/helmX/deckLevels 임의변경 금지(서로 튜닝 의존).
-  { key:'empty',   name:'엠티 범선', gold:1500, ship:{ objUrl:'/obj/empty-ship/optimized.glb', length:56, helmX:-17, clothSail:'all' } },
-  { key:'queen',   name:'퀸 앤스 리벤지', gold:3000, ship:{ objUrl:'/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25 } },
+  { key:'empty',   name:'엠티 범선', gold:1500, ship:{ objUrl:'/tomob-deploy/obj/empty-ship/optimized.glb', length:56, helmX:-17, clothSail:'all' } },
+  { key:'queen',   name:'퀸 앤스 리벤지', gold:3000, ship:{ objUrl:'/tomob-deploy/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25 } },
 ];
 
 import { toast as ukToast } from './uikit.js';
@@ -42,7 +42,7 @@ export function initShipyard(ctx){
     hudEl.style.display='block'; }
 
   async function loadGhost(rec){
-    const url=rec.ship.objUrl||'/obj/oseberg-ship/_ex/oseberg.1.8.obj';
+    const url=rec.ship.objUrl||'/tomob-deploy/obj/oseberg-ship/_ex/oseberg.1.8.obj';
     let obj;
     try{ obj=/\.fbx$/i.test(url) ? await new Promise((r,j)=>new FBXLoader().load(url,r,undefined,j))
       : /\.glb|\.gltf$/i.test(url) ? (await new Promise((r,j)=>new GLTFLoader().load(url,r,undefined,j))).scene
