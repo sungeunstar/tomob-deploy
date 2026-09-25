@@ -234,7 +234,7 @@ try{
 
   // ── 배(게임 모듈 그대로) ──
   const SHIP = {
-    caravel:{ objUrl:'/tomob-deploy/obj/caravel-ship/source/model.fbx', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true },
+    caravel:{ objUrl:'/tomob-deploy/obj/caravel-ship/source/model.fbx', length:56, albedoDir:'/tomob-deploy/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true },
     empty:  { objUrl:'/obj/empty-ship/source/TexturedShip2.fbx', length:56, helmX:-17 },
     oseberg:{},
   };
@@ -382,14 +382,14 @@ try{
     startCaveLoad = () => {
       return import('three/addons/loaders/FBXLoader.js').then(m=>{
         const ldr=new m.FBXLoader();
-        return ldr.loadAsync('/intro/dark-side-cave/source/lp-3-007.fbx');
+        return ldr.loadAsync('/tomob-deploy/intro/dark-side-cave/source/lp-3-007.fbx');
       }).then(cave=>{
         stripLights(cave);
         let bx=new THREE.Box3().setFromObject(cave), sz=bx.getSize(new THREE.Vector3());
         cave.scale.setScalar(150/Math.max(sz.x,sz.y,sz.z)); cave.updateMatrixWorld(true);   // 멀어진 만큼 키움(원경 가독)
         bx=new THREE.Box3().setFromObject(cave); const cc=bx.getCenter(new THREE.Vector3()); cave.position.sub(cc);
         // 재질 단순화: diffuse + 이미시브 색상만 (노말맵·이미시브맵 제거 → 셰이더 컴파일 10배 빠름)
-        const bd='/intro/dark-side-cave/textures/', tl=new THREE.TextureLoader();
+        const bd='/tomob-deploy/intro/dark-side-cave/textures/', tl=new THREE.TextureLoader();
         // ★샘플(voyage/동굴모습.png) = dark-side 동굴 입구서 강렬한 빨간 빛. 에셋 원본 _Emissive 텍스처 + 빨강 emissive 복원.
         // 샘플 매칭: 바위(top/bottom)는 어둡게, 입구 내부(interior)에만 빨간빛 집중. 입구 코어는 glow 구가 담당.
         const CMAP={
@@ -480,7 +480,7 @@ try{
 
     // ── 탐험 = 나침반 단독(동굴 앞 코리도 중앙) / 진영 = 테이블 단독(동굴 바로 앞). 사령관: 둘 분리. ──
     // 나침반(탐험 전용)
-    PRELOAD.push(loadOne({ url:'/intro/fantasy-compass/source/extracted/Sketchfab/Sketchfab_showcase.fbx', type:'fbx', scale:11, albedo:'/tomob-deploy/intro/fantasy-compass/source/extracted/Sketchfab/Textures/V1/Compass_Base_color_V1.png' })   // ★크기 줄임(사령관: 너무 큼, 테이블 기준)
+    PRELOAD.push(loadOne({ url:'/tomob-deploy/intro/fantasy-compass/source/extracted/Sketchfab/Sketchfab_showcase.fbx', type:'fbx', scale:11, albedo:'/tomob-deploy/intro/fantasy-compass/source/extracted/Sketchfab/Textures/V1/Compass_Base_color_V1.png' })   // ★크기 줄임(사령관: 너무 큼, 테이블 기준)
     .then(compass=>{
       // ★단색 금색 덮기 제거(사령관: 원본 glb가 온통 금색 아님). loadOne 원본 텍스처 유지 + 유리덮개 투명 → 나침반 면(장미) 보이게 + 흰 반사 줄임.
       compass.traverse(o=>{ if(o.isMesh && o.material){ const ms=Array.isArray(o.material)?o.material:[o.material];
@@ -500,9 +500,9 @@ try{
       _rippleTargets.push(grp); grp.userData.hud={ code:'SECTOR_04', key:'explore', ko:'탐험', en:'EXPLORE', tag:(SECTIONS.find(s=>s.key==='explore')||{}).tag||'', lay:[{fx:0.13,fy:0.15,to:[-30,-30],c:'name'},{fx:0.72,fy:0.38,to:[40,0],c:'depth'}] }; introCompass._meshes.forEach(o=>_addRipple(o, grp));   // ★퍼지는효과: 나침반 호버 그물 + HUD
     }).catch(e=>console.warn('[intro] 나침반', e&&e.message)));
     // 테이블(진영 전용)
-    PRELOAD.push(loadOne({ url:'/intro/old-pirate-table/source/Table_fbx.fbx', type:'fbx', scale:18 })
+    PRELOAD.push(loadOne({ url:'/tomob-deploy/intro/old-pirate-table/source/Table_fbx.fbx', type:'fbx', scale:18 })
     .then(table=>{
-      const tbd='/intro/old-pirate-table/textures/', ttl=new THREE.TextureLoader();
+      const tbd='/tomob-deploy/intro/old-pirate-table/textures/', ttl=new THREE.TextureLoader();
       const tblMC={};
       function mkTblMat(mname){
         const n=['lambert1','lambert2','lambert3'].includes(mname)?mname:'lambert1';

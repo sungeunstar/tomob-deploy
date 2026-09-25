@@ -12,7 +12,7 @@ export const ENEMY_POOL = {
   queen:   { headOff: Math.PI, name: "Queen Anne's Revenge",
              opt: { objUrl:'/tomob-deploy/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25, showSides:false } },
   caravel: { headOff: 0, name: 'Caravel',
-             opt: { objUrl:'/tomob-deploy/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
+             opt: { objUrl:'/tomob-deploy/obj/caravel-ship/optimized.glb', length:56, albedoDir:'/tomob-deploy/obj/caravel-ship/textures/', stripRig:true, center:true, useModelHelm:true, flip:true, clothSail:true, showSides:false } },
   empty:   { headOff: 0, name: 'Derelict',
              opt: { objUrl:'/tomob-deploy/obj/empty-ship/optimized.glb', length:56, helmX:-17, clothSail:'all', showSides:false } },
   egyptian:{ headOff: 0, name: 'Egyptian Ship',

@@ -165,7 +165,7 @@ export async function initOpening(ctx, opts={}){
   const shipSpawn = M ? { x:_isSp.x + 1500, z:_isSp.z + 1500 } : { x:0, z:0 };
   const ship = await initShip(ctx, {
     spawn:shipSpawn, objUrl:'/tomob-deploy/obj/caravel-ship/source/model.fbx', length:56,
-    albedoDir:'/obj/caravel-ship/textures/', stripRig:true, center:true,
+    albedoDir:'/tomob-deploy/obj/caravel-ship/textures/', stripRig:true, center:true,
     useModelHelm:true, flip:true, clothSail:true,
     cannonStations:true,   // ★2026-07-10(사령관 "Z눌러도 대포조준 안됨") — 빠져있어서 시작 캐러벨엔 대포 스테이션 자체가 없었음(shipyard 건조배만 true였음).
   });

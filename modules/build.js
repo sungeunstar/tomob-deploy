@@ -10,7 +10,7 @@ export async function initBuild(ctx, { woodBase='/tomob-deploy/obj/WoodFrameBuil
   const groundAt = (x,z,fromY)=>ctx.terrain.groundAt(x,z,fromY);
   const GRID=2, FSCALE=0.01;
   // 던전팩(LowPolyDungeonsLite) — unitypackage 추출분. 별도 base + 단일 아틀라스 텍스처 + 자동 그리드핏(fit).
-  const DBASE='/obj/LowPolyDungeonsLite/Models/', DTEX='/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
+  const DBASE='/tomob-deploy/obj/LowPolyDungeonsLite/Models/', DTEX='/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
   // Kenney 킷(GLB, 임베드 머티리얼) — 사령관 선택 팔레트(_thumb_select). glb=전체경로, gfit=목표 최대치수(m) 자동핏.
   const KAIO='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/', KSURV='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/';
   const PIECES={

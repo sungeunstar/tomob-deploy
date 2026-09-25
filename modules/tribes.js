@@ -6,7 +6,7 @@
 //   데이터 전용. raiders/capture/worldstream 이 import. 콘센트: ctx.tribes 노출(호환 위해 이름 유지).
 
 const CHAR='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';
-const GRV ='/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/';
+const GRV ='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/';
 const DUN ='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Dungeon/Models/GLB format/';
 const MINI='/tomob-deploy/assets/kenney_mini-characters/Models/GLB format/';
 const ARN ='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/';

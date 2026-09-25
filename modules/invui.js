@@ -16,7 +16,7 @@ import { SHIPS as SHIPYARD_SHIPS } from './shipyard.js';           // 🚢 배 �
 // ── 아이템 아이콘 = 3D 모델 자동 렌더 (모듈 1회 셋업, 결과 dataURL 캐시) ──
 const _STONE='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/resource-stone.glb';
 const _PLAT='/assets/kenney_all_in_one_3.4.0/3D assets/Platformer Kit/Models/GLB format/';   // 디스크 확인됨(추출 O)
-const _DUN='/obj/LowPolyDungeonsLite/Models/', _DUNTEX='/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
+const _DUN='/tomob-deploy/obj/LowPolyDungeonsLite/Models/', _DUNTEX='/tomob-deploy/obj/LowPolyDungeonsLite/Textures/LowPolyDungeonsLite_Texture_01.png';
 const _KAIO='/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/', _KSURV='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/';   // Kenney 빌드 GLB(임베드 머티)
 const _KRB='/tomob-deploy/KayKit_ResourceBits_1.0_FREE/KayKit_ResourceBits_1.0_FREE/Assets/gltf/';   // 🪨 KayKit ResourceBits(광물 너겟·바·통나무) — 텍스처 gltf폴더에 복사됨
 const ICON_MODELS={

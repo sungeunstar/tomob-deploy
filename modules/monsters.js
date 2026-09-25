@@ -10,7 +10,7 @@ import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (몬스터 스탯
 import { createLightPool, createSlotPool, radialTexture } from './fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
 import { locationReveal as ukLocation } from './uikit.js';   // 🔥 던전 보스 전멸기(Ⓖ) 경고 배너
 
-const MON_DIR=encodeURI('/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/');
+const MON_DIR=encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/');
 const KK_SK='/tomob-deploy/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';
 const KK_ADV='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Characters/gltf/';   // 부족 습격병 몸(살아있는 사람) — Rig_Medium 공용 애니 호환
 const KK_ANIM='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';

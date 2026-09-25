@@ -5,7 +5,7 @@
       "name": "시작의섬 카브",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
           "x": 200,
           "y": -4.78690064330766e-14,
           "z": 225,
@@ -13,7 +13,7 @@
           "scale": 1.5019390107937132
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_14.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_14.fbx",
           "x": 400,
           "y": 12.802610561580666,
           "z": 225,
@@ -21,7 +21,7 @@
           "scale": 2.4903585024906376
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
           "x": -750,
           "y": -1.2377622336214305e-13,
           "z": 550,
@@ -29,7 +29,7 @@
           "scale": 1.0962962165675656
         },
         {
-          "url": "/obj/lowpoly_terrain/Bonus_Assets/Meshes/Clouds/Cloud_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Bonus_Assets/Meshes/Clouds/Cloud_03.fbx",
           "x": -750,
           "y": 15.03673923827066,
           "z": 600,
@@ -65,7 +65,7 @@
       "name": "소형섬2",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
           "x": 250,
           "y": -5.3618119990785487e-14,
           "z": 250,
@@ -73,7 +73,7 @@
           "scale": 1.0675170533897334
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_04.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_04.fbx",
           "x": 275,
           "y": 9.277712227537625,
           "z": 300,
@@ -147,7 +147,7 @@
       "name": "중형섬1",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
           "x": 250,
           "y": 4.792686697424158e-15,
           "z": 225,
@@ -155,7 +155,7 @@
           "scale": 1.3503300189383272
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
           "x": -25,
           "y": -1.197354273144793e-13,
           "z": 550,
@@ -207,7 +207,7 @@
       "name": "중형섬3",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_03.fbx",
           "x": 275,
           "y": 1.5829921113482806e-17,
           "z": 250,
@@ -215,7 +215,7 @@
           "scale": 2.09086637718068
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_e_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_e_05.fbx",
           "x": 0,
           "y": -1.989655841381603e-14,
           "z": 600,
@@ -223,7 +223,7 @@
           "scale": 2.65711868512952
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_04.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_04.fbx",
           "x": 325,
           "y": 18.828876459867733,
           "z": 350,
@@ -537,7 +537,7 @@
       "name": "대형섬5",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
           "x": 325,
           "y": -1.2050742723743182e-12,
           "z": 1325,
@@ -545,7 +545,7 @@
           "scale": 12.08696708876487
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_06.fbx",
           "x": 2150,
           "y": 3.9109846370057206e-14,
           "z": -175,
@@ -733,7 +733,7 @@
           "scale": 2.65
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
           "x": -410,
           "y": 0,
           "z": 145,
@@ -781,7 +781,7 @@
           "scale": 2.55
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_05.fbx",
           "x": 930,
           "y": 0,
           "z": -245,
