@@ -7,7 +7,7 @@
 const ORDER = ['dodge','extra','attack','special','ultimate'];   // 왼→오른쪽 (메인/특수/궁극이 오른쪽으로)
 
 // ── 직업별 스킬셋 (role = ref 슬롯 매핑). k=키표기 ic=이모지 lb=라벨 cd=쿨다운소스 img=이미지(선택) ──
-const SK='/';   // 스킬 아이콘 경로(루트). 기본공격 아이콘은 아직 없어 이모지 placeholder.
+const SK='/tomob-deploy/';   // 스킬 아이콘 경로(루트). 기본공격 아이콘은 아직 없어 이모지 placeholder.
 const DODGE_IMG=SK+'dash_transparent.png';
 const CLASS_SKILLS = {
   knight:       { name:'기사', skills:[
