@@ -21,7 +21,7 @@ export function initForge(ctx){
 
   // 레시피 아이콘 스왑(ui/icons PNG). 매핑 있으면 <img>, 없으면 이모지 폴백.
   const RIC={ steel:'steel', bronze:'bronze', goldbar:'gold' };
-  const ric=(r)=>{ const n=RIC[r.id]; return n?`<img src="/ui/icons/icon_${n}.png" alt="">`:r.icon; };
+  const ric=(r)=>{ const n=RIC[r.id]; return n?`<img src="/tomob-deploy/ui/icons/icon_${n}.png" alt="">`:r.icon; };
 
   // ── 화로 메시 (용광로) — 거점 비치 ──
   let furnace=null, smithyTpl=null;

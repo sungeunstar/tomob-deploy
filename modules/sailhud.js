@@ -2,7 +2,7 @@
 // 조타(ctx.ship.boarded) 중에만 표시: 나침반 카드(bowYaw) + 바람 화살(파랑) + 돛 화살(노랑) + 잡힘% + 러더바.
 export function initSailhud(ctx){
   let hud=null, deck=null;
-  const ICO=(n,sz=15)=>`<img src="/ui/icons/icon_${n}.png" style="height:${sz}px;vertical-align:-3px;margin-right:3px;filter:drop-shadow(0 1px 1px #000)">`;   // HUD 인라인 아이콘
+  const ICO=(n,sz=15)=>`<img src="/tomob-deploy/ui/icons/icon_${n}.png" style="height:${sz}px;vertical-align:-3px;margin-right:3px;filter:drop-shadow(0 1px 1px #000)">`;   // HUD 인라인 아이콘
   const BEAR16=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];   // 16방위(침로 표시용)
   ctx.onUpdate(()=>{ const bs=ctx.ship; if(!bs) return;
     if(bs.boarded){

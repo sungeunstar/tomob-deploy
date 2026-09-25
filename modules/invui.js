@@ -197,9 +197,9 @@ export function initInvui(ctx){
   //   컨테이너별 CSS(.cell .pv img / .dPic img / .cRow .ci img / .scIcon img)가 크기 처리.
   const ICON_IMG={ potion:'potion', revivestone:'revive', rum:'rum', silk:'silk', spice:'spice', gem:'gem', timber:'timber', stone:'stone',
     iron:'iron', copper:'copper', tin:'tin', cobalt:'cobalt', gold:'gold', silver:'silver', coal:'coal', leaf:'leaf', rope:'rope', steel:'steel', bronze:'bronze', ration:'ration', plank:'plank', brick:'brick' };
-  const pv=(id)=>{ const n=ICON_IMG[id]; return n?`<img src="/ui/icons/icon_${n}.png" alt="">`:(ICON[id]||'📦'); };
+  const pv=(id)=>{ const n=ICON_IMG[id]; return n?`<img src="/tomob-deploy/ui/icons/icon_${n}.png" alt="">`:(ICON[id]||'📦'); };
   // 제작 아이템 아이콘: ICON_IMG 매핑 있으면 png(강철·청동·밧줄·판재·벽돌 등), 없으면 CRAFTABLES 고유 이모지(토대🧱·대포💣 등) 유지.
-  const pvc=(rc)=>{ const n=ICON_IMG[rc.id]; return n?`<img src="/ui/icons/icon_${n}.png" alt="">`:rc.icon; };
+  const pvc=(rc)=>{ const n=ICON_IMG[rc.id]; return n?`<img src="/tomob-deploy/ui/icons/icon_${n}.png" alt="">`:rc.icon; };
   const DESC={ iron:'대포 강화·철물의 핵심 금속',copper:'주석과 합쳐 청동',tin:'청동 합금 재료',cobalt:'고급 합금',gold:'화폐·고가 교역',silver:'화폐·교역',gem:'최희귀 교역품',coal:'제련 연료',timber:'건축·제작 기본 통나무',leaf:'벌목 부산물 — 밧줄 재료',stone:'건축 석재',rope:'나뭇잎으로 꼬아 만든 밧줄 — 깃발·텐트·돛',steel:'철광석 제련 — 강화',bronze:'구리+주석 합금',rum:'교역품',silk:'교역품',spice:'교역품',ration:'비상식량' };
 
   const CRAFTABLES=[
