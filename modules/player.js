@@ -904,7 +904,7 @@ export function initPlayer(ctx, { spawn={x:0,y:60,z:0}, charUrl='/tomob-deploy/K
     const building = !!(ctx.build && ctx.build.isBuilding && ctx.build.isBuilding());
     quickslots.forEach((s,i)=>{ const key=QKEYS[i]; let on=false, icon='', nm='', cnt='', durBar='';
       if(s && s.type==='tool'){ const cfg=LOADOUT[s.id]||{label:'빈손'}; const lbl=cfg.label||'', m=lbl.match(/^(\S+)\s+(.*)$/); nm=m?m[2]:lbl;   // ★공백 없으면 라벨 전체가 이름(빈손 등) — 아이콘 칸에 텍스트 노출 방지
-        const url=(s.id==='pickaxe'||s.id==='axe'||s.id==='torch')?_bIcon(s.id):(s.id==='none'?'/ui/icons/icon_fist.png':null);   // 🛠️ 도구=GLB썸네일 · 맨주먹=주먹아이콘(ui/icons)
+        const url=(s.id==='pickaxe'||s.id==='axe'||s.id==='torch')?_bIcon(s.id):(s.id==='none'?'/tomob-deploy/ui/icons/icon_fist.png':null);   // 🛠️ 도구=GLB썸네일 · 맨주먹=주먹아이콘(ui/icons)
         icon = url ? `<img src="${url}" alt="" onerror="this.remove()">` : (m?m[1]:''); on=(s.id===currentTool)&&!building;
         // ★D2(2026-07-15): 곡괭이·도끼 내구도 바(아이콘 하단). 초록>50%·노랑>20%·빨강. 소진 시 빨강 0%.
         if((s.id==='pickaxe'||s.id==='axe') && ctx.toolDur){ const c=ctx.toolDur.get(s.id), mx=ctx.toolDur.max[s.id]||1, f=Math.max(0,Math.min(1,c/mx));

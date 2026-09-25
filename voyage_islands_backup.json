@@ -43,7 +43,7 @@
       "name": "소형섬1",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
           "x": 200,
           "y": -4.8143879488571825e-14,
           "z": 225,
@@ -51,7 +51,7 @@
           "scale": 1.1033963337746584
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_02.fbx",
           "x": 150,
           "y": -2.349176791043715e-13,
           "z": 550,
@@ -87,7 +87,7 @@
       "name": "소형섬3",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_02.fbx",
           "x": 100,
           "y": -6.765892554421493e-14,
           "z": 300,
@@ -95,7 +95,7 @@
           "scale": 2.3870746939321767
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_01.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_01.fbx",
           "x": 300,
           "y": 8.157675427154469e-14,
           "z": 150,
@@ -103,7 +103,7 @@
           "scale": 2.3870746939321767
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_07.fbx",
           "x": 325,
           "y": 9.401848263618913,
           "z": 150,
@@ -117,7 +117,7 @@
       "name": "소형섬5",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_03.fbx",
           "x": 200,
           "y": 9.789735803765156e-15,
           "z": 200,
@@ -125,7 +125,7 @@
           "scale": 3.183643482582762
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_04.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_04.fbx",
           "x": 150,
           "y": -4.8931351636605616e-14,
           "z": 475,
@@ -133,7 +133,7 @@
           "scale": 2.0597860808324353
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
           "x": 175,
           "y": 11.086496123074534,
           "z": 225,
@@ -163,7 +163,7 @@
           "scale": 0.9560519275156043
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_06.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_06.fbx",
           "x": -25,
           "y": 13.035092419887636,
           "z": 625,
@@ -171,7 +171,7 @@
           "scale": 1.417142970685516
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_31.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_31.fbx",
           "x": 275,
           "y": 11.767812914552817,
           "z": 275,
@@ -185,7 +185,7 @@
       "name": "중형섬2",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_13.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_13.fbx",
           "x": 175,
           "y": 5.104583331489437e-15,
           "z": 225,
@@ -193,7 +193,7 @@
           "scale": 7.9448045194735135
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_37.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_37.fbx",
           "x": 150,
           "y": 28.62664818739091,
           "z": 275,
@@ -237,7 +237,7 @@
       "name": "중형섬4",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_14.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_a_14.fbx",
           "x": 225,
           "y": 3.884015740285761e-15,
           "z": 250,
@@ -267,7 +267,7 @@
       "name": "소형섬4",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_04.fbx",
           "x": 275,
           "y": 3.3682415108886347e-15,
           "z": 250,
@@ -275,7 +275,7 @@
           "scale": 1.0783172139765143
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
           "x": 225,
           "y": -5.96290674727121e-14,
           "z": 525,
@@ -297,7 +297,7 @@
       "name": "대형섬1",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
           "x": -75,
           "y": -3.172358609987008e-14,
           "z": 150,
@@ -305,7 +305,7 @@
           "scale": 7.889117763863799
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_43.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_43.fbx",
           "x": -200,
           "y": 46.175982603059985,
           "z": 25,
@@ -313,7 +313,7 @@
           "scale": 17.298000000000002
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": -175,
           "y": 49.75216512696854,
           "z": 1075,
@@ -321,7 +321,7 @@
           "scale": 12.939803668980003
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": 525,
           "y": 45.54013794966989,
           "z": -925,
@@ -329,7 +329,7 @@
           "scale": 12.939803668980003
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": -700,
           "y": 48.59846255648809,
           "z": -900,
@@ -337,7 +337,7 @@
           "scale": 10.40822165976975
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": -1150,
           "y": 45.61076474050695,
           "z": -250,
@@ -359,7 +359,7 @@
       "name": "대형섬2",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_01.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_01.fbx",
           "x": -50,
           "y": -4.849419029170331e-13,
           "z": 125,
@@ -367,7 +367,7 @@
           "scale": 8.010238891525592
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
           "x": 75,
           "y": 68.85842391749948,
           "z": 125,
@@ -391,7 +391,7 @@
           "scale": 14.098238412335348
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": 975,
           "y": 62.792554996820044,
           "z": 450,
@@ -399,7 +399,7 @@
           "scale": 8.482922326735268
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": 875,
           "y": 67.60853283610241,
           "z": -525,
@@ -413,7 +413,7 @@
       "name": "대형섬3",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
           "x": -50,
           "y": 2.082688773520972e-13,
           "z": 1100,
@@ -421,7 +421,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
           "x": 575,
           "y": -2.9099124288950893e-13,
           "z": -725,
@@ -429,7 +429,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_07.fbx",
           "x": -1000,
           "y": 2.7778927642923317e-14,
           "z": -125,
@@ -437,7 +437,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_d_02.fbx",
           "x": 1750,
           "y": -6.67840311893673e-13,
           "z": 950,
@@ -445,7 +445,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
           "x": 2150,
           "y": 45.63979423091739,
           "z": 1300,
@@ -453,7 +453,7 @@
           "scale": 9.679646143585867
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": 825,
           "y": 97.73428843327937,
           "z": -200,
@@ -467,7 +467,7 @@
       "name": "대형섬4",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
           "x": 0,
           "y": 4.1881777238501153e-13,
           "z": 150,
@@ -475,7 +475,7 @@
           "scale": 17.75972010687979
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
           "x": 275,
           "y": 117.62734187216213,
           "z": 1075,
@@ -483,7 +483,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
           "x": 975,
           "y": 107.87703792158781,
           "z": -725,
@@ -491,7 +491,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_02.fbx",
           "x": 2175,
           "y": 103.84546598601129,
           "z": 625,
@@ -499,7 +499,7 @@
           "scale": 14.961040200000003
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
           "x": -1925,
           "y": 107.12812349048176,
           "z": 325,
@@ -507,7 +507,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
           "x": -1125,
           "y": 105.56364461642721,
           "z": -2400,
@@ -515,7 +515,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_10.fbx",
           "x": 1400,
           "y": 106.86421355741433,
           "z": -2550,
@@ -523,7 +523,7 @@
           "scale": 20
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_07.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_c_07.fbx",
           "x": 50,
           "y": 103.51450664188627,
           "z": 2525,
@@ -553,7 +553,7 @@
           "scale": 5.440386743131167
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/L/CPT_Island_L_b_10.fbx",
           "x": 2150,
           "y": -9.006756572254967e-13,
           "z": -50,
@@ -561,7 +561,7 @@
           "scale": 5.059559671111986
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
           "x": 1775,
           "y": 165.72262351635914,
           "z": 2100,
@@ -569,7 +569,7 @@
           "scale": 13.913767386000004
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_10.fbx",
           "x": -100,
           "y": 165.0688830984122,
           "z": 2250,
@@ -577,7 +577,7 @@
           "scale": 13.913767386000004
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_06.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_06.fbx",
           "x": -175,
           "y": 165.3362832908996,
           "z": 450,
@@ -725,7 +725,7 @@
       },
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
           "x": 0,
           "y": 0,
           "z": 0,
@@ -741,7 +741,7 @@
           "scale": 1.15
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_d_03.fbx",
           "x": 15,
           "y": 23,
           "z": 315,
@@ -765,7 +765,7 @@
           "scale": 4.05
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_12.fbx",
           "x": -500,
           "y": 13,
           "z": -180,
@@ -773,7 +773,7 @@
           "scale": 2.65
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_b_13.fbx",
           "x": 510,
           "y": 13,
           "z": -135,
@@ -789,7 +789,7 @@
           "scale": 0.92
         },
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Mountains/CPT/NoLOD/L/CPT_Mountain_L_a_18.fbx",
           "x": 930,
           "y": 11,
           "z": -230,
@@ -803,7 +803,7 @@
       "name": "테스트섬 Sea Keep",
       "objs": [
         {
-          "url": "/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
+          "url": "/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Meshes/Islands/CPT/NoLOD/H/CPT_Island_H_a_02.fbx",
           "x": 0,
           "y": 0,
           "z": 0,
