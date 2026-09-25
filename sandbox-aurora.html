@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOMOB — 바람의 유적섬 · 본편 조작 샌드박스</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#98c9da;color:#f6f1d9;font:13px/1.5 system-ui,'Malgun Gothic',sans-serif}canvas{display:block}button,select,a{font:inherit}button,a.control,select{border:1px solid #ffffff35;color:#f6f1d9;background:#162c31c9;border-radius:6px;padding:8px 12px;cursor:pointer;text-decoration:none}button:hover,a.control:hover{background:#315253}select{max-width:170px}button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #e0cd8c;outline-offset:2px}#hud{position:fixed;left:24px;top:20px;z-index:5;pointer-events:none;text-shadow:0 2px 5px #16323f}#hud .eyebrow{font-size:10px;letter-spacing:2px;color:#e8debb}h1{font-size:25px;font-weight:550;letter-spacing:-1px;margin:2px 0}#location{font-size:13px;color:#f0deaa}#pos{font:10px ui-monospace,monospace;opacity:.65;margin-top:7px}#tools{position:fixed;right:20px;top:20px;z-index:10;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:480px}#tools details{background:#152e36d9;border:1px solid #ffffff26;border-radius:6px}#tools summary{padding:8px 12px;cursor:pointer}#tools .inner{padding:4px 12px 12px;display:grid;gap:8px}#hint{position:fixed;left:24px;bottom:24px;z-index:5;max-width:310px;background:#18323bbc;padding:12px 16px;border-left:2px solid #ddc787;border-radius:0 5px 5px 0;pointer-events:none}#hint b{color:#f9df91}#cross{position:fixed;left:50%;top:50%;width:4px;height:4px;transform:translate(-50%,-50%);border-radius:50%;background:#ffffff9c;z-index:4;pointer-events:none}#fps{position:fixed;right:20px;bottom:22px;font:11px ui-monospace,monospace;background:#152e36bc;padding:7px 10px;border-radius:4px;z-index:5}#load{position:fixed;inset:0;background:#152b36;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:100;gap:14px;text-align:center;padding:24px}#load h2{font-size:32px;font-weight:500;margin:0}#load small{opacity:.6}#load progress{width:220px;accent-color:#b8c79d}#qa{display:none;position:fixed;right:20px;top:90px;max-width:430px;max-height:66vh;overflow:auto;white-space:pre-wrap;background:#081820eb;color:#b4e6cf;padding:14px;z-index:15;font:11px/1.45 ui-monospace,monospace;pointer-events:none}#native-test{display:none}#notice{position:fixed;top:105px;left:24px;color:#fae0a0;text-shadow:0 2px 5px #000;z-index:5}#backlinks{font-size:11px;color:#d0e2dd}#backlinks a{color:inherit}@media(max-width:700px){#hud{left:14px;top:14px}h1{font-size:19px}#tools{right:10px;top:88px;max-width:260px}#hint{left:14px;bottom:85px;font-size:11px;max-width:240px}#qa{max-width:90vw;right:10px;top:165px}}
+</style>
+<script>window.__auroraErrors=[];const originalError=console.error.bind(console);console.error=(...args)=>{const msg=args.map(a=>String(a)).join(' ');if(window.__auroraErrors.length<150&&!window.__auroraErrors.includes(msg))window.__auroraErrors.push(msg);originalError(...args);};window.addEventListener('error',e=>window.__auroraErrors.push(e.message));window.addEventListener('unhandledrejection',e=>window.__auroraErrors.push(String(e.reason)));</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","three-pinata":"https://esm.sh/@dgreenheck/three-pinata@2.0.1?external=three","three.quarks":"https://esm.sh/three.quarks@0.15.3?external=three","three-mesh-bvh":"https://esm.sh/three-mesh-bvh@0.7.0?external=three","three-bvh-csg":"https://esm.sh/three-bvh-csg@0.0.16?external=three,three-mesh-bvh"}}</script>
+</head><body>
+<div id="load"><small>TOMOB / TERRAIN SANDBOX 02</small><h2>바람의 유적섬</h2><div id="load-note">본편 엔진을 준비하고 있어요.</div><progress></progress><small>본편의 캐릭터·애니메이션·물리 모듈을 불러옵니다.</small></div>
+<div id="hud"><div class="eyebrow">TOMOB / EXPLORATION SANDBOX</div><h1>바람의 유적섬</h1><div id="location">해안 산책로</div><div id="pos"></div></div>
+<div id="tools"><a class="control" id="overview" href="?view=overview">섬 전체 보기</a><details><summary>검수 도구</summary><div class="inner"><label>장소 <select id="places" aria-label="검수 장소"></select></label><button id="reset">선착장으로 돌아가기</button><button id="native-test">본편 이동 검사</button><div id="backlinks"><a href="./sandbox.html">기존 샌드박스</a> · <a href="./island-lab.html">이전 버전</a></div><small>장소 이동은 검수용 순간이동입니다.</small></div></details></div>
+<div id="cross"></div><div id="notice"></div><div id="hint">화면 클릭 → 마우스 시점<br><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프<br><b>F</b> 1·3인칭 전환 · <b>ESC</b> 마우스 해제</div>
+<div id="fps">본편 컨트롤러 로드 중</div><pre id="qa"></pre>
+<script type="module">
+import * as THREE from 'three';
+import { initCore } from './modules/core.js';
+import { initPhysics } from './modules/physics.js';
+import { initWater } from './modules/water.js';
+import { initInput } from './modules/input.js';
+import { initPlayer,KAY_CHARS } from './modules/player.js';
+import { initAuroraPlayable } from './modules/aurora-playable.js?v=2';
+const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),overview=q.get('view')==='overview',delay=ms=>new Promise(r=>setTimeout(r,ms)),note=s=>{$('load-note').textContent=s;};
+try{
+ const ctx=initCore();window.ctx=ctx;
+ ctx.renderer.outputColorSpace=THREE.SRGBColorSpace;ctx.renderer.toneMapping=THREE.ACESFilmicToneMapping;ctx.renderer.toneMappingExposure=1.12;
+ ctx.scene.background=new THREE.Color('#abd1d8');ctx.scene.fog=new THREE.FogExp2('#abd1d8',.00115);
+ ctx.hemi.color.set('#e3eff8');ctx.hemi.groundColor.set('#778b61');ctx.hemi.intensity=1.55;
+ ctx.sun.color.set('#ffebcb');ctx.sun.intensity=2.4;ctx.sun.position.set(-100,180,105);ctx.sun.shadow.mapSize.set(2048,2048);ctx.sun.shadow.normalBias=.08;ctx.sun.shadow.bias=-.0001;
+ Object.assign(ctx.sun.shadow.camera,{left:-145,right:145,top:145,bottom:-145,near:1,far:450});ctx.sun.shadow.camera.updateProjectionMatrix();ctx.fill.intensity=.4;ctx.fill.color.set('#bedbe7');ctx.amb.intensity=.12;
+ note('본편 물리와 바다를 불러오는 중');await initPhysics(ctx);initWater(ctx);initInput(ctx);
+ note('유적섬 지형과 충돌을 만드는 중');const island=await initAuroraPlayable(ctx,{nativeWater:true});
+ note('기존 캐릭터와 움직임을 불러오는 중');const character=KAY_CHARS[q.get('char')]||KAY_CHARS.knight;
+ initPlayer(ctx,{spawn:island.spawn,charUrl:character});ctx.player.setThird(true);ctx.stepPhysics();
+ const places=$('places');for(const p of island.field.points){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;places.appendChild(o);}
+ const go=id=>{const p=island.field.points.find(p=>p.id===id)||island.field.points[0],py=island.groundAt(p.x,p.z,p.y+2.0)+2.3;ctx.player.setSpawn(p.x,py,p.z);$('location').textContent=p.name;places.value=p.id;};
+ places.onchange=()=>go(places.value);$('reset').onclick=()=>ctx.player.setSpawn(island.spawn.x,island.spawn.y,island.spawn.z);
+ const alt=new URL(location.href);if(overview)alt.searchParams.delete('view');else alt.searchParams.set('view','overview');$('overview').href=alt.href;$('overview').textContent=overview?'본편 조작으로 탐험':'섬 전체 보기';
+ if(overview){$('cross').style.display='none';$('hint').textContent='전체 지형 검수 화면입니다. 「본편 조작으로 탐험」을 누르면 직접 걸어볼 수 있어요.';ctx.onUpdate(()=>{ctx.camera.fov=43;ctx.camera.updateProjectionMatrix();ctx.camera.position.set(181,164,226);ctx.camera.lookAt(0,15,0);});}
+ // Native player callbacks precede the physical world step, as in sandbox.html.
+ ctx.onUpdate(()=>ctx.stepPhysics());
+ let frames=0,fps=0,acc=0,n=0,reportTime=0;
+ const report=()=>{const p=ctx.player.pos;let avatars=0;ctx.scene.traverse(o=>{if(o.isSkinnedMesh)avatars++;});return{build:'aurora-v2-native',controller:'modules/player.js (unmodified)',physics:'modules/physics.js (unmodified)',mode:overview?'overview':'native-play',character,characterReady:typeof window.__curAnim==='function',animation:window.__curAnim?.()||null,position:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3)},ground:+island.groundAt(p.x,p.z,p.y+.2).toFixed(3),skinnedMeshes:avatars,assets:island.assets,details:island.detailStats,bvh:!!island.bvh,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,fps,frames,errors:window.__auroraErrors.slice(-12),nativeTest:window.__auroraQA?.testResult||null};};
+ function distance(a,b){return Math.hypot(a.x-b.x,a.z-b.z);}
+ ctx.onUpdate(dt=>{frames++;n++;acc+=dt;reportTime+=dt;if(reportTime>.5){fps=Math.round(n/Math.max(acc,.001));n=0;acc=0;reportTime=0;const p=ctx.player.pos;$('pos').textContent=`${p.x.toFixed(0)}, ${p.z.toFixed(0)} · ${p.y.toFixed(1)}m`;const near=island.field.points.find(t=>distance(p,t)<t.r+5);if(near)$('location').textContent=near.name;$('fps').textContent=`${fps} FPS · 본편 조작`;if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}});
+ window.__auroraQA={ctx,island,report,go,testResult:null};
+ async function nativeTest(){
+  if(overview)return;const canvas=ctx.renderer.domElement;try{await canvas.requestPointerLock();}catch{}await delay(300);
+  if(document.pointerLockElement!==canvas){window.__auroraQA.testResult={pass:false,reason:'Pointer lock not granted; click the game canvas first.'};return;}
+  const emit=(type,code,key)=>document.dispatchEvent(new KeyboardEvent(type,{code,key,bubbles:true})),samples=[],sample=tag=>samples.push({tag,...report(),nativeTest:undefined});$('native-test').disabled=true;
+  try{sample('idle');emit('keydown','KeyW','w');await delay(1000);sample('walk');emit('keydown','ShiftLeft','Shift');await delay(900);sample('run');emit('keydown','Space',' ');await delay(180);sample('jump');emit('keyup','Space',' ');emit('keyup','ShiftLeft','Shift');emit('keyup','KeyW','w');await delay(1000);sample('land');const moved=distance(samples[0].position,samples[1].position),jump=samples[3].position.y-samples[2].position.y;window.__auroraQA.testResult={moved:+moved.toFixed(3),jumpDelta:+jump.toFixed(3),samples:samples.map(s=>({tag:s.tag,position:s.position,animation:s.animation})),pass:moved>.2&&jump>.15&&/Jump/i.test(samples[3].animation||'')};}
+  finally{for(const[c,k]of[['KeyW','w'],['ShiftLeft','Shift'],['Space',' ']])emit('keyup',c,k);$('native-test').disabled=false;document.exitPointerLock?.();}
+ }
+ if(q.has('qa')){$('native-test').style.display='block';$('native-test').onclick=nativeTest;window.__auroraQA.nativeTest=nativeTest;}
+ ctx.start();await island.ready;for(let i=0;i<100&&!window.__curAnim;i++){note('본편 캐릭터 애니메이션 준비 중…');await delay(250);}
+ $('load').remove();if(!window.__curAnim)$('notice').textContent='캐릭터 애니메이션을 계속 불러오고 있어요.';console.info('[aurora-native]',report());
+}catch(e){console.error('[aurora-boot]',e);window.__auroraErrors.push(e.message);note('초기화 실패: '+e.message);document.querySelector('#load progress')?.remove();}
+</script></body></html>
