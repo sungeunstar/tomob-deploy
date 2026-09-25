@@ -27,7 +27,7 @@ function surfaceDetail(material,kind,clock){
  aurP=instanceMatrix*aurP;aurN=mat3(instanceMatrix)*aurN;
  #endif
  vAuroraP=(modelMatrix*aurP).xyz;vAuroraUp=normalize(mat3(modelMatrix)*aurN).y;`);
- shader.fragmentShader='varying vec3 vAuroraP; varying float vAuroraUp;\n'+noiseGLSL+shader.fragmentShader;
+ shader.fragmentShader='varying vec3 vAuroraP; varying float vAuroraUp;\n'+noiseGLSL+'\n'+shader.fragmentShader;
  let details='';
  if(kind==='ground')details=`float aurLarge=aurNoise(vAuroraP.xz*.19),aurFine=aurNoise(vAuroraP.xz*4.8);diffuseColor.rgb*=.91+.13*aurLarge+.085*aurFine;`;
  else if(kind==='stone')details=`float aurPatch=aurNoise(vAuroraP.xz*.53+vAuroraP.yy*.21);float aurLayer=sin(vAuroraP.y*3.9+aurNoise(vAuroraP.xz*.31)*3.0);diffuseColor.rgb*=.94+.055*aurLayer+.055*aurPatch;float aurMoss=smoothstep(.35,.8,vAuroraUp)*smoothstep(.40,.73,aurPatch)*.53;diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.16,.25,.085),aurMoss);`;
@@ -43,7 +43,6 @@ export async function initAuroraPlayable(ctx,options={}){
  const land=root.children.find(o=>o.isMesh&&o.geometry?.attributes?.position?.count===field.heights.length);
  if(!land){api.dispose();throw new Error('Aurora terrain geometry not found.');}
  land.name='Aurora terrain / visual and collision surface';land.material.flatShading=false;land.material.roughness=.97;const grain=grainTexture(6326);land.material.bumpMap=grain;land.material.bumpScale=.07;surfaceDetail(land.material,'ground',clock);
- // Native water owns the ocean; remove only the original demonstration ocean.
  if(ctx.water&&options.nativeWater!==false){const ownOcean=root.children.find(o=>o.isMesh&&o.material?.uniforms?.depthMap);if(ownOcean){root.remove(ownOcean);ownOcean.geometry.dispose();ownOcean.material.dispose();}}
  const matSet=new Set();root.traverse(o=>{for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[])matSet.add(m);});
  for(const m of matSet){if(!m.isMeshStandardMaterial||!m.color||m===land.material)continue;const h=m.color.getHex();if(h===0x819593||h===0xd4cfb5)surfaceDetail(m,'stone',clock);if(h===0x806044||h===0x4b4033)surfaceDetail(m,'wood',clock);}
@@ -68,7 +67,6 @@ export async function initAuroraPlayable(ctx,options={}){
  for(const radius of[7.9,9.15]){const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.024,4,96),goldMat);ring.rotation.x=-Math.PI/2;ring.position.set(-9,sy+.955,-39);detail.add(ring);}
  const vines=[];for(let i=0;i<24;i++){const a=i/23*Math.PI,x=64+Math.cos(a)*5.45,y=11+Math.sin(a)*6.2;vines.push({x,y,z:24.65,s:[.22,.36,.12],rot:a,color:i%3?'#657f48':'#9aab69'});}instances(new THREE.IcosahedronGeometry(1,0),mossMat,vines,'Cave-mouth vegetation');
  root.traverse(o=>{if(o.isPoints&&o.material?.isPointsMaterial){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,31);g.addColorStop(0,'rgba(255,255,255,.8)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);const tex=new THREE.CanvasTexture(c);o.material.map=tex;o.material.size=1.15;o.material.opacity=.28;o.material.depthWrite=false;o.material.needsUpdate=true;}});
- // Respect fromY: cave-floor queries must not snap to the roof.
  root.updateMatrixWorld(true);const structures=api.collide.filter(o=>o!==land),ray=new THREE.Raycaster(),down=new THREE.Vector3(0,-1,0),origin=new THREE.Vector3();ray.firstHitOnly=true;
  api.groundAt=(x,z,fromY=5000)=>{const y0=Number.isFinite(fromY)?fromY:5000,gy=field.height(x,z);let y=gy<=y0+.001?gy:-8;origin.set(x,y0,z);ray.set(origin,down);ray.far=Math.max(0,y0+12);const hits=ray.intersectObjects(structures,true);if(hits.length)y=Math.max(y,hits[0].point.y);return y;};
  api.radius=145;api.qualityVersion='aurora-v2-native';api.data.name='바람의 유적섬 · 본편 샌드박스';api.spawn={x:-43,y:field.height(-43,66)+2.3,z:66};
@@ -76,6 +74,5 @@ export async function initAuroraPlayable(ctx,options={}){
  api.detailStats={grass:grass.length,undergrowth:ferns.length,beachStones:pebbles.length,trailStones:pavers.length,cliffSolids};
  let elapsed=0;const update=dt=>{if(disposed)return;elapsed+=dt;clock.value=elapsed;api.update(elapsed);};ctx.onUpdate(update);cleanup.push(()=>ctx.offUpdate?.(update));
  api.bvhReady=import('three-mesh-bvh').then(bvh=>{if(disposed)return;if(!THREE.BufferGeometry.prototype.computeBoundsTree){THREE.BufferGeometry.prototype.computeBoundsTree=bvh.computeBoundsTree;THREE.BufferGeometry.prototype.disposeBoundsTree=bvh.disposeBoundsTree;}THREE.Mesh.prototype.raycast=bvh.acceleratedRaycast;for(const mesh of api.collide)mesh.traverse(o=>{if(o.isMesh&&o.geometry?.attributes?.position?.count>=96&&!o.geometry.boundsTree)o.geometry.computeBoundsTree();});api.bvh=true;}).catch(e=>{api.bvh=false;console.warn('[aurora] BVH optional:',e.message);});
- const oldDispose=api.dispose;api.dispose=()=>{if(disposed)return;disposed=true;cleanup.forEach(f=>f());for(const c of extras){try{world.removeCollider(c,true);}catch{}}for(const mesh of api.collide)mesh.traverse(o=>o.geometry?.disposeBoundsTree?.());oldDispose();};
- api.ready=Promise.all([api.ready,api.bvhReady]);return api;
+ const oldDispose=api.dispose;api.dispose=()=>{if(disposed)return;disposed=true;cleanup.forEach(f=>f());for(const c of extras){try{world.removeCollider(c,true);}catch{}}for(const mesh of api.collide)mesh.traverse(o=>o.geometry?.disposeBoundsTree?.());oldDispose();};api.ready=Promise.all([api.ready,api.bvhReady]);return api;
 }
