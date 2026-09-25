@@ -4,10 +4,10 @@
 //   ?sys=combat (보통 ?sys=...,monsters,combat 같이).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { initSkillBar } from './skillbar.js';   // 우측 직업 스킬바(combat과 함께 로드)
-import { SOUL_PTS } from './_soulpts.js';        // firelings 굽기 좌표(영혼 드롭 파티클)
-import { UI, keycapHtml, keycap, compass as ukCompass, keyhints as ukKeyhints, toast } from './uikit.js';   // ★디자인 시스템 토큰 + 나침반 + 단축키힌트 + 토스트
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (레벨 성장·플레이어 스탯)
+import { initSkillBar } from '/tomob-deploy/modules/skillbar.js';   // 우측 직업 스킬바(combat과 함께 로드)
+import { SOUL_PTS } from '/tomob-deploy/modules/_soulpts.js';        // firelings 굽기 좌표(영혼 드롭 파티클)
+import { UI, keycapHtml, keycap, compass as ukCompass, keyhints as ukKeyhints, toast } from '/tomob-deploy/modules/uikit.js';   // ★디자인 시스템 토큰 + 나침반 + 단축키힌트 + 토스트
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (레벨 성장·플레이어 스탯)
 
 const KW='/tomob-deploy/KayKit_Adventurers_2.0_FREE/Assets/gltf/';
 // 원거리 화살 설정(활/석궁) — 모델·속도·데미지·사거리. [수치 제안]

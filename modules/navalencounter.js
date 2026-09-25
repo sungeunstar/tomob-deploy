@@ -4,8 +4,8 @@
 //   게임 본체(game.html)는 startNavalEncounter(ctx, opts) 한 번만 호출하면 됨.
 //   의존: ship.js(initShip) · navalcombat.js(initNavalcombat) · ctx.ship(플레이어 배) · ctx.water.
 import * as THREE from 'three';
-import { initShip } from './ship.js';
-import { initNavalcombat } from './navalcombat.js';
+import { initShip } from '/tomob-deploy/modules/ship.js';
+import { initNavalcombat } from '/tomob-deploy/modules/navalcombat.js';
 
 // 적 배 풀 (sandbox SHIP_PROFILES 기반). headOff = 시각 뱃머리 보정(후진 버그용). name = 전투개시 배너 표기.
 export const ENEMY_POOL = {

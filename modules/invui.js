@@ -8,10 +8,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';   // 보유배 3D — oseberg 배(OBJ)
-import { KAY_CHARS } from './player.js';   // 중앙 3D 캐릭터 뷰어 — 클래스별 GLB 경로
-import { BAL } from './balance.js';        // 배 내구도 최대값(보유배 화면)
-import { BUILDINGS as SETTLE_BUILDINGS } from './settlement.js';   // 🏛️ 거점 건물 카탈로그 — 제작 탭 [거점]에 편입(정의는 settlement.js가 SSOT)
-import { SHIPS as SHIPYARD_SHIPS } from './shipyard.js';           // 🚢 배 카탈로그 — 제작 탭 [선박]에 편입(정의는 shipyard.js가 SSOT)
+import { KAY_CHARS } from '/tomob-deploy/modules/player.js';   // 중앙 3D 캐릭터 뷰어 — 클래스별 GLB 경로
+import { BAL } from '/tomob-deploy/modules/balance.js';        // 배 내구도 최대값(보유배 화면)
+import { BUILDINGS as SETTLE_BUILDINGS } from '/tomob-deploy/modules/settlement.js';   // 🏛️ 거점 건물 카탈로그 — 제작 탭 [거점]에 편입(정의는 settlement.js가 SSOT)
+import { SHIPS as SHIPYARD_SHIPS } from '/tomob-deploy/modules/shipyard.js';           // 🚢 배 카탈로그 — 제작 탭 [선박]에 편입(정의는 shipyard.js가 SSOT)
 
 // ── 아이템 아이콘 = 3D 모델 자동 렌더 (모듈 1회 셋업, 결과 dataURL 캐시) ──
 const _STONE='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/resource-stone.glb';

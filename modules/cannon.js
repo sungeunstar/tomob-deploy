@@ -9,8 +9,8 @@
 import * as THREE from 'three';
 import { BatchedRenderer, ParticleSystem, ConstantValue, IntervalValue, ConstantColor,
          ColorOverLife, ColorRange, SphereEmitter, RenderMode } from 'three.quarks';
-import { createLightPool, createVisiblePool, radialTexture } from './fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
-import { BAL } from './balance.js';   // ★C(2026-07-15): 포탄 중력/속도 SSOT — navalcombat 조준밴드와 동일 소스(밴드=실탄도 계약 보호)
+import { createLightPool, createVisiblePool, radialTexture } from '/tomob-deploy/modules/fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ★C(2026-07-15): 포탄 중력/속도 SSOT — navalcombat 조준밴드와 동일 소스(밴드=실탄도 계약 보호)
 
 export function initCannon(ctx){
   const { scene } = ctx; const PROJ_G=BAL.naval.projGravity; const projectiles=[], impacts=[];   // ★C: 하드코딩 24 → BAL(동작 불변)

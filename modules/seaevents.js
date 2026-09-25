@@ -7,10 +7,10 @@
 //   공통 축: 위험도 = 1 - clamp(원점거리/riskMax). 세 시스템(조우·약탈·계약)이 이 값 하나를 공유.
 //   의존: ctx.ship(플레이어 배) · ctx.npc(상선) · ctx.inventory · ctx.reputation · navalencounter.startNavalEncounter.
 //   수치 SSOT = balance.js BAL.naval.encounter / BAL.naval.merchant. 미탑재 시 아래 DEF 폴백(SSOT 이관 전 안전).
-import { startNavalEncounter } from './navalencounter.js';
-import { initFreeFire } from './navalcombat.js';   // ⚓ 상시 함포(좌클릭 = 조우 무관 broadside) — 2026-07-12 통일
-import { toast } from './uikit.js';
-import { WORLD_SCALE as WS } from './islands.js';   // 🧭 상선 pos=canon 원단위 → 3D 스폰은 ×WS(좌표공간 규약)
+import { startNavalEncounter } from '/tomob-deploy/modules/navalencounter.js';
+import { initFreeFire } from '/tomob-deploy/modules/navalcombat.js';   // ⚓ 상시 함포(좌클릭 = 조우 무관 broadside) — 2026-07-12 통일
+import { toast } from '/tomob-deploy/modules/uikit.js';
+import { WORLD_SCALE as WS } from '/tomob-deploy/modules/islands.js';   // 🧭 상선 pos=canon 원단위 → 3D 스폰은 ×WS(좌표공간 규약)
 
 // balance.js 이관 전 폴백 기본값(탑재되면 ctx.balance.naval.* 우선).
 const DEF = {

@@ -1,5 +1,5 @@
 // inventory.js — 콘센트 ② 인벤토리. (리그, 게임팀)
-import { BAL } from './balance.js';   // 🧭 시작 골드 SSOT(BAL.economy.startGold — 튜토 스킵 무관 공통, 사령관 2026-07-05)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // 🧭 시작 골드 SSOT(BAL.economy.startGold — 튜토 스킵 무관 공통, 사령관 2026-07-05)
 // _GAME_DESIGN.md §9 확정 구조: 개인 인벤(personal) + 배 화물칸(cargo) 2분할, 둘 다 무게제. 금화(gold)는 무게 없음.
 //   personal = 재료(목재·돌 등) + 먹을거. maxWeight 무게제. 제작 재료는 여기서 remove로 차감(§3-B).
 //   cargo    = 교역품(럼·비단·향신료·보석·목재·돌). cargoCapacity 무게제, 배별 차등.

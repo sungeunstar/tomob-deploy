@@ -2,8 +2,8 @@
 //   소스: sky.dayTime(시간대) + environment.tier(바이옴) + player 고도. → 위험존이면 HP 드레인.
 //   ?sys=...,temperature 로 로드. ★밸런스 값은 전부 CFG 한 곳(사령관 튜닝 지점).
 //   노출: ctx.temp = { value(°C), zone('cold'|'safe'|'hot'), ratio()(0=최한 1=최열), CFG }.
-import { toast } from './uikit.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (온도 CFG)
+import { toast } from '/tomob-deploy/modules/uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (온도 CFG)
 const TORCH_WARM = 14;   // 🔥 든 횃불 온기(밤 추위 상쇄) — 횃불 들고 있으면 몸이 녹는다(사령관)
 export function initTemperature(ctx){
   const CFG = BAL.temp;   // ★튜닝 지점 = balance.js BAL.temp (SAFE_MIN/MAX·DPS·BIOME 등)

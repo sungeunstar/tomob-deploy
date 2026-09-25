@@ -6,7 +6,7 @@
 //        physics 없으면 파편 없이 "제거"만(비치명적).
 import * as THREE from 'three';
 import { DestructibleMesh, FractureOptions } from 'three-pinata';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (공성 포탄 데미지)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (공성 포탄 데미지)
 
 const FRAG_COUNT       = 12;    // 구조물당 파편 수(21번 F-3 타워 12~20)
 const FRAG_LIFE        = 5.0;   // 파편 수명(초)

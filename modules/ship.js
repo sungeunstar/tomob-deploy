@@ -9,11 +9,11 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';   // OBJ 원본 텍스처(mtl 있는 배 — shipx 등)
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';   // 스킨 메시 클론(조타수 복제용)
-import { makeClothSail } from './sail.js';   // 천 물리 돛(메인급 시스템, 모든 배 공용)
-import { polarCatch, windAngleOff } from './sailpolar.js';   // ⛵ 범선 폴라 곡선(순수 수학 — Node 하네스가 직접 검사)
-import { KAY_CHARS } from './player.js';     // 조타수 외형(플레이어와 동일 KayKit 캐릭터 풀)
-import { toast as ukToast } from './uikit.js';   // ⚓ 닻 알림
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (배 내구도·속도·마모)
+import { makeClothSail } from '/tomob-deploy/modules/sail.js';   // 천 물리 돛(메인급 시스템, 모든 배 공용)
+import { polarCatch, windAngleOff } from '/tomob-deploy/modules/sailpolar.js';   // ⛵ 범선 폴라 곡선(순수 수학 — Node 하네스가 직접 검사)
+import { KAY_CHARS } from '/tomob-deploy/modules/player.js';     // 조타수 외형(플레이어와 동일 KayKit 캐릭터 풀)
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';   // ⚓ 닻 알림
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (배 내구도·속도·마모)
 
 // ── ⚓ 조타수(헬름 잡는 NPC) — 모든 배 공용. KayKit 캐릭터를 헬름에 세워 player.js와 같은 'Fishing_Struggling' 재생 ──
 const HELM_ANIM_URL='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/Rig_Medium_Simulation.glb';

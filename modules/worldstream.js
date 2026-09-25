@@ -11,9 +11,9 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DestructibleMesh } from 'three-pinata';   // 🪓 스트리밍 섬 나무 벌목화(environment 방식과 동일) — 사령관 #20
-import { locationReveal } from './uikit.js';   // 해역 진입 배너(P3)
-import { BAL } from './balance.js';   // 🏝️ 섬 크기 손잡이(BAL.island) — 홈섬(game.html)과 같은 SSOT
-import { TRIBES, tribeById } from './tribes.js';   // 🏴 섬 = 12부족 소유(사령관: 섬은 이미 중립 부족이 점령 중)
+import { locationReveal } from '/tomob-deploy/modules/uikit.js';   // 해역 진입 배너(P3)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // 🏝️ 섬 크기 손잡이(BAL.island) — 홈섬(game.html)과 같은 SSOT
+import { TRIBES, tribeById } from '/tomob-deploy/modules/tribes.js';   // 🏴 섬 = 12부족 소유(사령관: 섬은 이미 중립 부족이 점령 중)
 
 const CANON_URL  = '/tomob-deploy/worldmap.canon.json';
 const BACKUP_URL = '/tomob-deploy/voyage_islands_backup.json';
@@ -25,7 +25,7 @@ const TERRAIN_TEX= '/tomob-deploy/obj/lowpoly_terrain/Terrain_Assets/Textures/CP
 const LOWPOLY_TERRAIN = new Set(['Islands','Terrain','Mountains','River','Water','Ice','Clouds']);
 const TREE_TYPES = ['Tree_1_A','Tree_1_C','Tree_2_B','Tree_2_D','Tree_3_A','Tree_3_C','Tree_4_B','Tree_4_C'];   // environment 20종 중 서브셋
 
-import { WORLD_SCALE, filterCanonIslands } from './islands.js';   // 🧭 canon→월드 SSOT(R5 승격) + R6 섬목록 필터(navmap과 공유 — 사령관 2026-07-09)
+import { WORLD_SCALE, filterCanonIslands } from '/tomob-deploy/modules/islands.js';   // 🧭 canon→월드 SSOT(R5 승격) + R6 섬목록 필터(navmap과 공유 — 사령관 2026-07-09)
 const LOAD_R   = 2800;      // 이 반경 내 섬 지형 로딩
 const UNLOAD_R = 3600;      // 이 반경 밖 섬 언로딩 (히스테리시스)
 const TREE_NEAR= 1700;      // 이 반경 내 섬에만 나무 산포(가까이 오면 채움) — 먼 섬은 민둥 실루엣

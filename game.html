@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><base href="/tomob-deploy/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAS — 게임</title>
 <style>
   *{box-sizing:border-box} html,body{margin:0;height:100%;overflow:hidden;background:#8fc1e3;font:13px system-ui,'Malgun Gothic',sans-serif}
@@ -30,88 +30,88 @@
 <div id="fps">FPS --</div>
 <div id="hint">화면을 클릭하면 시점이 잠깁니다 (ESC로 해제)</div>
 <script type="module">
-import { initCore }    from './modules/core.js';
-import { initPhysics } from './modules/physics.js';
-import { initWater }   from './modules/water.js';
-import { initFoamtrail } from './modules/foamtrail.js';   // 🌊 웨이크/물보라 포말 RT(ref/배나가는효과.png) — water.setWake 주입
-import { initSeabed }  from './modules/seabed.js';   // 🏝️ 해저 모래 바닥(수면 아래 굴곡 사구) — water 직후
-import { initFish }    from './modules/fish.js';     // 🐟 lowpoly 어군(InstancedMesh+거리 LOD) — 수중 데코
-import { initSky }     from './modules/sky.js';
-import { initNightSky } from './modules/nightsky.js';
-import { initWind }    from './modules/wind.js';
-import { initInput }   from './modules/input.js';   // ⌨️ 입력 모드 라우터(ctx.input) — 조타/UI/건설/컷신 중 도보키 차단. 전수표=_입력키맵.md
-import { initAI }      from './modules/ai.js';      // 🧠 AI 코어(ctx.ai) — 지각(FOV/발각/기억)·공격토큰·디렉터(전투 게이팅). 수치=BAL.ai
-import { initTerrain } from './modules/terrain.js';
-import { initSeaKeepTest } from './modules/seakeeptest.js?v=20260806f';   // Sea Keep 완성 씬 로드(테스트 교체 또는 ?seaKeep=1 본편 추가)
-import { initGround }  from './modules/ground.js';   // 🗺️ R4 지형 쿼리 SSOT(해안 판정 3벌 통일)
-import { initIslands, WORLD_SCALE } from './modules/islands.js';  // 🏝️ R5-P1 아일랜드 레지스트리 SSOT(세션/스트림/오프닝 섬 단일 장부)
-import { BAL } from './modules/balance.js';   // 🏝️ 홈섬 목표폭(BAL.island.sizeMul) — worldstream과 같은 SSOT
-import { initShip }    from './modules/ship.js';
-import { initCrew }    from './modules/crew.js';   // ⚔️ 1인 크루 해전(§B) — 스테이션(1=조타/2=포) + 안 잡은 쪽 AI 크루
-import { initPlayer, KAY_CHARS }  from './modules/player.js';
-import { initTorch }   from './modules/torch.js';   // 🔥 횃불 불빛(밤 조명 메커닉)
-import { initCampfire } from './modules/campfire.js';   // 🔥 모닥불(제작·설치·밤 온기)
-import { initBuild }   from './modules/build.js';
-import { initEnvironment } from './modules/environment.js';
-import { initAxetree } from './modules/axetree.js';   // 🪓 벌목(environment 나무 대상, 도끼 장착 시)
-import { initMine }    from './modules/mine.js';      // ⛏️ 채광(environment 광석 → Brush 광맥 교체, 곡괭이 장착 시)
-import { initResourceFocus } from './modules/resourcefocus.js';   // 🔎 광물·나무 근접 포커스(이름표+금빛 외곽선)
-import { initFortify } from './modules/fortify.js';   // 🧱 블록 방어 축성(L키 — 성벽·타워, static 인스턴싱+HP파괴)
-import { initSettlement } from './modules/settlement.js';   // 🏛️ 거점 건물(owned 섬 항구에 골드로 건설, 그 섬 패시브 효과)
-import { initOutpost } from './modules/outpost.js';   // 🚩 거점 깃발(제작→설치→반경 경계. 섬당 1개, 레벨업으로 개수 증가)
-import { initMercenary } from './modules/mercenary.js';   // 🗡️ 몬스터 용병(던전 정복 시 최강 1종 굴복 → 거점 수비병 배치)
-import { initEmpire } from './modules/empire.js';   // 🏛️ 내 섬 전체뷰(N키) — 소유 섬 목록 → 원격 건설 진입점(settlement.build 래핑)
-import { initNavMap }  from './modules/navmap.js';
-import { initSound }   from './modules/sound.js';
-import { initSailhud } from './modules/sailhud.js';
-import { compass as ukCompass } from './modules/uikit.js';
-import { initCannon }  from './modules/cannon.js';
-import { initCannonFx } from './modules/cannonfx.js';   // ⚓ 대포 "제대로" VFX(머즐/착탄 먼지·파편·판자·잔불·연기+킥)
-import { initMonsters } from './modules/monsters.js';
-import { initTribes }  from './modules/tribes.js';    // 🏴 12부족·2진영 데이터(SSOT) — raiders/claim 앞
-import { initRaiders } from './modules/raiders.js';   // 🏴 부족 습격병 스폰(ctx.spawnMonster 재활용) — monsters·tribes 뒤
-import { initHitfx }   from './modules/hitfx.js';   // 💥 타격 임팩트(흰 휘도 플래시+스파크 버스트) — combat 단일통로에서 ctx.flashHit 호출
-import { initClaim }   from './modules/claim.js';
-import { initSiegeFort } from './modules/siegefort.js';   // 🏰 첫 섬 요새 공성전(Hexagon 성+투석기탑, 함포 직격/스플래시/연쇄)
-import { initCapture } from './modules/capture.js';   // 🏴 깃발 점령 게이지(방어타워 무력화→상륙→점령, 공/수 대칭) — claim·raiders 뒤
-import { initRaidship } from './modules/raidship.js'; // 🚢 습격선 접근 연출(해적 갤리온이 해안으로) — raid 앞
-import { initRaid }    from './modules/raid.js';      // ⚔️ 습격 이벤트(점령 섬 위협) — capture·raiders·claim 뒤
-import { initGarrison } from './modules/garrison.js'; // 🛡️ 그롬 주둔(점령 섬 수비대, 습격병 자동방어)
-import { initTrade }   from './modules/trade.js';
-import { initCombat }  from './modules/combat.js';
-import { initCombatTuto } from './modules/combattuto.js';   // ⚔️ 전투 튜토(첫 전투 발동, 최초 1회)
-import { initTemperature } from './modules/temperature.js';
-import { initMagic }   from './modules/magic.js';
-import { initGrade }   from './modules/grade.js';   // 🎨 컬러 그레이딩 포스트 패스(화면 전체 색감) — magic 블룸 override를 감쌈. 반드시 magic 뒤.
-import { initReputation } from './modules/reputation.js';
-import { initFaction }  from './modules/faction.js';   // ⚑ 축5 세력 선언(ctx.faction) — reputation·crew·claimed 뒤(5조건 참조)
-import { initNpc }     from './modules/npc.js';
-import { initTrader }  from './modules/trader.js';
-import { initSeaevents } from './modules/seaevents.js';   // 🌊 해적 랜덤 조우(중심가중) + 상선 약탈([E])
-import { initContract }  from './modules/contract.js';    // 📜 항구 배송 계약(데스 스트랜딩식 위험 해역 보상)
-import { initInventory } from './modules/inventory.js';
-import { initPickup }   from './modules/pickup.js';   // 공용 드롭+마그넷 픽업(벌목·채광·전리품)
-import { initInvui }   from './modules/invui.js';
-import { initForge }   from './modules/forge.js';
-import { initHarbor }  from './modules/harbor.js';
-import { initWharf }   from './modules/wharf.js';
-import { initSave }    from './modules/save.js';   // 💾 로컬 세이브(스냅샷/복원) — ?load=1 시 오프닝 스킵하고 저장 지점 재개
-import { restoreAndStartAutosave } from './modules/save-boot.js';
-import { initNetcode } from './modules/netcode.js';   // 🌐 멀티 위치 릴레이 클라 — 타 플레이어 고스트 + 서버 시간 동기(Phase 3)
-import { initMenu }    from './modules/menu.js';   // ⎋ 인게임 메뉴(ESC) — 계속/근처섬복귀/캐릭터선택
-import { initTutoSlot } from './modules/tutoslot.js';   // 🎯 중앙 튜토 팝업 단일 슬롯(gather/combat/raid 동시노출 방지)
-import { initGatherTuto } from './modules/gathertuto.js';   // 🪓⛏️ 채집 튜토(벌목·채광) — 전투튜토 패턴
-import { initRaidTuto } from './modules/raidtuto.js';   // 🛡️ 방어 튜토(첫 습격 시 자동, ctx.raid.status 폴링) — raid 뒤
-import { initQuestline } from './modules/questline.js';   // 🧭 1차 퀘스트라인(?quest=1) — 깨어남→채집→제작→항구→배
-import { initWorldstream } from './modules/worldstream.js';   // 🌊 오픈월드 섬 스트리밍(?stream=1) — 근처 섬만 3D 로딩·페이드
-import { initOpening } from './modules/opening.js';   // ⚓ P4-B: 오프닝 골든패스(?opening=1) — 오세베르그 없이 caravel 전투→난파→표류→깨어남→그 자리서 게임 시작
-import { initShipyard } from './modules/shipyard.js';   // 🔨 조선소(K) — 부두 옆 바다에 배 건조(목재+골드 차감). 퀘스트라인 Q5(ctx.onShipBuilt) 완료 훅.
-import { initGate }    from './modules/gate.js';   // 🌙 차원문 게이트 — 자정(sky dayTime 0.75) 근처 섬 개방·등급별 몹 웨이브+보스 토벌
-import { initDungeonRun } from './modules/dungeonrun.js';   // ⛏️ 광산 던전 — empire 광산 패널 "던전 입장"(ctx.dungeon.enter)
-import { initPerfProbe } from './modules/perfprobe.js';   // 📊 프레임 드랍 계측 — 콘솔 __perf() (헤드리스로는 전투 재현이 안 돼 실기기 측정용)
-import { initNavalTuto } from './modules/navaltuto.js';   // ⚓ 해전/항해 튜토(첫 배 탑승 시 Shift→Q→E 안내, 최초 1회)
-import { initQuestFx } from './modules/questfx.js';   // 🗼 퀘스트 시각효과 — 동료 머리 위 ! 빌보드 + 첫 목표 하늘 빛기둥
-import { initLoadScreen } from './modules/loadscreen.js';   // 🏮 공용 로딩 화면(석판 배경+tomob 로고+세계관 문구+등불 진행률)
+import { initCore }    from '/tomob-deploy/modules/core.js';
+import { initPhysics } from '/tomob-deploy/modules/physics.js';
+import { initWater }   from '/tomob-deploy/modules/water.js';
+import { initFoamtrail } from '/tomob-deploy/modules/foamtrail.js';   // 🌊 웨이크/물보라 포말 RT(ref/배나가는효과.png) — water.setWake 주입
+import { initSeabed }  from '/tomob-deploy/modules/seabed.js';   // 🏝️ 해저 모래 바닥(수면 아래 굴곡 사구) — water 직후
+import { initFish }    from '/tomob-deploy/modules/fish.js';     // 🐟 lowpoly 어군(InstancedMesh+거리 LOD) — 수중 데코
+import { initSky }     from '/tomob-deploy/modules/sky.js';
+import { initNightSky } from '/tomob-deploy/modules/nightsky.js';
+import { initWind }    from '/tomob-deploy/modules/wind.js';
+import { initInput }   from '/tomob-deploy/modules/input.js';   // ⌨️ 입력 모드 라우터(ctx.input) — 조타/UI/건설/컷신 중 도보키 차단. 전수표=_입력키맵.md
+import { initAI }      from '/tomob-deploy/modules/ai.js';      // 🧠 AI 코어(ctx.ai) — 지각(FOV/발각/기억)·공격토큰·디렉터(전투 게이팅). 수치=BAL.ai
+import { initTerrain } from '/tomob-deploy/modules/terrain.js';
+import { initSeaKeepTest } from '/tomob-deploy/modules/seakeeptest.js?v=20260806f';   // Sea Keep 완성 씬 로드(테스트 교체 또는 ?seaKeep=1 본편 추가)
+import { initGround }  from '/tomob-deploy/modules/ground.js';   // 🗺️ R4 지형 쿼리 SSOT(해안 판정 3벌 통일)
+import { initIslands, WORLD_SCALE } from '/tomob-deploy/modules/islands.js';  // 🏝️ R5-P1 아일랜드 레지스트리 SSOT(세션/스트림/오프닝 섬 단일 장부)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // 🏝️ 홈섬 목표폭(BAL.island.sizeMul) — worldstream과 같은 SSOT
+import { initShip }    from '/tomob-deploy/modules/ship.js';
+import { initCrew }    from '/tomob-deploy/modules/crew.js';   // ⚔️ 1인 크루 해전(§B) — 스테이션(1=조타/2=포) + 안 잡은 쪽 AI 크루
+import { initPlayer, KAY_CHARS }  from '/tomob-deploy/modules/player.js';
+import { initTorch }   from '/tomob-deploy/modules/torch.js';   // 🔥 횃불 불빛(밤 조명 메커닉)
+import { initCampfire } from '/tomob-deploy/modules/campfire.js';   // 🔥 모닥불(제작·설치·밤 온기)
+import { initBuild }   from '/tomob-deploy/modules/build.js';
+import { initEnvironment } from '/tomob-deploy/modules/environment.js';
+import { initAxetree } from '/tomob-deploy/modules/axetree.js';   // 🪓 벌목(environment 나무 대상, 도끼 장착 시)
+import { initMine }    from '/tomob-deploy/modules/mine.js';      // ⛏️ 채광(environment 광석 → Brush 광맥 교체, 곡괭이 장착 시)
+import { initResourceFocus } from '/tomob-deploy/modules/resourcefocus.js';   // 🔎 광물·나무 근접 포커스(이름표+금빛 외곽선)
+import { initFortify } from '/tomob-deploy/modules/fortify.js';   // 🧱 블록 방어 축성(L키 — 성벽·타워, static 인스턴싱+HP파괴)
+import { initSettlement } from '/tomob-deploy/modules/settlement.js';   // 🏛️ 거점 건물(owned 섬 항구에 골드로 건설, 그 섬 패시브 효과)
+import { initOutpost } from '/tomob-deploy/modules/outpost.js';   // 🚩 거점 깃발(제작→설치→반경 경계. 섬당 1개, 레벨업으로 개수 증가)
+import { initMercenary } from '/tomob-deploy/modules/mercenary.js';   // 🗡️ 몬스터 용병(던전 정복 시 최강 1종 굴복 → 거점 수비병 배치)
+import { initEmpire } from '/tomob-deploy/modules/empire.js';   // 🏛️ 내 섬 전체뷰(N키) — 소유 섬 목록 → 원격 건설 진입점(settlement.build 래핑)
+import { initNavMap }  from '/tomob-deploy/modules/navmap.js';
+import { initSound }   from '/tomob-deploy/modules/sound.js';
+import { initSailhud } from '/tomob-deploy/modules/sailhud.js';
+import { compass as ukCompass } from '/tomob-deploy/modules/uikit.js';
+import { initCannon }  from '/tomob-deploy/modules/cannon.js';
+import { initCannonFx } from '/tomob-deploy/modules/cannonfx.js';   // ⚓ 대포 "제대로" VFX(머즐/착탄 먼지·파편·판자·잔불·연기+킥)
+import { initMonsters } from '/tomob-deploy/modules/monsters.js';
+import { initTribes }  from '/tomob-deploy/modules/tribes.js';    // 🏴 12부족·2진영 데이터(SSOT) — raiders/claim 앞
+import { initRaiders } from '/tomob-deploy/modules/raiders.js';   // 🏴 부족 습격병 스폰(ctx.spawnMonster 재활용) — monsters·tribes 뒤
+import { initHitfx }   from '/tomob-deploy/modules/hitfx.js';   // 💥 타격 임팩트(흰 휘도 플래시+스파크 버스트) — combat 단일통로에서 ctx.flashHit 호출
+import { initClaim }   from '/tomob-deploy/modules/claim.js';
+import { initSiegeFort } from '/tomob-deploy/modules/siegefort.js';   // 🏰 첫 섬 요새 공성전(Hexagon 성+투석기탑, 함포 직격/스플래시/연쇄)
+import { initCapture } from '/tomob-deploy/modules/capture.js';   // 🏴 깃발 점령 게이지(방어타워 무력화→상륙→점령, 공/수 대칭) — claim·raiders 뒤
+import { initRaidship } from '/tomob-deploy/modules/raidship.js'; // 🚢 습격선 접근 연출(해적 갤리온이 해안으로) — raid 앞
+import { initRaid }    from '/tomob-deploy/modules/raid.js';      // ⚔️ 습격 이벤트(점령 섬 위협) — capture·raiders·claim 뒤
+import { initGarrison } from '/tomob-deploy/modules/garrison.js'; // 🛡️ 그롬 주둔(점령 섬 수비대, 습격병 자동방어)
+import { initTrade }   from '/tomob-deploy/modules/trade.js';
+import { initCombat }  from '/tomob-deploy/modules/combat.js';
+import { initCombatTuto } from '/tomob-deploy/modules/combattuto.js';   // ⚔️ 전투 튜토(첫 전투 발동, 최초 1회)
+import { initTemperature } from '/tomob-deploy/modules/temperature.js';
+import { initMagic }   from '/tomob-deploy/modules/magic.js';
+import { initGrade }   from '/tomob-deploy/modules/grade.js';   // 🎨 컬러 그레이딩 포스트 패스(화면 전체 색감) — magic 블룸 override를 감쌈. 반드시 magic 뒤.
+import { initReputation } from '/tomob-deploy/modules/reputation.js';
+import { initFaction }  from '/tomob-deploy/modules/faction.js';   // ⚑ 축5 세력 선언(ctx.faction) — reputation·crew·claimed 뒤(5조건 참조)
+import { initNpc }     from '/tomob-deploy/modules/npc.js';
+import { initTrader }  from '/tomob-deploy/modules/trader.js';
+import { initSeaevents } from '/tomob-deploy/modules/seaevents.js';   // 🌊 해적 랜덤 조우(중심가중) + 상선 약탈([E])
+import { initContract }  from '/tomob-deploy/modules/contract.js';    // 📜 항구 배송 계약(데스 스트랜딩식 위험 해역 보상)
+import { initInventory } from '/tomob-deploy/modules/inventory.js';
+import { initPickup }   from '/tomob-deploy/modules/pickup.js';   // 공용 드롭+마그넷 픽업(벌목·채광·전리품)
+import { initInvui }   from '/tomob-deploy/modules/invui.js';
+import { initForge }   from '/tomob-deploy/modules/forge.js';
+import { initHarbor }  from '/tomob-deploy/modules/harbor.js';
+import { initWharf }   from '/tomob-deploy/modules/wharf.js';
+import { initSave }    from '/tomob-deploy/modules/save.js';   // 💾 로컬 세이브(스냅샷/복원) — ?load=1 시 오프닝 스킵하고 저장 지점 재개
+import { restoreAndStartAutosave } from '/tomob-deploy/modules/save-boot.js';
+import { initNetcode } from '/tomob-deploy/modules/netcode.js';   // 🌐 멀티 위치 릴레이 클라 — 타 플레이어 고스트 + 서버 시간 동기(Phase 3)
+import { initMenu }    from '/tomob-deploy/modules/menu.js';   // ⎋ 인게임 메뉴(ESC) — 계속/근처섬복귀/캐릭터선택
+import { initTutoSlot } from '/tomob-deploy/modules/tutoslot.js';   // 🎯 중앙 튜토 팝업 단일 슬롯(gather/combat/raid 동시노출 방지)
+import { initGatherTuto } from '/tomob-deploy/modules/gathertuto.js';   // 🪓⛏️ 채집 튜토(벌목·채광) — 전투튜토 패턴
+import { initRaidTuto } from '/tomob-deploy/modules/raidtuto.js';   // 🛡️ 방어 튜토(첫 습격 시 자동, ctx.raid.status 폴링) — raid 뒤
+import { initQuestline } from '/tomob-deploy/modules/questline.js';   // 🧭 1차 퀘스트라인(?quest=1) — 깨어남→채집→제작→항구→배
+import { initWorldstream } from '/tomob-deploy/modules/worldstream.js';   // 🌊 오픈월드 섬 스트리밍(?stream=1) — 근처 섬만 3D 로딩·페이드
+import { initOpening } from '/tomob-deploy/modules/opening.js';   // ⚓ P4-B: 오프닝 골든패스(?opening=1) — 오세베르그 없이 caravel 전투→난파→표류→깨어남→그 자리서 게임 시작
+import { initShipyard } from '/tomob-deploy/modules/shipyard.js';   // 🔨 조선소(K) — 부두 옆 바다에 배 건조(목재+골드 차감). 퀘스트라인 Q5(ctx.onShipBuilt) 완료 훅.
+import { initGate }    from '/tomob-deploy/modules/gate.js';   // 🌙 차원문 게이트 — 자정(sky dayTime 0.75) 근처 섬 개방·등급별 몹 웨이브+보스 토벌
+import { initDungeonRun } from '/tomob-deploy/modules/dungeonrun.js';   // ⛏️ 광산 던전 — empire 광산 패널 "던전 입장"(ctx.dungeon.enter)
+import { initPerfProbe } from '/tomob-deploy/modules/perfprobe.js';   // 📊 프레임 드랍 계측 — 콘솔 __perf() (헤드리스로는 전투 재현이 안 돼 실기기 측정용)
+import { initNavalTuto } from '/tomob-deploy/modules/navaltuto.js';   // ⚓ 해전/항해 튜토(첫 배 탑승 시 Shift→Q→E 안내, 최초 1회)
+import { initQuestFx } from '/tomob-deploy/modules/questfx.js';   // 🗼 퀘스트 시각효과 — 동료 머리 위 ! 빌보드 + 첫 목표 하늘 빛기둥
+import { initLoadScreen } from '/tomob-deploy/modules/loadscreen.js';   // 🏮 공용 로딩 화면(석판 배경+tomob 로고+세계관 문구+등불 진행률)
 
 // 🏮 로딩 화면. expect = stage 갱신 횟수 = 진행률 분모.
 //    기본 14 + 스트리밍 1 + 오프닝 4(opening.js가 setLoad를 4번 부른다) + 세이브 복원 1.
@@ -345,7 +345,7 @@ try{
 
   // ⚔️ 해적선 전투(navalcombat/destruct/shipwreck) = 골든패스 [3] 단계 전용 → 본체 부팅 시 로드 안 함.
   //   적 해적선이 시작부터 떠 있는 건 게임 흐름과 무관 → 제거. 격리 하네스 _navalcombat.html서 검증 유지.
-  //   ※ [3] 조우 시점에 동적 로드(import('./modules/navalcombat.js'))로 켜는 게 맞음 (흐름 기반 로딩, 후속).
+  //   ※ [3] 조우 시점에 동적 로드(import('/tomob-deploy/modules/navalcombat.js'))로 켜는 게 맞음 (흐름 기반 로딩, 후속).
 
   // 물리 스텝은 항상 마지막(캐릭터 이동 계산 뒤)
   ctx.onUpdate(()=> ctx.stepPhysics());

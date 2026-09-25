@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><base href="/tomob-deploy/"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MAS — 차원문 연출(검증)</title>
 <!--
   intro 랜딩 클라이맥스 연출(검증 1단계): 게임 모듈을 연출용으로만 로드 →
@@ -51,16 +51,16 @@
 <div id="cinFrame"><div class="vig"></div><div class="bar t"></div><div class="bar b"></div></div>
 <div id="landing"><img class="logo" src="/tomob-deploy/intro/logo.png" alt="tomob"><div class="cta"><button class="startbtn">PRESS ANY BUTTON</button></div></div>
 <script type="module">
-import { initCore }      from '../modules/core.js';
-import { initPhysics }   from '../modules/physics.js';
-import { initWater }     from '../modules/water.js';
-import { initSky }       from '../modules/sky.js';
-import { initNightSky }  from '../modules/nightsky.js';
-import { initWind }      from '../modules/wind.js';
-import { initTerrain }   from '../modules/terrain.js';
-import { initEnvironment } from '../modules/environment.js';
-import { initMonsters }  from '../modules/monsters.js';
-import { initGate }      from '../modules/gate.js';
+import { initCore }      from '/tomob-deploy/modules/core.js';
+import { initPhysics }   from '/tomob-deploy/modules/physics.js';
+import { initWater }     from '/tomob-deploy/modules/water.js';
+import { initSky }       from '/tomob-deploy/modules/sky.js';
+import { initNightSky }  from '/tomob-deploy/modules/nightsky.js';
+import { initWind }      from '/tomob-deploy/modules/wind.js';
+import { initTerrain }   from '/tomob-deploy/modules/terrain.js';
+import { initEnvironment } from '/tomob-deploy/modules/environment.js';
+import { initMonsters }  from '/tomob-deploy/modules/monsters.js';
+import { initGate }      from '/tomob-deploy/modules/gate.js';
 
 const L=document.getElementById('load'), DBG=document.getElementById('dbg');
 try{
@@ -72,7 +72,7 @@ try{
   L.textContent='바람/날씨 생성 중…';          initWind(ctx);
   document.getElementById('windHud')?.remove();   // ★게임 HUD(WIND 나침반) 제거 — 실제 랜딩이라 게임 UI 끔
   L.textContent='시작섬(연출 복사본) 불러오는 중…';
-  const island = await fetch('./_island_intro.json').then(r=>r.json());
+  const island = await fetch('/tomob-deploy/intro/_island_intro.json').then(r=>r.json());
   const terrain = await initTerrain(ctx, { session: island });
   L.textContent='식생(나무·풀·광석) 산포 중…';  await initEnvironment(ctx);
   // ★연출용 더미 player — monsters.spawn()은 !ctx.player면 즉시 return(스폰 안 함). 최소 객체만 주입(조작 없음).

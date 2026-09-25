@@ -16,7 +16,7 @@
 //         ★몹별 머티리얼 clone → 각 몹이 자기 u_hit uniform 보유 = 공유머티리얼 흰색고착/교차오염 근본해결.
 //   ■ origin 배치 : 매 명중 미세 지터(originJitter) + 몹중심→플레이어 방향 접촉면 당김(contactPull) = "같은 위치 고착" 방지.
 import * as THREE from 'three';
-import { BAL } from './balance.js';   // ⚖️ 타격감 수치 SSOT (BAL.feel.hitfx). 하드코딩 금지(G4).
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 타격감 수치 SSOT (BAL.feel.hitfx). 하드코딩 금지(G4).
 
 export function initHitfx(ctx){
   const { scene, camera } = ctx;

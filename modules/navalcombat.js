@@ -11,8 +11,8 @@
 //   ★호출 순서: ship.js initShip 들이 onUpdate를 먼저 등록한 뒤 initNavalcombat 호출.
 import * as THREE from 'three';
 
-import { toast as ukToast } from './uikit.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (해전 대포·적선·AI 기본값)
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (해전 대포·적선·AI 기본값)
 
 // ── 현측 일제사격 본체(모듈 공용) — ★2026-07-12 "공격 = 바로 전투" 통일(사령관): ──
 //   조우 인스턴스(broadside)와 자유항해 상시 발사(initFreeFire)가 같은 발사 경로를 공유.

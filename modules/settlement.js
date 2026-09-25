@@ -5,8 +5,8 @@
 //   배치 = 항구(dockPoint) 주변 슬롯 링(조준 없이 슬롯 자동 = 헤드리스 검증 가능). v1=시장 효과(trade.js) → 이후 증분.
 import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { BAL } from './balance.js';
-import { tribeById } from './tribes.js';   // 섬 소유 진영(lean) → 건물 색
+import { BAL } from '/tomob-deploy/modules/balance.js';
+import { tribeById } from '/tomob-deploy/modules/tribes.js';   // 섬 소유 진영(lean) → 건물 색
 
 // 건물 색 = 섬 소유 진영(사령관 확정 2026-07-04, 얼라이언스/호드式): 파수꾼=blue / 남은자=red / 중립=yellow. green=예비.
 const HXBASE = '/tomob-deploy/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';

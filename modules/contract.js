@@ -5,7 +5,7 @@
 //   의존: ctx.worldmap.islands(항구 목록) · ctx.ship/ctx.player · ctx.inventory · ctx.reputation · ctx.combat.addSoul · ctx.camera.
 //   수치 SSOT = balance.js BAL.contracts. 미탑재 시 아래 DEF 폴백(SSOT 이관 전 안전).
 import * as THREE from 'three';
-import { toast, compass as ukCompass } from './uikit.js';
+import { toast, compass as ukCompass } from '/tomob-deploy/modules/uikit.js';
 
 const DEF = { baseGold: 80, riskMul: 3.0, distMul: 0.04, soulReward: 10, cooldownSec: 20,
               offerRange: 140, arrivePad: 70, minDist: 500, maxDist: 3400 };

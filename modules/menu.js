@@ -2,7 +2,7 @@
 //   항목: 계속하기(닫기) / 근처 섬으로 돌아가기(가장 가까운 점령섬 또는 홈으로 텔레포트 — 바다에서 길 잃었을 때 복귀) / 캐릭터 선택(저장 후 로비).
 //   ESC 충돌: 교역·건설창이 열려 있으면 그쪽 ESC가 먼저 닫게 양보(메뉴는 안 뜸). 그 외 ESC = 메뉴 토글.
 //   콘센트: ctx.player(setSpawn/pos)·claimed·terrain·water·save 읽기/호출만. 이 파일만 수정.
-import { toast as ukToast } from './uikit.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 export function initMenu(ctx){
   let open=false;

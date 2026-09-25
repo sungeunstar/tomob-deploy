@@ -1,7 +1,7 @@
 // harbor.js — 항구 관리 허브 (invui 톤 통일: 다크 네이비 글래스 + 골드/청록, 백드롭 블러).
 //   ★진입: 교역소 NPC(trader.js) 앞 [E] → openAt / 점령 항구(claim) 근처 [E] → open.
 //   탭: 🏪교역(구매·판매, ctx.trade 살아있는 시세) / 🔧배 수리 / ⚓업그레이드 / 🕳️던전 / 🏗️건설.
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (내구도 최대·수리비)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (내구도 최대·수리비)
 export function initHarbor(ctx){
   const NEAR=16;
   ctx.shipUpgrades = ctx.shipUpgrades || { speed:0, cannon:0, sail:0 };   // ★D1(2026-07-15): 배 업그레이드 레벨(save.js 왕복). 적용=ship.js(속도·돛)·navalcombat.js(대포).

@@ -2,7 +2,7 @@
 //   색 역할: 🟡골드=재화/메뉴 · 🔵시안=맵/항해/정보 · 🔴레드=전투/위험 · ⚪흰=본문
 //   형태: 무테두리 시네마틱(발할라·엘든링·젤다) — 테두리·박스감 제거, 가장자리 페이드 + 발광 텍스트.
 //   레퍼런스: voyage/ref/ 디자인시스템1~3 · 화면/ · map design.
-//   사용: import { UI, toast, keycap } from './uikit.js';
+//   사용: import { UI, toast, keycap } from '/tomob-deploy/modules/uikit.js';
 //
 // ── UI 사운드 훅 (sound.js가 setUiSound로 주입 — uikit은 ctx 없이 저수준이라 함수 참조로 배선) ──
 let _uiSnd=null;

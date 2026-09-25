@@ -2,8 +2,8 @@
 // 표준 공식: forward=(sinYaw,0,-cosYaw), right=(cosYaw,0,sinYaw). 3인칭은 캐릭터가 "이동방향"을 바라봄.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (무기 데미지·스태미나)
-import { comboHit, comboEnd } from './uikit.js';   // 그로기 난타 콤보 카운터 UI
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (무기 데미지·스태미나)
+import { comboHit, comboEnd } from '/tomob-deploy/modules/uikit.js';   // 그로기 난타 콤보 카운터 UI
 
 // KayKit 캐릭터 + Rig_Medium 공용 애니(전 캐릭터 공유). 캐릭터 교체는 charUrl 한 줄.
 const KAY_ANIM_BASE='/tomob-deploy/KayKit_Character_Animations_1.1/Animations/gltf/Rig_Medium/';

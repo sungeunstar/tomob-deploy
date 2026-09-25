@@ -8,18 +8,18 @@
 import * as THREE from 'three';
 import { GLTFLoader as _CutGLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader as _CutFBX } from 'three/addons/loaders/FBXLoader.js';
-import { initShip, preloadShip, preloadHelmRig } from './ship.js';
-import { initPlayer, KAY_CHARS } from './player.js';
-import { initSound }    from './sound.js';
-import { initCannon }   from './cannon.js';
-import { initDestruct } from './destruct.js';
-import { initShipwreck } from './shipwreck.js';
-import { startNavalEncounter } from './navalencounter.js';
-import { initRain }     from './rain.js';
-import { initEnvironment } from './environment.js';
-import { initNightSky } from './nightsky.js';
-import { initSky }      from './sky.js';
-import { toast as ukToast, gauge as ukGauge, dialog as ukDialog, locationReveal as ukLocation } from './uikit.js';
+import { initShip, preloadShip, preloadHelmRig } from '/tomob-deploy/modules/ship.js';
+import { initPlayer, KAY_CHARS } from '/tomob-deploy/modules/player.js';
+import { initSound }    from '/tomob-deploy/modules/sound.js';
+import { initCannon }   from '/tomob-deploy/modules/cannon.js';
+import { initDestruct } from '/tomob-deploy/modules/destruct.js';
+import { initShipwreck } from '/tomob-deploy/modules/shipwreck.js';
+import { startNavalEncounter } from '/tomob-deploy/modules/navalencounter.js';
+import { initRain }     from '/tomob-deploy/modules/rain.js';
+import { initEnvironment } from '/tomob-deploy/modules/environment.js';
+import { initNightSky } from '/tomob-deploy/modules/nightsky.js';
+import { initSky }      from '/tomob-deploy/modules/sky.js';
+import { toast as ukToast, gauge as ukGauge, dialog as ukDialog, locationReveal as ukLocation } from '/tomob-deploy/modules/uikit.js';
 
 // ── 엘든링식 튜토 팝업 CSS/DOM (tutorial.html에 이미 있으면 no-op — game.html 등 없는 곳에만 주입) ──
 const TUTO_CSS = `

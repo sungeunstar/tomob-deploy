@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { initShip } from './ship.js';
+import { initShip } from '/tomob-deploy/modules/ship.js';
 
 // ★조선소 라인업 = 3티어 진행형(사령관 확정 2026-07-03). 화물칸 용량 = 티어 차등(inventory.js CARGO_CAPACITY와 키 정렬).
 //   시작배 오세베르그(무료·화물20)는 game.html이 직접 지급 → 여기엔 없음. 건조 가능배 = 캐러벨→엠티범선→퀸.
@@ -23,7 +23,7 @@ export const SHIPS = [
   { key:'queen',   name:'퀸 앤스 리벤지', gold:3000, ship:{ objUrl:'/tomob-deploy/obj/queen-annes-revenge/optimized.glb', length:45, center:true, standUp:true, calmBuoy:true, deckLevels:[5.5,7.3], ovDeckW:31, ovDeckL:7.5, deckCx:3.5, deckCz:1.25 } },
 ];
 
-import { toast as ukToast } from './uikit.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 export function initShipyard(ctx){
   const { scene } = ctx;
   ctx.fleet = ctx.fleet || [];   // 내 함대(항구 귀속)

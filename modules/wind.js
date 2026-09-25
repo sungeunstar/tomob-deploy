@@ -2,8 +2,8 @@
 // 바람 세기 = base(플레이어~섬 거리) × 날씨(비). water.uWaveAmp를 매 프레임 구동 → 파도가 바람 따라.
 // 비는 임시 파티클(rain.unitypackage 추출은 추후). R키 토글.
 import * as THREE from 'three';
-import { BAL } from './balance.js';
-import { toast as ukToast } from './uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 export function initWind(ctx){
   const { scene, camera } = ctx;

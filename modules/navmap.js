@@ -5,7 +5,7 @@
 //   레퍼런스: voyage/애셋/전체완성본 맵(교역).png. UI 자산: voyage/ui/*.png (애셋에서 복사).
 //   game.html 호환: initNavMap export 유지(미니맵). 샌드박스 ?sys=navmap = initNavmap 별칭.
 import * as THREE from 'three';
-import { filterCanonIslands } from './islands.js';   // 🧭 R6 — worldstream과 동일 필터 공유(지도엔 있는데 실제론 없는 섬 방지, 사령관 2026-07-09)
+import { filterCanonIslands } from '/tomob-deploy/modules/islands.js';   // 🧭 R6 — worldstream과 동일 필터 공유(지도엔 있는데 실제론 없는 섬 방지, 사령관 2026-07-09)
 
 // ── UI 자산 경로(voyage/ui/) ──
 const UI = '/tomob-deploy/ui/';
@@ -489,7 +489,7 @@ class MapWindow{
       // R6: worldstream(3D 렌더)과 동일 필터 적용 — 원본 203섬 그대로 쓰면 실제 게임엔 없는 섬(~106개)이 지도에 표시됨(사령관 2026-07-09)
       try{ const backup = await bres.json(); this.data.islands = filterCanonIslands(this.data.islands, backup.sessions); }
       catch(e){ console.warn('[navmap] 섬 필터 로드 실패 — 원본 목록 사용(실제 월드와 어긋날 수 있음)', e&&e.message); }
-      try{ const ec = await import('./economy.js'); this.econ = ec.generateEconomy(this.data, { seed:this.data.seed||1 }); this.GOODS=ec.GOODS; }
+      try{ const ec = await import('/tomob-deploy/modules/economy.js'); this.econ = ec.generateEconomy(this.data, { seed:this.data.seed||1 }); this.GOODS=ec.GOODS; }
       catch(e){ console.warn('[navmap] economy 로드 실패 — 영토/시세 없이 진행', e&&e.message); this.econ={territory:{},prices:{},merchants:[]}; this.GOODS=[]; }
       // ★3D npc 상선과 동기화 — npc.js 가 굴리는 실제 상선(같은 위치·실제 항해속도)을 읽어 그림. 없으면(sandbox 단독) economy 자체.
       this.useNpc = !!(this.ctx.npc && Array.isArray(this.ctx.npc.merchants) && this.ctx.npc.merchants.length);

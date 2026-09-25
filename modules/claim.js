@@ -7,8 +7,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (구조물 HP)
-import { WORLD_SCALE } from './islands.js';   // 🧭 canon↔3D 좌표 변환(축5 세력선언 교역로 조건 — 점령섬↔canon id 매칭용)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (구조물 HP)
+import { WORLD_SCALE } from '/tomob-deploy/modules/islands.js';   // 🧭 canon↔3D 좌표 변환(축5 세력선언 교역로 조건 — 점령섬↔canon id 매칭용)
 
 const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
 
@@ -39,7 +39,7 @@ const SHORE_DIST  = 32;                            // 해안 판정 반경(이 �
 const BUILD_TICK  = 0.22;                          // 게이지 1단위(재료 1개) 투입 간격(초)
 const SITE_RADIUS = 8;                             // 이 반경 안에 있으면 재료 투입(게이지 차오름)
 
-import { toast as ukToast } from './uikit.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 export function initClaim(ctx){
   const { scene } = ctx;
   const loader = new GLTFLoader();

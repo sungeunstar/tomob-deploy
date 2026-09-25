@@ -3,9 +3,9 @@
 //   §2 경제: 섬 A 저가 매수 → 섬 B 고가 매도 차익. 교역품 = TRADE_GOODS(럼·비단·향신료·보석).
 //   §5 평판: 섬 시세에 ctx.reputation.getTradeModifier()(0.5~1.5) 곱 → 평판 높을수록 절대 차익 증폭.
 //   교역 완료 시 ctx.reputation.applyAction('TRADE_DONE')(+3, §5 표). 콘센트 구조는 호출만(수정 금지).
-import { TRADE_GOODS, MATERIALS } from './inventory.js';   // basePrice/name 단일 출처(읽기 전용 참조)
-import { BAL } from './balance.js';   // 🔮 영혼 상점 가격/효과 SSOT (soulShop)
-import { tribeById } from './tribes.js';   // 🏴 섬 소유 종족 → 특산품 시세
+import { TRADE_GOODS, MATERIALS } from '/tomob-deploy/modules/inventory.js';   // basePrice/name 단일 출처(읽기 전용 참조)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // 🔮 영혼 상점 가격/효과 SSOT (soulShop)
+import { tribeById } from '/tomob-deploy/modules/tribes.js';   // 🏴 섬 소유 종족 → 특산품 시세
 
 export function initTrade(ctx){
   // 교역 4종(§2 명시: 럼·비단·향신료·보석) + 🏭 가공 교역품(P6: 판재·벽돌 — 채집→가공→판매 마진). basePrice는 콘센트 카탈로그에서.

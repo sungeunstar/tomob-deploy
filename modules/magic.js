@@ -8,8 +8,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (스펠 데미지·쿨다운)
-import { createLightPool } from './fxpool.js';   // R1: 라이트 풀 공용화(개수 8·수치 불변)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (스펠 데미지·쿨다운)
+import { createLightPool } from '/tomob-deploy/modules/fxpool.js';   // R1: 라이트 풀 공용화(개수 8·수치 불변)
 
 const BLOOM_LAYER = 1;   // 이 레이어 객체(마법 VFX)만 블룸. 하늘·지형·물은 제외.
 

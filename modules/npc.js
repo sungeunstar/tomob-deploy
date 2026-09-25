@@ -6,10 +6,10 @@
 //   3D LOD(단계 c): 플레이어 거리별 near=로우폴리 메시 / mid=빌보드 스프라이트 / far=데이터만.
 //   (c 보강) near 풀메시에만 ship.js식 항해감: 4점 프로브 부력(출렁/roll·pitch) + 돛 펄럭임 셰이더. mid/far 는 현행 직선.
 //   ctx.onUpdate(dt) 콜백으로 매 프레임 전 상선 상태 + 수급 drift + LOD 거리 체크 + near 부력/돛 갱신.
-import { generateEconomy, GOODS, stockFactor, STOCK_FLOOR, STOCK_CAP } from './economy.js';
-import { WORLD_SCALE as WS } from './islands.js';   // 🧭 canon→월드 SSOT — ★상태머신/경제는 canon 원단위 유지, 3D 접점(메시·스프라이트·거리)만 ×WS
+import { generateEconomy, GOODS, stockFactor, STOCK_FLOOR, STOCK_CAP } from '/tomob-deploy/modules/economy.js';
+import { WORLD_SCALE as WS } from '/tomob-deploy/modules/islands.js';   // 🧭 canon→월드 SSOT — ★상태머신/경제는 canon 원단위 유지, 3D 접점(메시·스프라이트·거리)만 ×WS
                                                     //   (버그: 상선 메시가 canon 원좌표에 놓여 ×1.5 시각세계와 어긋나 "엉뚱한 섬 앞 뭉침" — 사령관 2026-07-04)
-import { TRADE_GOODS } from './inventory.js';   // basePrice 단일 출처(동결 콘센트, 읽기만)
+import { TRADE_GOODS } from '/tomob-deploy/modules/inventory.js';   // basePrice 단일 출처(동결 콘센트, 읽기만)
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 // ── 밸런스 수치 (npc_ai.md §2-A 수치표 단일 출처) ──

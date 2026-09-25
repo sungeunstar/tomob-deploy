@@ -7,8 +7,8 @@
 //     차이는 모델과 이름이 MERCS 고정 4종이 아니라 "내가 잡은 몬스터"라는 것뿐.
 //   ★던전 클리어 = 유일한 획득 경로(골드로 살 수 없음). 던전을 도는 이유 = 용병 풀이 늘어나는 것.
 //   수치 SSOT = BAL.mercenary (balance.js).
-import { BAL } from './balance.js';
-import { toast as ukToast } from './uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 export function initMercenary(ctx){
   const M = () => BAL.mercenary;

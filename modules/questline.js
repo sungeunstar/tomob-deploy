@@ -20,7 +20,7 @@
 //     Q8 점령: ctx.onOutpostCaptured(o) 훅 — capture.js flipOwner('player') 시 발동
 
 import * as THREE from 'three';
-import { toast as ukToast, compass as ukCompass } from './uikit.js';
+import { toast as ukToast, compass as ukCompass } from '/tomob-deploy/modules/uikit.js';
 
 // ★캐릭터별 완료 플래그(사령관: 이전 캐릭터 완료 → 새 캐릭터도 퀘스트 스킵되던 버그). cid(세이브)·name 폴백.
 //   ★버그③(2026-07-13): 오프닝 URL엔 cid가 없어(select.html) — 예전엔 이 값이 모듈 top-level에서 '한 번만'

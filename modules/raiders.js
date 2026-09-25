@@ -2,8 +2,8 @@
 //   ★습격병 = 그 종족의 실제 모델(추종자 모델)로 스폰 → ctx.monsters 등록 → 타워 자동포격·전투 자동연동.
 //     정체성 = 종족 모델(각기 다름) + 진영 문양 배지. 스탯은 공용(BAL.raider_warrior), 모델/애니만 종족별.
 //   콘센트: ctx.spawnMonster(monsters.js — opts.def 지원)·ctx.tribes(tribes.js) 읽기/호출만. 이 파일만 수정.
-import { tribeById, sigilUrl, raiderTribes, RAIDER_TRIBE_IDS } from './tribes.js';
-import { BAL } from './balance.js';
+import { tribeById, sigilUrl, raiderTribes, RAIDER_TRIBE_IDS } from '/tomob-deploy/modules/tribes.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
 
 const BASE = BAL.monsters.stats.raider_warrior;   // 습격병 공용 스탯(어그로 큼=거점 쇄도)
 

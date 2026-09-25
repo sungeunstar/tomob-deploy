@@ -1,6 +1,6 @@
 // core.js — THREE 씬/카메라/렌더러/루프 + 공유 컨텍스트(ctx) 생성. 한 책임: 렌더 기반.
 import * as THREE from 'three';
-import { BAL } from './balance.js';   // 🌫️ 원경 대기(BAL.atmosphere) — 안개 밀도·랜드마크 관통 SSOT
+import { BAL } from '/tomob-deploy/modules/balance.js';   // 🌫️ 원경 대기(BAL.atmosphere) — 안개 밀도·랜드마크 관통 SSOT
 
 export function initCore({ sky=0x8fc1e3 }={}){
   // ── 전역 텍스처 경로 교정 ── FBX 파일들이 내부에 박아둔 원본 소스 경로(export 시 남은 상대경로)를

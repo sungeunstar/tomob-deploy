@@ -3,7 +3,7 @@
 //     (node_modules에 없음) → ship.js 안에 두면 **Node 검증 하네스에서 import가 불가능**하다.
 //     순수 함수만 여기로 빼서 `scripts/_sail_e2e.mjs`가 브라우저 없이 직접 검사한다.
 //   유도·검산 정본 = `_바다물리_수식.md`(Fable 유도 + 앤 독립 수치검산 12개 값 오차 0).
-import { BAL } from './balance.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
 
 // ── 각도 규약 ─────────────────────────────────────────────────────────────────
 //   ⚠️`wd`(= ctx.wind.dir)는 **바람이 불어가는 방향**이다. 코드 실측으로 확정:

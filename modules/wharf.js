@@ -11,8 +11,8 @@ const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/P
 const HARBOR_SCALE = 2.2;   // 항구 건물 크기 배율(settlement 기본 6m × 2.2 ≈ 13m 랜드마크). 사령관 "너무 작음" — 여기서 튜닝.
 const GHOST_FWD = 11;       // 고스트를 시야(카메라 정면) 앞으로 밀어내는 거리(m) — 발밑 파묻힘 방지 + 화면에 보이게(사령관).
 
-import { toast as ukToast } from './uikit.js';
-import { initGround } from './ground.js';   // R4: 해안 판정 SSOT (game.html 밖 하네스 페이지 대비 자체 보장)
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
+import { initGround } from '/tomob-deploy/modules/ground.js';   // R4: 해안 판정 SSOT (game.html 밖 하네스 페이지 대비 자체 보장)
 export function initWharf(ctx){
   const { scene } = ctx;
   if(!ctx.ground) initGround(ctx);   // R4: SSOT 미등록 페이지(구 하네스 등)에서도 동일 판정 보장

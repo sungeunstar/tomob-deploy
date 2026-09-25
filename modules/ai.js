@@ -8,7 +8,7 @@
 //       + 점령 섬 2개 미만이면 해적 조우 미발동(_해전비전.md §E 공정 난이도).
 //   수치 SSOT = balance.js BAL.ai. 에이전트 지각 상태는 agent.bb(블랙보드)에만 기록 — 런타임 전용(save 무관).
 //   소비처: monsters.js(지각·토큰) · seaevents.js(디렉터). 없는 환경(샌드박스)은 각자 기존 로직 폴백.
-import { BAL } from './balance.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
 
 export function initAI(ctx){
   const P  = () => BAL.ai.perception;

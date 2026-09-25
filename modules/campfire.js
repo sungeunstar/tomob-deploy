@@ -4,7 +4,7 @@
 //   불꽃 = volfire.js 볼류메트릭(레이마칭 GLSL, 열 램프). 불빛 = 따뜻한 PointLight(깜빡임).
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { makeVolFire } from './volfire.js';
+import { makeVolFire } from '/tomob-deploy/modules/volfire.js';
 
 const MODEL='/tomob-deploy/assets/kenney_survival-kit/Models/GLB format/campfire-pit.glb';
 

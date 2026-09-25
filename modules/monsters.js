@@ -5,10 +5,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';   // 드래곤 보스(meshopt 압축) 디코딩
-import { FBXLoader } from '../lib/FBXLoader.patched.js';   // 신규 몹 FBX(빈 트랙 스킵 패치본 — Foe 크래시 우회)
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (몬스터 스탯·티어·스폰)
-import { createLightPool, createSlotPool, radialTexture } from './fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
-import { locationReveal as ukLocation } from './uikit.js';   // 🔥 던전 보스 전멸기(Ⓖ) 경고 배너
+import { FBXLoader } from '/tomob-deploy/lib/FBXLoader.patched.js';   // 신규 몹 FBX(빈 트랙 스킵 패치본 — Foe 크래시 우회)
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (몬스터 스탯·티어·스폰)
+import { createLightPool, createSlotPool, radialTexture } from '/tomob-deploy/modules/fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
+import { locationReveal as ukLocation } from '/tomob-deploy/modules/uikit.js';   // 🔥 던전 보스 전멸기(Ⓖ) 경고 배너
 
 const MON_DIR=encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Graveyard Kit/Models/GLB format/');
 const KK_SK='/tomob-deploy/KayKit_Skeletons_1.1_FREE/KayKit_Skeletons_1.1_FREE/characters/gltf/';

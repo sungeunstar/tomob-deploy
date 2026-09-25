@@ -16,7 +16,7 @@
 //   ★한 번 선언하면 불변(declared=true). 재선언/이름변경 없음.
 //   ★위치 게이트 없음 — 전역 성취라 항구 근처 같은 조건 없이 화면 상단 배너로 상시 노출.
 
-import { toast } from './uikit.js';
+import { toast } from '/tomob-deploy/modules/uikit.js';
 
 // ───────── 밸런스 상수(한 곳에 모음) ─────────
 const REQ = {

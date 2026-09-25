@@ -19,7 +19,7 @@
 //   ⑥ 🔥 화점 위치 갑판 클램프 — hitTest 판정박스가 선체보다 커서(여유 +3/+2.5) 불이 배 밖
 //      허공에 뜨던 것 → 갑판 보행 범위(deckW/deckL) 안으로 클램프해 배 위에 붙게.
 import * as THREE from 'three';
-import { createLightPool, createVisiblePool, radialTexture } from './fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
+import { createLightPool, createVisiblePool, radialTexture } from '/tomob-deploy/modules/fxpool.js';   // R1: 풀/텍스처 공용화(수치·개수 불변)
 
 // ═══════════ 불꽃 = mattatz THREE.Fire 볼류메트릭(레이마칭) — 하네스 그대로 ═══════════
 const FIRE_TEX = new THREE.TextureLoader().load('/tomob-deploy/_fire_ref.png');

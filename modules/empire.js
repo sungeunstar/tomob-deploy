@@ -5,8 +5,8 @@
 //   ★건설 게이트: 건물 슬롯은 그 섬 지형에 앉혀야 하므로 섬이 3D 로드(=근처)된 상태에서만 건설(settlement.canBuildAt).
 //   데이터 소유 없음(콘센트): ctx.claimed(소유 섬) · ctx.settlement(BUILDINGS/build/growthOf/ghost*) · ctx.invui.toast 읽기·호출.
 //   톤 = 샘플 공통(다크 파치먼트 + 골드, 마스터-디테일). harbor.js 글래스 계열과 정합.
-import { BAL } from './balance.js';   // ⚖️ 건물 비용/슬롯 상한 SSOT(settlement.js와 동일 출처)
-import { TRIBES, ROLE_AXIS } from './tribes.js';   // 🏨 여관 건물 추종자 후보(종족·영입 축·문턱값) — 항구 여관탭에서 이관
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 건물 비용/슬롯 상한 SSOT(settlement.js와 동일 출처)
+import { TRIBES, ROLE_AXIS } from '/tomob-deploy/modules/tribes.js';   // 🏨 여관 건물 추종자 후보(종족·영입 축·문턱값) — 항구 여관탭에서 이관
 
 export function initEmpire(ctx){
   if(typeof document === 'undefined') return null;

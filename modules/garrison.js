@@ -7,8 +7,8 @@
 //   콘센트: ctx.claimed(내 섬)·ctx.monsters(습격병)·ctx.terrain·ctx.inventory·ctx.scene. 이 파일만 수정.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { toast as ukToast } from './uikit.js';
-import { BAL } from './balance.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
 
 const GUARD = '/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Mini Arena/Models/GLB format/character-soldier.glb';   // 잠긴 왕국 병사(내장 애니 idle/walk/attack/die)
 // 🛡 용병 로스터 — 전부 자체 애니 내장 모델(리타깃 불필요). 이름=세계관(구 추종자 로스터에서 계승).

@@ -14,8 +14,8 @@
 //   수치 SSOT = BAL.outpost (balance.js 한 곳) — [[voyage-balance-ssot]].
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { BAL } from './balance.js';
-import { toast as ukToast } from './uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 const FLAG_MODEL = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Castle Kit/Models/GLB format/flag.glb');
 const FLAG_H = 5.2;            // 깃대 목표 높이(m) — 멀리서도 내 거점이 보이게 랜드마크 크기

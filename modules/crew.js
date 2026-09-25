@@ -13,8 +13,8 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
-import { toast as ukToast } from './uikit.js';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT — 육상 지시(따라와/공격해/대기해) 수치
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT — 육상 지시(따라와/공격해/대기해) 수치
 
 // ★크루 외형 = 사령관이 고른 추종자(?follower=) 모델. opening.js/game.html FOLLOWER_MODELS와 1:1 동기화.
 //   ★KayKit 클래스 6종 한정(사령관 지시 2026-07-05) — 전부 자체 애니 0 → Rig_Medium 공용 클립 리타깃(아래).

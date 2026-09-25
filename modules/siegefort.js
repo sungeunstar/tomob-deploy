@@ -9,8 +9,8 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { DestructibleMesh, FractureOptions } from 'three-pinata';
-import { tribeById } from './tribes.js';
-import { toast as ukToast, locationReveal as ukLocation } from './uikit.js';
+import { tribeById } from '/tomob-deploy/modules/tribes.js';
+import { toast as ukToast, locationReveal as ukLocation } from '/tomob-deploy/modules/uikit.js';
 
 const HXBASE = '/tomob-deploy/KayKit_Medieval_Hexagon_Pack_1.0_FREE/KayKit_Medieval_Hexagon_Pack_1.0_FREE/Assets/fbx/buildings';
 const hxDir = (col)=>`${HXBASE}/${col}/`;

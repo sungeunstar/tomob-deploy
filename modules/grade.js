@@ -17,7 +17,7 @@
 //     `window.__grade(...)`로 하나씩 끄며 판정(visual-one-change-at-a-time). 확정값은 BAL.grading으로.
 import * as THREE from 'three';
 import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
-import { BAL } from './balance.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
 
 export function initGrade(ctx){
   const r = ctx.renderer, scene = ctx.scene, camera = ctx.camera;

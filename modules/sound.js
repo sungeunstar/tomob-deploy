@@ -1,7 +1,7 @@
 // sound.js — TOMOB 사운드 통합 SSOT. 상황별 BGM(bgm_*) + 바다 ambient(suimo_ocean) + 배소리(boat) + 수영(swim) + 물splash + 발소리 + 이벤트 효과음 테이블(SFX_DIR).
 // 출처: mas game.html <audio> 요소(bgm/sfxWave/sfxBoat/sfxSwim/sfxSplash) + main.js sfxToggle(1277)/sfxBoat(6863)/sfxOne(1283).
 // 브라우저 정책: 첫 클릭/키 입력 후 재생 시작.
-import { setUiSound, nowPlaying } from './uikit.js';   // 패널 사운드 훅 + 데스스트랜딩식 now-playing 위젯
+import { setUiSound, nowPlaying } from '/tomob-deploy/modules/uikit.js';   // 패널 사운드 훅 + 데스스트랜딩식 now-playing 위젯
 const RPG=encodeURI('/tomob-deploy/kenney_rpg-audio/Audio/');
 
 export function initSound(ctx){

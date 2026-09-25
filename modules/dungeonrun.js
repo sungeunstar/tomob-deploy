@@ -15,12 +15,12 @@
 //   구 dungeon.js(SDF 던전)는 미사용 — 사령관 지시 "새로 만들어라".
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';   // ★D4b: KayKit 조각 로더(프로젝트 관례 = three/addons)
-import { BAL } from './balance.js';           // ⚖️ tierForLevel + gates pool(등급별 몬스터 풀 SSOT)
-import { MATERIALS } from './inventory.js';   // 광물 보상 이름표(토스트용)
-import { toast as ukToast, dialog as ukDialog, locationReveal as ukLocation } from './uikit.js';   // ★[5] 상자 개봉 = 대화창(디자인 시스템) / 던전 입장 = 지역 진입 배너
-import { radialTexture } from './fxpool.js';   // 🔥 불 함정 파티클 텍스처(드래곤 브레스와 동일 방식)
-import { createWaterfall, createPool } from './waterfallfx.js';   // 🏔️ 지하 2층 폭포·물웅덩이 (정본=water.js)
-import { createPortal } from './portalfx.js';                     // 🚪 보스 게이트 포탈 막 (정본=gate.js)
+import { BAL } from '/tomob-deploy/modules/balance.js';           // ⚖️ tierForLevel + gates pool(등급별 몬스터 풀 SSOT)
+import { MATERIALS } from '/tomob-deploy/modules/inventory.js';   // 광물 보상 이름표(토스트용)
+import { toast as ukToast, dialog as ukDialog, locationReveal as ukLocation } from '/tomob-deploy/modules/uikit.js';   // ★[5] 상자 개봉 = 대화창(디자인 시스템) / 던전 입장 = 지역 진입 배너
+import { radialTexture } from '/tomob-deploy/modules/fxpool.js';   // 🔥 불 함정 파티클 텍스처(드래곤 브레스와 동일 방식)
+import { createWaterfall, createPool } from '/tomob-deploy/modules/waterfallfx.js';   // 🏔️ 지하 2층 폭포·물웅덩이 (정본=water.js)
+import { createPortal } from '/tomob-deploy/modules/portalfx.js';                     // 🚪 보스 게이트 포탈 막 (정본=gate.js)
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';   // ⚡ 정적 지오메트리 병합(드로우콜 감축)
 
 // ══════════════════════════════════════════════════════════════════════════

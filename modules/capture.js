@@ -6,8 +6,8 @@
 //   콘센트: ctx.scene/terrain/player/monsters/claimed/reputation 읽기·호출만. + (축6) ctx.npc.tradeVolume/nearestPort · ctx.settlement.placeFree/BUILDINGS 읽기·호출. 이 파일만 수정.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { tribeById, sigilUrl, TRIBES } from './tribes.js';   // ★ROLE_AXIS 제거 — 야외 영입 로직 폐지(항구 여관 탭으로 이관). TRIBES는 tickSeasonDrift가 계속 사용.
-import { toast as ukToast } from './uikit.js';
+import { tribeById, sigilUrl, TRIBES } from '/tomob-deploy/modules/tribes.js';   // ★ROLE_AXIS 제거 — 야외 영입 로직 폐지(항구 여관 탭으로 이관). TRIBES는 tickSeasonDrift가 계속 사용.
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 const FLAG = encodeURI('/tomob-deploy/assets/kenney_all_in_one_3.4.0/3D assets/Pirate Kit/Models/GLB format/flag-pirate.glb');
 const CAP_R    = 16;    // 깃발 점령 반경(이 안에 있으면 게이지)

@@ -5,7 +5,7 @@
 //   위치/크기는 __torchTune(y,z,s) 또는 ctx.torch.tune 으로 라이브 조정(모델 확정 후 값 고정).
 //   의존: ctx.scene · ctx.camera · ctx.player(currentTool·pos·heldR·vmModel·isThird) · ctx.onUpdate.
 import * as THREE from 'three';
-import { makeVolFire } from './volfire.js';
+import { makeVolFire } from '/tomob-deploy/modules/volfire.js';
 
 export function initTorch(ctx){
   const COL   = new THREE.Color(0xffa24a);

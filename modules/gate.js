@@ -6,9 +6,9 @@
 //     원근 축소(멀수록 작게)와 시점각 왜곡(비스듬히 보면 타원=누운 도넛)이 자동으로 생김.
 //   ?sys=terrain,player,sky,nightsky,monsters,combat,gate. 단축키 O:게이트 N:밤 M:일반.
 import * as THREE from 'three';
-import { BAL } from './balance.js';   // ⚖️ 밸런스 SSOT (게이트 등급·스폰 풀)
-import { radialTexture } from './fxpool.js';   // R1: radial 텍스처 팩토리 공용화(색스톱 그대로)
-import { toast } from './uikit.js';   // ★2026-07-13: 침공 알림 토스트
+import { BAL } from '/tomob-deploy/modules/balance.js';   // ⚖️ 밸런스 SSOT (게이트 등급·스폰 풀)
+import { radialTexture } from '/tomob-deploy/modules/fxpool.js';   // R1: radial 텍스처 팩토리 공용화(색스톱 그대로)
+import { toast } from '/tomob-deploy/modules/uikit.js';   // ★2026-07-13: 침공 알림 토스트
 
 const NOISE=`
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}

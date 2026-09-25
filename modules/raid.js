@@ -2,9 +2,9 @@
 //   흐름: 점령 섬 보유 → (유예) → 습격 예고 배너 → 상륙(습격병 스폰, 내 깃발 노림) → 방어 →
 //         전멸=격퇴 보상 / 곁을 안 지키면 capture.js가 깃발 넘겨 섬 상실.
 //   콘센트: ctx.claimed(내 섬)·ctx.capture(방어 거점·역방향 게이지)·ctx.raiders(습격병)·ctx.monsters·ctx.inventory. 이 파일만 수정.
-import { BAL } from './balance.js';
-import { tribeById, raiderTribes } from './tribes.js';
-import { toast as ukToast } from './uikit.js';
+import { BAL } from '/tomob-deploy/modules/balance.js';
+import { tribeById, raiderTribes } from '/tomob-deploy/modules/tribes.js';
+import { toast as ukToast } from '/tomob-deploy/modules/uikit.js';
 
 export function initRaid(ctx){
   const R = BAL.raid;
