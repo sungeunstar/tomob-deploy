@@ -9,7 +9,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createIslandField } from './aurora-island.js';
 
-const SIZE=284,N=200,SEA=2;
+const SIZE=284,N=200;
 const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a));return t*t*(3-2*t);};
 const rngFor=seed=>()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
@@ -45,9 +45,12 @@ export async function initAuroraRefined(ctx,options={}){
  const mat=(color,more={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.94,...more});materials.add(m);return m;};
  const stone=mat('#9aa59a',{flatShading:true}),darkStone=mat('#737f78',{flatShading:true}),moss=mat('#69874c'),wood=mat('#8b7050'),woodDark=mat('#64543f'),sandMat=mat('#d2c3a1');
  const cube=new THREE.BoxGeometry(1,1,1),rockG=rockGeometry();geometries.add(cube);geometries.add(rockG);
- const spec=AURORA_BUILDINGS.map(b=>({...b,y:field.height(b.x,b.z)}));
+ const spec=AURORA_BUILDINGS.map(b=>({...b,y:b.id==='shrine'?46:field.height(b.x,b.z)}));
  // Flatten only building footprints. The surrounding terrain blends back into the shared field.
- for(let iz=0;iz<=N;iz++)for(let ix=0;ix<=N;ix++){const i=iz*(N+1)+ix,x=(ix/N-.5)*SIZE,z=(iz/N-.5)*SIZE;for(const b of spec){const d=Math.hypot(x-b.x,z-b.z),a=1-smooth(b.r*.76,b.r+2.2,d);field.heights[i]+=(b.y-field.heights[i])*a;}}
+ for(let iz=0;iz<=N;iz++)for(let ix=0;ix<=N;ix++){const i=iz*(N+1)+ix,x=(ix/N-.5)*SIZE,z=(iz/N-.5)*SIZE;for(const b of spec){const d=Math.hypot(x-b.x,z-b.z),a=1-smooth(b.r*.76,b.r+2.2,d);field.heights[i]+=(b.y-field.heights[i])*a;}
+  // The whole terrace, not only the chapel, shares one support elevation.
+  const px=Math.max(0,Math.abs(x+9)-9),pz=Math.max(0,Math.abs(z+39)-8.5),plaza=1-smooth(0,3,Math.hypot(px,pz));field.heights[i]+=(46-field.heights[i])*plaza;
+ }
  const names={cave:'돌산 광산',shrine:'정상의 옛 성소',lookout:'동쪽 망루',falls:'폭포와 오래된 다리'};
  for(const p of field.points){p.name=names[p.id]||p.name;if(p.id==='cave'){p.x=64;p.z=27;}if(p.id==='shrine'){p.x=-9;p.z=-31;}if(p.id==='lookout'){p.x=76;p.z=-23;}p.y=field.height(p.x,p.z);}
  field.points.push({id:'harbor',name:'선착장 선술집',sub:'출항 전 잠깐의 휴식',x:-48,z:63,y:field.height(-48,63),r:6},{id:'mill',name:'물방앗간',sub:'계곡을 따라 난 샛길',x:-65,z:18,y:field.height(-65,18),r:6});
@@ -73,7 +76,7 @@ export async function initAuroraRefined(ctx,options={}){
  for(let i=0;i<=68;i++){const x=-64+i*.5,y=bridgeTop(x);pv.push(x,y,1.7,x,y,6.3);if(i<68){const k=i*2;pi.push(k,k+1,k+2,k+1,k+3,k+2);box(x+.23,y-.11,4,[.44,.2,4.7],i%5?wood:woodDark);}}
  const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.Float32BufferAttribute(pv,3));bg.setIndex(pi);bg.computeVertexNormals();const bm=mat('#ffffff');bm.visible=false;mesh(bg,bm,0,0,0,[1,1,1],true,false);
  for(const z of[1.8,6.2])for(let i=0;i<=10;i++){const x=-64+i*3.4,y=bridgeTop(x);beam([x,y-.1,z],[x,y+1.12,z],.08);if(i<10)beam([x,y+1,z],[x+3.4,bridgeTop(x+3.4)+1,z],.044);}
- function ribbon(points,width,material,name,solid=false){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),ps=[],uv=[],ix=[],steps=Math.max(24,points.length*12);for(let i=0;i<=steps;i++){const t=i/steps,p=curve.getPoint(t),tan=curve.getTangent(t),side=new THREE.Vector3(-tan.z,0,tan.x).normalize();if(side.lengthSq()<.01)side.set(1,0,0);const w=typeof width==='function'?width(t):width;for(const s of[-1,1]){const v=p.clone().addScaledVector(side,w*.5*s);ps.push(v.x,v.y,v.z);uv.push((s+1)/2,t);}if(i<steps){const k=i*2;ix.push(k,k+1,k+2,k+1,k+3,k+2);}}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(ix);g.computeVertexNormals();const o=mesh(g,material,0,0,0,[1,1,1],solid,false);o.name=name;return o;}
+ function ribbon(points,width,material,name,solid=false){const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),ps=[],uv=[],ix=[],steps=Math.max(24,points.length*12);for(let i=0;i<=steps;i++){const t=i/steps,p=curve.getPoint(t),tan=curve.getTangent(t),side=new THREE.Vector3(-tan.z,0,tan.x).normalize();if(side.lengthSq()<.01)side.set(1,0,0);const w=typeof width==='function'?width(t):width;for(const s of[-1,1]){const v=p.clone().addScaledVector(side,w*.5*s);if(name==='Short approach to existing building')v.y=field.height(v.x,v.z)+.045;else if(/cascade|Spring running/.test(name))v.y=Math.max(v.y,field.height(v.x,v.z)+.12);ps.push(v.x,v.y,v.z);uv.push((s+1)/2,t);}if(i<steps){const k=i*2;ix.push(k,k+1,k+2,k+1,k+3,k+2);}}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(ps,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(ix);g.computeVertexNormals();const o=mesh(g,material,0,0,0,[1,1,1],solid,false);o.name=name;return o;}
  // Side paths are draped on the actual ground; the main shared paths stay unchanged.
  const connections=[[[ -48,66],[-53,63]], [[-29,51],[-23,54]], [[-64,4],[-66,11],[-66,18]],[[64,27],[73,29],[79,29]]];
  const pathMat=mat('#c2b18c',{side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-1});for(const path of connections)ribbon(path.map(([x,z])=>[x,field.height(x,z)+.035,z]),2.3,pathMat,'Short approach to existing building');
@@ -90,9 +93,13 @@ export async function initAuroraRefined(ctx,options={}){
  async function building(b){try{const raw=await fbx.loadAsync(new URL(HX+b.file,base).href);if(disposed)return;raw.updateMatrixWorld(true);let bb=new THREE.Box3().setFromObject(raw),size=bb.getSize(new THREE.Vector3());const scale=b.size/Math.max(size.x,size.y,size.z);raw.scale.multiplyScalar(scale);raw.updateMatrixWorld(true);bb=new THREE.Box3().setFromObject(raw);const c=bb.getCenter(new THREE.Vector3());raw.position.sub(new THREE.Vector3(c.x,bb.min.y,c.z));const h=new THREE.Group();h.name=b.name;h.userData.nativeAsset=HX+b.file;h.add(raw);h.rotation.y=b.yaw;h.position.set(b.x,b.y+(b.id==='shrine'?.26:0),b.z);root.add(h);h.updateMatrixWorld(true);raw.traverse(o=>{if(!o.isMesh)return;o.material=buildingMat;o.castShadow=o.receiveShadow=true;geometries.add(o.geometry);addTrimesh(o);});const bounds=new THREE.Box3().setFromObject(h);assets.buildings.push({id:b.id,file:b.file,size:bounds.getSize(new THREE.Vector3()).toArray().map(n=>+n.toFixed(2)),x:b.x,y:+h.position.y.toFixed(2),z:b.z});return h;}catch(e){assets.errors.push(b.file+': '+e.message);console.error('[aurora-v3 asset]',b.file,e);}}
  const buildingJobs=spec.map(building);
  // Waterfall: a spring-backed rock face, two cascades, an irregular terrain-fitted pool.
- const waterClock={value:0},pondY=8.03,sourceY=field.height(-39,-25)+.6;
+ const waterClock={value:0},pondY=8.03;
+ const followSurface=(x,z)=>[x,Math.max(pondY+.08,field.height(x,z)+.18),z];
  const wetStone=mat('#798f85',{roughness:.68});
- for(let i=0;i<8;i++){const x=-50+i*1.75,z=-20+Math.sin(i*.8)*2,ground=field.height(x,z),top=sourceY-1.1+Math.sin(i*.55)*1.4;const height=Math.max(4,top-ground);mesh(rockG,wetStone,x,ground+height*.45,z,[2.4,height*.6,2.8],true);}
+ // Rock banks flank the water; no tall opaque rock wall cuts across the stream.
+ for(const[cx,cz]of[[-38,-25],[-41,-20],[-44,-15]])for(const side of[-1,1]){
+  const x=cx+side*3.7,z=cz,ground=field.height(x,z);mesh(rockG,wetStone,x,ground+.7,z,[1.3,1.6,1.65],true);
+ }
  const sheetMat=new THREE.MeshStandardMaterial({color:'#a9dcd6',roughness:.27,metalness:.06,transparent:true,opacity:.87,side:THREE.DoubleSide,depthWrite:false});materials.add(sheetMat);
  const prev=sheetMat.onBeforeCompile;sheetMat.onBeforeCompile=function(shader,renderer){prev?.call(this,shader,renderer);shader.uniforms.auroraWaterTime=waterClock;shader.vertexShader='varying vec2 vCascadeUv;\n'+shader.vertexShader;shader.vertexShader=shader.vertexShader.replace('#include <uv_vertex>','#include <uv_vertex>\nvCascadeUv=uv;');shader.fragmentShader='varying vec2 vCascadeUv; uniform float auroraWaterTime;\n'+shader.fragmentShader;shader.fragmentShader=shader.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
  float lane=sin(vCascadeUv.x*83.0+sin(vCascadeUv.y*13.0-auroraWaterTime*2.0)*1.4);
@@ -101,11 +108,9 @@ export async function initAuroraRefined(ctx,options={}){
  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.89,.98,.94),.18+flow*.22+max(0.0,lane)*.12);
  diffuseColor.a*=edge*(.72+.24*flow);
  `);};sheetMat.customProgramCacheKey=()=> 'aurora-v3-cascade';
- ribbon([[-35,sourceY+.1,-29],[-37,sourceY,-26],[-39,sourceY,-24]],3,sheetMat,'Spring running over rock lip');
- const shelfY=Math.max(pondY+5,Math.min(sourceY-4,17.5));
- ribbon([[-39,sourceY,-24],[-40,sourceY-.7,-22],[-42,shelfY+2,-19],[-43,shelfY,-16.5]],t=>3.2+Math.sin(t*Math.PI)*.6,sheetMat,'Upper cascade');
- mesh(rockG,wetStone,-44,shelfY-1.8,-17,[5,2.4,3.4],true);
- ribbon([[-43,shelfY+.1,-17],[-44,shelfY-.6,-15.4],[-46,pondY+2.5,-12],[-47,pondY+.1,-9.5]],t=>3.5+t*1.2,sheetMat,'Lower cascade');
+ ribbon([[-35,-29],[-37,-26],[-39,-24]].map(([x,z])=>followSurface(x,z)),2.5,sheetMat,'Spring running over rock lip');
+ ribbon([[-39,-24],[-40,-22],[-42,-19],[-43,-16.5]].map(([x,z])=>followSurface(x,z)),t=>2.6+Math.sin(t*Math.PI)*.4,sheetMat,'Upper cascade');
+ ribbon([[-43,-16.5],[-44,-15.4],[-46,-12],[-47,-9.5]].map(([x,z])=>followSurface(x,z)),t=>2.9+t*.9,sheetMat,'Lower cascade');
  const lakeMat=mat('#58a9a3',{roughness:.32,metalness:.16,transparent:true,opacity:.91,side:THREE.DoubleSide,depthWrite:false});
  const lp=[-49,pondY,1],li=[],outline=[];for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;let r=2;for(;r<25;r+=.25){const x=-49+Math.cos(a)*r,z=1+Math.sin(a)*r;if(field.height(x,z)>=pondY-.08)break;}r=Math.max(2,r-.15);const p=[-49+Math.cos(a)*r,pondY,1+Math.sin(a)*r];lp.push(...p);outline.push(p);if(i<96)li.push(0,i+2,i+1);}
  const lakeG=new THREE.BufferGeometry();lakeG.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));lakeG.setIndex(li);lakeG.computeVertexNormals();mesh(lakeG,lakeMat,0,0,0,[1,1,1],false,false).castShadow=false;
@@ -130,7 +135,7 @@ export async function initAuroraRefined(ctx,options={}){
  instances(grassG,grassMat,grass,'Meadow tufts',false);instances(new THREE.IcosahedronGeometry(1,1),moss,shrubs,'Low undergrowth',false);instances(new THREE.IcosahedronGeometry(1,0),mat('#ffffff'),flowers,'Small wildflowers',false);
  for(let i=0;i<2200&&pebbles.length<250;i++){const x=(rng()-.5)*224,z=(rng()-.5)*205,y=field.height(x,z);if(y<2.8||y>6.6||field.slope(x,z)>.5||field.nearPath(x,z).d<2.6||excluded(x,z,1))continue;const s=.1+rng()*.17;pebbles.push({x,y:y+.035,z,s:[s,s*.5,s*1.3],rot:rng()*6.28});}instances(new THREE.IcosahedronGeometry(1,0),sandMat,pebbles,'Shore pebbles',false);
  root.updateMatrixWorld(true);const ray=new THREE.Raycaster(),down=new THREE.Vector3(0,-1,0),origin=new THREE.Vector3();ray.firstHitOnly=true;
- const api={root,field,collide,assets,placementPoints:placements,spawn:{x:-43,y:field.height(-43,66)+2.3,z:66},radius:145,offset:{x:0,z:0},data:{name:'바람의 유적섬 · 기존 에셋 v3',objs:[]},_allObjs:[root],qualityVersion:'aurora-v3-native-assets',detailStats:{grass:grass.length,undergrowth:shrubs.length,beachStones:pebbles.length,cliffSolids:cliffs.length},addTrimesh,
+ const api={root,field,collide,assets,placementPoints:placements,spawn:{x:-43,y:field.height(-43,66)+2.3,z:66},radius:145,offset:{x:0,z:0},data:{name:'바람의 유적섬 · 기존 에셋 v3',objs:[]},_allObjs:[root],qualityVersion:'aurora-v3b-native-assets',detailStats:{grass:grass.length,undergrowth:shrubs.length,beachStones:pebbles.length,cliffSolids:cliffs.length},addTrimesh,
  groundAt(x,z,fromY=5000){const start=Number.isFinite(fromY)?fromY:5000,h=field.height(x,z);let y=h<=start+.001?h:-8;origin.set(x,start,z);ray.set(origin,down);ray.far=Math.max(0,start+12);const hit=ray.intersectObjects(walkSurfaces,true)[0];if(hit)y=Math.max(y,hit.point.y);return y;},
  placeOnGround(o,x,z,{offset=0,fromY=5000}={}){o.position.set(x,api.groundAt(x,z,fromY)+offset,z);return o;},
  dispose(){if(disposed)return;disposed=true;ctx.offUpdate?.(updateHook);for(const c of colliders)try{world.removeCollider(c,true);}catch{}root.removeFromParent();for(const g of geometries){g.disposeBoundsTree?.();g.dispose();}for(const m of materials)if(Array.isArray(m))m.forEach(x=>x.dispose());else m.dispose();for(const t of textures)t.dispose();if(ctx.terrain===api)delete ctx.terrain;}};
