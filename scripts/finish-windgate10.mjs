@@ -14,6 +14,17 @@ v=once(v,"const cube=new THREE.BoxGeometry(1,1,1)",`// World-space mineral varia
 v=once(v,"dark=mat('#505b50')","dark=mat('#656e60')");
 v=once(v,'for(let i=0;i<75;i++){const r=rows','for(let i=0;i<43;i++){const r=rows');
 v=once(v,'width=3.36','width=3.60');
+v=once(v,'// Open-ended inward-facing',`// Grounded shoulders join the floor ribbon to the exterior terrain at both mouths.
+ const ap=[],ac=[];
+ for(const [lo,hi] of [[0,24],[97,120]])for(let i=lo;i<hi;i++)for(const side of[-1,1]){
+  const a=rows[i],b=rows[i+1],v=[];
+  for(const r of[a,b]){const inner=toWorld(r,side*3.45,.025),outer=toWorld(r,side*5.1,0);outer[1]=field.height(outer[0],outer[2])+.022;v.push(inner,outer);}
+  if(v[1][1]>a.p.y+.8||v[3][1]>b.p.y+.8)continue;
+  for(const k of [0,2,1,1,2,3]){ap.push(...v[k]);const c=k%2?.9:.8;ac.push(c,c,c);}
+ }
+ const ag=new THREE.BufferGeometry();ag.setAttribute('position',new THREE.Float32BufferAttribute(ap,3));ag.setAttribute('color',new THREE.Float32BufferAttribute(ac,3));ag.computeVertexNormals();
+ add(ag,floorMat,[0,0,0],[1,1,1],[0,0,0],true,false).name='Mouth embankments grounded into terrain';
+ // Open-ended inward-facing`);
 v=once(v,'const shell=add(geometry(wp,wc,wu,inside),rock',`// Clip complete wall triangles against terrain, preserving UVs and colour.
  function clippedShell(){const op=[],oc=[],ou=[];
   const point=k=>[...wp.slice(k*3,k*3+3),...wc.slice(k*3,k*3+3),...wu.slice(k*2,k*2+2)];
