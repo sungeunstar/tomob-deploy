@@ -1,0 +1,63 @@
+name: Windgate 07 build and browser verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/aurora-refuge-field.js'
+      - 'modules/aurora-refuge-history.js'
+      - 'scripts/build-aurora-refuge07.mjs'
+      - 'scripts/qa-aurora-refuge07.mjs'
+      - '.github/workflows/aurora-refuge07.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: windgate-refuge07
+  cancel-in-progress: true
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /modules/*.js
+            /scripts/*aurora*.mjs
+            /sandbox-aurora-v6.html
+            /.github/workflows/aurora-refuge07.yml
+          fetch-depth: 1
+      - name: Generate additive runtime and inspect syntax
+        run: |
+          node scripts/build-aurora-refuge07.mjs
+          node --check modules/aurora-refuge.js
+          node --check modules/aurora-refuge-field.js
+          node --check modules/aurora-refuge-history.js
+      - name: Install isolated browser tools
+        run: |
+          mkdir -p /tmp/windgate-tools
+          cd /tmp/windgate-tools
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1
+          npx playwright install --with-deps chromium
+          ln -s /tmp/windgate-tools/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Verify actual WebGL and native gameplay
+        run: node scripts/qa-aurora-refuge07.mjs
+      - name: Commit only generated preview files after tests pass
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add modules/aurora-refuge.js sandbox-aurora-v7.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: publish verified Windgate 07 refugee island preview'
+            git push origin HEAD:main
+          fi
+      - name: Preserve actual screenshots, code and test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windgate07-render-and-play-evidence
+          path: artifacts
+          retention-days: 7
+          if-no-files-found: warn
