@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TOMOB · 바람의 차원문 섬 04</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#adcfd4;color:#f7f1dd;font:13px/1.55 system-ui,'Malgun Gothic',sans-serif}canvas{display:block}button,select,a{font:inherit}button,select,a.control{background:#173139e8;color:inherit;border:1px solid #ffffff35;border-radius:5px;padding:8px 12px;text-decoration:none;cursor:pointer}button:hover,a.control:hover{background:#38554b}button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid #e5cf91;outline-offset:2px}#hud{position:fixed;left:24px;top:20px;z-index:5;pointer-events:none;text-shadow:0 2px 7px #18363b}.eyebrow{font-size:10px;letter-spacing:2px;color:#eee0b6}h1{font-size:26px;letter-spacing:-1px;font-weight:550;margin:3px 0}#location{color:#f2dfac}#pos{font:10px ui-monospace,monospace;opacity:.65;margin-top:6px}#tools{position:fixed;top:20px;right:20px;z-index:20;display:flex;gap:7px;align-items:start}details{background:#173139ed;border:1px solid #ffffff30;border-radius:5px}summary{cursor:pointer;padding:8px 12px}.inner{display:grid;gap:8px;padding:5px 12px 12px}small{opacity:.75}#hint{position:fixed;left:24px;bottom:26px;z-index:5;pointer-events:none;background:#18343aca;border-left:2px solid #ddc58b;padding:11px 16px;max-width:330px}#hint b{color:#ebd399}#fps{position:fixed;right:20px;bottom:22px;z-index:5;background:#19353dcf;padding:6px 9px;font:11px ui-monospace,monospace}#cross{position:fixed;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:#ffffff95;z-index:4;pointer-events:none}#load{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#142c35;gap:15px;padding:25px;text-align:center}#load h2{font-size:32px;font-weight:500;margin:0}progress{width:220px;accent-color:#b3c299}#qa{display:none;position:fixed;right:20px;top:230px;width:460px;max-width:90vw;max-height:60vh;overflow:auto;background:#102329ed;color:#b8ddc3;font:10px/1.4 ui-monospace,monospace;padding:12px;white-space:pre-wrap;z-index:15}#notice{position:fixed;left:24px;top:115px;z-index:6;color:#ffe4a2;text-shadow:0 2px 5px #000;max-width:380px}#test{display:none}.inner a{color:inherit;font-size:11px}@media(max-width:720px){#hud{left:14px;top:12px}h1{font-size:21px}#tools{right:12px;top:115px}#hint{font-size:11px;left:14px;bottom:90px}}
+</style>
+<script>window.__auroraErrors=[];const originalError=console.error.bind(console);console.error=(...a)=>{const s=a.map(String).join(' ');if(!window.__auroraErrors.includes(s)&&window.__auroraErrors.length<30)window.__auroraErrors.push(s);originalError(...a);};addEventListener('error',e=>window.__auroraErrors.push(e.message));addEventListener('unhandledrejection',e=>window.__auroraErrors.push(String(e.reason)));</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","three-mesh-bvh":"https://esm.sh/three-mesh-bvh@0.7.0?external=three"}}</script>
+</head><body>
+<div id="load"><small>TOMOB / ISLAND STUDY 04</small><h2>바람의 차원문 섬</h2><div id="load-note">본편 엔진을 준비하는 중</div><progress></progress><small>광산 · 옛 부두 · 계곡 · 정상의 차원문</small></div>
+<div id="hud"><div class="eyebrow">TOMOB / ISLAND STUDY 04</div><h1>바람의 차원문 섬</h1><div id="location">해안 산책로</div><div id="pos"></div></div>
+<div id="tools"><a class="control" id="view" href="?view=overview">섬 전체 보기</a><details><summary>장소 둘러보기</summary><div class="inner"><select id="places" aria-label="장소 선택"><option value="">장소 선택</option></select><button id="reset">선착장으로</button><button id="test">본편 이동·점프 검사</button><small>장소 이동은 검수용 순간이동입니다.</small><a href="./sandbox-aurora-v3.html">03 버전과 비교</a></div></details></div>
+<div id="cross"></div><div id="notice"></div><div id="hint">화면 클릭 → 마우스 시점<br><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프<br><b>F</b> 1·3인칭 · <b>ESC</b> 마우스 해제</div><div id="fps"></div><pre id="qa"></pre>
+<script type="module">
+import * as THREE from 'three';
+import {initCore} from './modules/core.js';
+import {initPhysics} from './modules/physics.js';
+import {initWater} from './modules/water.js';
+import {initInput} from './modules/input.js';
+import {initPlayer,KAY_CHARS} from './modules/player.js';
+import {initAuroraFinale} from './modules/aurora-finale.js?v=4';
+const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),overview=q.get('view')==='overview',delay=ms=>new Promise(r=>setTimeout(r,ms));
+try{
+ const ctx=initCore();window.ctx=ctx;ctx.renderer.outputColorSpace=THREE.SRGBColorSpace;ctx.renderer.toneMapping=THREE.ACESFilmicToneMapping;ctx.renderer.toneMappingExposure=1.08;
+ ctx.scene.background=new THREE.Color('#aecfd5');ctx.scene.fog=new THREE.FogExp2('#aecfd5',.0011);ctx.hemi.color.set('#e5eff8');ctx.hemi.groundColor.set('#798b68');ctx.hemi.intensity=1.5;ctx.sun.color.set('#ffedcf');ctx.sun.intensity=2.25;ctx.sun.position.set(-100,180,105);ctx.sun.shadow.normalBias=.08;ctx.sun.shadow.bias=-.0001;Object.assign(ctx.sun.shadow.camera,{left:-155,right:155,top:155,bottom:-155,near:1,far:460});ctx.sun.shadow.camera.updateProjectionMatrix();ctx.fill.intensity=.4;ctx.fill.color.set('#c1dce8');ctx.amb.intensity=.1;
+ $('load-note').textContent='바다와 물리엔진 준비';await initPhysics(ctx);initWater(ctx,{waveAmp:.18});
+ const wu=ctx.water.mat.uniforms;wu.uSwell.value=.12;wu.uWaveN.value=14;wu.uFoam.value=.2;if(wu.uStreak)wu.uStreak.value=.1;
+ initInput(ctx);$('load-note').textContent='기존 광산·건물·부두와 차원문을 불러오는 중';const island=await initAuroraFinale(ctx);await island.ready;
+ const character=KAY_CHARS[q.get('char')]||KAY_CHARS.knight;initPlayer(ctx,{spawn:island.spawn,charUrl:character});ctx.player.setThird(true);ctx.stepPhysics();
+ let frames=0,fps=0,count=0,last=performance.now(),ready=false,inspection=null,testActive=false;
+ function go(id){const p=island.field.points.find(p=>p.id===id);if(!p)return;ctx.player.setSpawn(p.x,island.groundAt(p.x,p.z,p.y+.5)+2.3,p.z);inspection=p;$('location').textContent=p.name;$('places').value=id;}
+ for(const p of island.field.points){const option=document.createElement('option');option.value=p.id;option.textContent=p.name;$('places').appendChild(option);} $('places').onchange=()=>go($('places').value);$('reset').onclick=()=>{ctx.player.setSpawn(island.spawn.x,island.spawn.y,island.spawn.z);inspection=null;$('location').textContent='해안 산책로';};
+ const other=new URL(location.href);overview?other.searchParams.delete('view'):other.searchParams.set('view','overview');$('view').href=other.href;$('view').textContent=overview?'본편 조작으로 탐험':'섬 전체 보기';
+ if(overview){$('cross').style.display='none';$('hint').textContent='장소를 선택해 가까이 볼 수 있어요. 실제 탐험은 본편 조작 버튼을 눌러주세요.';ctx.onUpdate(()=>{ctx.camera.fov=43;ctx.camera.updateProjectionMatrix();if(inspection){const p=inspection;const d=p.id==='dock'?40:28;ctx.camera.position.set(p.x+d,p.y+d*.75,p.z+d*1.25);ctx.camera.lookAt(p.x,p.y+4,p.z);}else{ctx.camera.position.set(190,168,246);ctx.camera.lookAt(-2,18,1);}});}
+ ctx.onUpdate(()=>ctx.stepPhysics());
+ const report=()=>{const p=ctx.player.pos;return{build:island.qualityVersion,ready,mode:overview?'overview':'native-play',controller:'modules/player.js (unchanged)',physics:'modules/physics.js (unchanged)',characterReady:!!window.__curAnim?.(),animation:window.__curAnim?.()||null,position:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3)},ground:+island.groundAt(p.x,p.z,p.y+.15).toFixed(3),portalTime:+island.portal.U.uTime.value.toFixed(2),portalOpen:island.portal.U.uOpen.value,waterReuse:island.waterProof,waterRegions:island.waterRegions.map(r=>({name:r.name,level:r.level})),assets:island.assets,bvh:!!island.bvh,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,wallClockFPS:fps,frames,errors:window.__auroraErrors,test:window.__auroraQA?.testResult||null};};
+ function showReport(){if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}
+ ctx.onUpdate(()=>{frames++;if(testActive)return;count++;const now=performance.now();if(now-last>=800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;const p=ctx.player.pos;$('pos').textContent=`${p.x.toFixed(0)}, ${p.z.toFixed(0)} · ${p.y.toFixed(1)}m`;$('fps').textContent=`${fps} FPS`;showReport();}});
+ // Deterministic native-controller check. Rendering is suppressed, not physics.
+ async function nativeTest(){
+  if(overview||!ready||testActive)return;const canvas=ctx.renderer.domElement,emit=(type,code)=>window.dispatchEvent(new KeyboardEvent(type,{code,bubbles:true})),samples=[];const previous=ctx.getRenderOverride();$('test').disabled=true;
+  try{
+   await canvas.requestPointerLock();await delay(200);if(document.pointerLockElement!==canvas)throw new Error('Pointer lock not granted; native test not run.');
+   testActive=true;ctx.setRenderOverride(()=>{});const tick=n=>{for(let i=0;i<n;i++)ctx.tick(1/60);};const sample=tag=>{const r=report();samples.push({tag,position:r.position,animation:r.animation});};
+   tick(90);sample('idle');emit('keydown','KeyW');tick(24);sample('walk');emit('keydown','ShiftLeft');tick(24);sample('run');emit('keyup','KeyW');emit('keyup','ShiftLeft');tick(60);sample('settled');
+   const base=ctx.player.pos.y;let peak=base;const clips=new Set();emit('keydown','Space');for(let i=0;i<70;i++){ctx.tick(1/60);peak=Math.max(peak,ctx.player.pos.y);clips.add(window.__curAnim?.());}emit('keyup','Space');sample('land');
+   const moved=Math.hypot(samples[1].position.x-samples[0].position.x,samples[1].position.z-samples[0].position.z),jumpDelta=peak-base;
+   window.__auroraQA.testResult={method:'native input + ctx.tick(1/60); render suppressed during simulation',moved,jumpDelta,clips:[...clips],samples,pass:moved>.2&&jumpDelta>.15&&[...clips].some(n=>/Jump/.test(n||''))};
+  }catch(e){window.__auroraQA.testResult={pass:false,reason:e.message,samples};}
+  finally{for(const code of['KeyW','ShiftLeft','Space'])emit('keyup',code);ctx.setRenderOverride(previous);testActive=false;last=performance.now();count=0;$('test').disabled=false;document.exitPointerLock?.();ctx.renderer.render(ctx.scene,ctx.camera);showReport();}
+ }
+ window.__auroraQA={ctx,island,report,go,nativeTest,testResult:null};if(q.has('qa')){$('test').style.display='block';$('test').onclick=nativeTest;}
+ ctx.start();$('load-note').textContent='본편 캐릭터 애니메이션을 준비하는 중';for(let i=0;i<160&&!window.__curAnim?.();i++)await delay(250);ready=!!window.__curAnim?.();document.body.dataset.ready=String(ready);$('load').remove();
+ if(island.assets.errors.length)$('notice').textContent='일부 에셋을 불러오지 못했습니다. 진단 화면에서 확인할 수 있어요.';else if(!ready)$('notice').textContent='캐릭터 애니메이션을 계속 불러오는 중입니다.';
+ if(q.get('place'))go(q.get('place'));showReport();
+}catch(e){console.error('[aurora04 boot]',e);$('load-note').textContent='초기화 실패: '+e.message;$('load').querySelector('progress')?.remove();}
+</script></body></html>
