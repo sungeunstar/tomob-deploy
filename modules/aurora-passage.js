@@ -1,7 +1,7 @@
-import {prepareVault,carveVaultTerrain,dressWindgate10,vaultReserve} from './windgate10-vault-runtime.js?v=59edc30991';
+import {prepareVault,carveVaultTerrain,dressWindgate10,vaultReserve} from './windgate10-vault-runtime.js?v=8ed7094567';
 // Generated from pinned v6 template; authoring recipe: scripts/build-aurora-refuge07.mjs.
 import {dressRefuge} from './aurora-refuge-history.js';
-import {polishRefuge} from './windgate10-polish.js?v=59edc30991';
+import {polishRefuge} from './windgate10-polish.js?v=8ed7094567';
 /** Aurora 06: a new sightline-led map using the existing native game modules.
  * The source of terrain geometry is aurora-refuge-field.js, not an imported island asset.
  * Native player/physics/water/portal and original KayKit/wharf files are not modified.
