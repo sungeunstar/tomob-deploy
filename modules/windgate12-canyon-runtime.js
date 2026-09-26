@@ -7,7 +7,7 @@ import {BUILDINGS,BASINS,basinRadius,fallAxes,axisDistance} from './aurora-refug
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const mix=(a,b,t)=>a+(b-a)*t;
 const rndFor=s=>()=>((s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296);
-const controls=[[-18,-68,55],[-23,-75,55.7],[-26,-82,56.7],[-22,-89,58.2],[-14,-94,60],[-4,-96,61.1],[7,-93,61.6],[14,-88,61.4]];
+const controls=[[-18,-68,55],[-22,-74,54.1],[-25,-81,53.8],[-22,-88,54.7],[-15,-94,56.2],[-5,-97,57.2],[5,-95,58.1],[12,-91,59.0]];
 const curve=new THREE.CatmullRomCurve3(controls.map(([x,z,y])=>new THREE.Vector3(x,y,z)),false,'centripetal');
 const rows=Array.from({length:121},(_,i)=>{const p=curve.getPoint(i/120),t=curve.getTangent(i/120);t.y=0;t.normalize();return {p,t,n:new THREE.Vector3(-t.z,0,t.x),u:i/120};});
 export function vaultSample(x,z){
@@ -17,7 +17,7 @@ export function vaultSample(x,z){
  return best;
 }
 export function vaultReserve(x,z,pad=0){return x>-32-pad&&x<22+pad&&z>-103-pad&&z<-61+pad&&vaultSample(x,z).d<6.4+pad;}
-function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+2.2+3.05*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.035-y,y-roof,before,after);}
+function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+1.92+2.52*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.035-y,y-roof,before,after);}
 export function prepareVault(field){
  field.vaultReserve=vaultReserve;
  const n=field.segments,sz=field.size;
@@ -39,7 +39,7 @@ export function prepareVault(field){
  const points=rows.map(r=>[r.p.x,r.p.z,r.p.y]);field.segmentsList=field.segmentsList.slice();field.routeDefs=field.routeDefs.slice();
  for(let i=0;i<points.length-1;i++)field.segmentsList.push({a:points[i],b:points[i+1],id:'vault',width:6.4,bridge:true});
  field.routeDefs.push({id:'vault',name:'마지막 바위 고개 → 성소 뒤편 바람굴',width:6.4,points});for(let i=points.length-1;i>0;i--)field.segmentsList.push({a:points[i],b:points[i-1],id:'vault-return',width:6.4,bridge:true});
- const stations=[['vault-entry','마지막 바위 고개 · 굴 입구',0],['vault-turn','성소 아래 굽이',.48],['vault-exit','성소 뒤편 굴 출구',1]];
+ const stations=[['vault-entry','마지막 바위 고개 · 굴 입구',.015],['vault-turn','성소 아래 굽이',.48],['vault-exit','성소 뒤편 굴 출구',.985]];
  for(const[id,name,u]of stations){const p=curve.getPoint(u),q=curve.getPoint(clamp(u+.13));field.points.push({id,name,x:p.x,y:p.y,z:p.z,r:5,target:[q.x,q.y+1.6,q.z],text:'산 아래를 돌아서 통과하는 옛길'});}
  return field;
 }
@@ -108,8 +108,8 @@ export function dressWindgate10(ctx,island){
   }
  }
  // Open-ended inward-facing rock shell clipped where it meets the exterior landscape.
- const wp=[],wc=[],wu=[],wi=[],cross=[[-3.52,-.32],[-3.52,2.2]];
- for(let j=1;j<20;j++){const a=j/20*Math.PI;cross.push([-3.52*Math.cos(a),2.2+3.09*Math.sin(a)]);}cross.push([3.52,2.2],[3.52,-.32]);
+ const wp=[],wc=[],wu=[],wi=[],cross=[[-3.52,-.32],[-3.52,1.92]];
+ for(let j=1;j<20;j++){const a=j/20*Math.PI;cross.push([-3.52*Math.cos(a),1.92+2.56*Math.sin(a)]);}cross.push([3.52,1.92],[3.52,-.32]);
  for(let i=0;i<rows.length;i++){const r=rows[i];for(let j=0;j<cross.length;j++){const[l,y]=cross[j];const p=toWorld(r,l,y),shade=.38+.18*(Math.abs(l)/3.52)+.23*Math.abs(r.u-.5)*2;wp.push(...p);wc.push(shade,shade,shade);wu.push(j/cross.length,r.u*10);
   if(i<rows.length-1&&j<cross.length-1){const k=i*cross.length+j;wi.push(k,k+1,k+cross.length,k+1,k+cross.length+1,k+cross.length);}}}
  const inside=[];for(let i=0;i<wi.length;i+=3){const a=wi.slice(i,i+3),x=a.reduce((s,k)=>s+wp[k*3],0)/3,y=a.reduce((s,k)=>s+wp[k*3+1],0)/3,z=a.reduce((s,k)=>s+wp[k*3+2],0)/3;if(field.height(x,z)>y-.05 && !(vaultSample(x,z).u<.19 && field.nearPath(x,z).d<2.2))inside.push(...a);}
