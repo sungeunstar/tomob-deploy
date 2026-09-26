@@ -7,3 +7,4 @@ const pts=[
 [-10,-92],[0,-92],[10,-92],[20,-92],[30,-92]
 ];
 for(const [x,z] of pts) console.log('H',x,z,f.height(x,z).toFixed(2),'slope',f.slope(x,z).toFixed(2),'path',f.nearPath(x,z).d.toFixed(2));
+// trigger sample
