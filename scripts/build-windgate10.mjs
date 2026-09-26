@@ -15,19 +15,17 @@ source=once(source,oldSigns,'// Replaced by the grounded directional atlas signs
 source=once(source,'polishRefuge(ctx,api);','polishRefuge(ctx,api);dressWindgate10(ctx,api);');
 source=source.replaceAll('aurora-v7c-refuge','aurora-v10-undercroft').replaceAll('Windgate 07 / drowned sanctuary','Windgate 10 / curved pilgrimage vault');
 polish=once(polish,'if(y<8||sl<1.1','if(island.field.vaultReserve(x,z,4)||y<8||sl<1.1');
-// This authored sample does not alter the player's controller or the preceding sample.
-page=page.replaceAll('initAuroraRefuge','initAuroraPassage').replaceAll('./modules/aurora-refuge.js?v=7c','./modules/aurora-passage.js?v=10a').replaceAll('REFUGE 07','PASSAGE 10').replaceAll('피난섬 07','순례굴 섬 10').replaceAll('./sandbox-aurora-v6.html','./sandbox-aurora-v7.html?rev=7c');
+page=page.replaceAll('initAuroraRefuge','initAuroraPassage').replaceAll('./modules/aurora-refuge.js?v=7c','./modules/aurora-passage.js?v=10b').replaceAll('REFUGE 07','PASSAGE 10').replaceAll('피난섬 07','순례굴 섬 10').replaceAll('./sandbox-aurora-v6.html','./sandbox-aurora-v7.html?rev=7c');
 if(!page.includes('aurora-passage.js'))throw new Error('Import hook did not match.');
 page=once(page,'history:island.historyStats,','vault:island.vault?{length:island.vault.length,cut:island.vault.cut,signs:island.vault.signs,shoulders:island.vault.shoulders,cameraCorrections:island.vault.cameraCorrections}:null,history:island.historyStats,');
 page=once(page,'const views={','const views={"vault-entry":{eye:[-29,61,-60],at:[-10,58,-75]},"vault-turn":{eye:[-7,59,-78],at:[-6,59,-86]},"vault-exit":{eye:[-22,68,-105],at:[-10,62,-93]},');
-// Direction of the entrance camera looks into the first bend, not through both mouths.
 page=page.replaceAll('옛 돌길과 피난민 항구를 불러오는 중','산 아래 굽은 순례굴을 불러오는 중');
 let vault=await read('modules/windgate10-vault.js');
 vault=once(vault,'const points=rows.map(r=>[r.p.x,r.p.z,r.p.y]);','const points=rows.map(r=>[r.p.x,r.p.z,r.p.y]);field.segmentsList=field.segmentsList.slice();field.routeDefs=field.routeDefs.slice();');
 vault=once(vault,"field.routeDefs.push({id:'vault',name:'성소 아래 굽은 순례굴',width:6.4,points});","field.routeDefs.push({id:'vault',name:'성소 아래 굽은 순례굴',width:6.4,points});for(let i=points.length-1;i>0;i--)field.segmentsList.push({a:points[i],b:points[i-1],id:'vault-return',width:6.4,bridge:true});");
 vault=once(vault,'ix.push(k,k+11,k+1,k+1,k+11,k+12);','ix.push(k,k+1,k+11,k+1,k+12,k+11);');
-// Do not mutate the authored module on disk: corrected implementation gets its own generated path.
-source=source.replaceAll('./windgate10-vault.js','./windgate10-vault-runtime.js');
+vault=once(vault,'if(field.height(x,z)>y-.05)inside.push(...a);','if(field.height(x,z)>y-.05 && !(vaultSample(x,z).u<.19 && field.nearPath(x,z).d<2.6))inside.push(...a);');
+source=source.replaceAll('./windgate10-vault.js','./windgate10-vault-runtime.js?v=10b').replaceAll('./windgate10-polish.js','./windgate10-polish.js?v=10b');
 const outputs={'modules/aurora-passage.js':source,'modules/windgate10-polish.js':polish,'modules/windgate10-vault-runtime.js':vault,'sandbox-aurora-v10.html':page};
 await fs.mkdir('artifacts/source/modules',{recursive:true});
 for(const[p,s]of Object.entries(outputs)){await fs.writeFile(p,s);await fs.writeFile('artifacts/source/'+p,s);}
