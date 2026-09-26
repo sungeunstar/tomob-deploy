@@ -17,7 +17,7 @@ export function vaultSample(x,z){
  return best;
 }
 export function vaultReserve(x,z,pad=0){return x>-26-pad&&x<6+pad&&z>-106-pad&&z<-59+pad&&vaultSample(x,z).d<6.2+pad;}
-function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+2.2+3.05*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.38-y,y-roof,before,after);}
+function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+2.2+3.05*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.035-y,y-roof,before,after);}
 export function prepareVault(field){
  field.vaultReserve=vaultReserve;
  const n=field.segments,sz=field.size;
@@ -61,7 +61,7 @@ export function dressWindgate10(ctx,island){
  function add(g,m,p=[0,0,0],s=[1,1,1],rot=[0,0,0],solid=false,batch=true){gs.add(g);const o=new THREE.Mesh(g,m);o.position.set(...p);o.scale.set(...s);o.rotation.set(...rot);o.castShadow=o.receiveShadow=true;root.add(o);o.updateWorldMatrix(true,false);if(solid)island.addTrimesh(o);if(batch)staticMeshes.push(o);return o;}
  const box=(p,s,m=masonry,rot=[0,0,0],solid=false)=>add(cube,m,p,s,rot,solid);
  const toWorld=(r,l,y)=>[r.p.x+r.n.x*l,r.p.y+y,r.p.z+r.n.z*l];
- const pos=[],colors=[],uv=[],ix=[],width=3.36;
+ const pos=[],colors=[],uv=[],ix=[],width=3.60;
  for(let i=0;i<rows.length;i++){const r=rows[i];for(let j=0;j<=10;j++){const l=(j/10*2-1)*width,edge=Math.abs(l)/width;pos.push(...toWorld(r,l,-.01+edge*edge*.06));const shade=.58+.3*Math.abs(r.u-.5)*2;colors.push(shade,shade,shade);uv.push(j/10,r.u*18);if(i<rows.length-1&&j<10){const k=i*11+j;ix.push(k,k+1,k+11,k+1,k+12,k+11);}}}
  function geometry(p,c,u,i){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));if(c)g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));if(u)g.setAttribute('uv',new THREE.Float32BufferAttribute(u,2));g.setIndex(i);g.computeVertexNormals();return g;}
  const floor=add(geometry(pos,colors,uv,ix),floorMat,[0,0,0],[1,1,1],[0,0,0],true,false);floor.name='Vault continuous walkable floor';
@@ -71,7 +71,18 @@ export function dressWindgate10(ctx,island){
  for(let i=0;i<rows.length;i++){const r=rows[i];for(let j=0;j<cross.length;j++){const[l,y]=cross[j];const p=toWorld(r,l,y),shade=.38+.18*(Math.abs(l)/3.52)+.23*Math.abs(r.u-.5)*2;wp.push(...p);wc.push(shade,shade,shade);wu.push(j/cross.length,r.u*10);
   if(i<rows.length-1&&j<cross.length-1){const k=i*cross.length+j;wi.push(k,k+1,k+cross.length,k+1,k+cross.length+1,k+cross.length);}}}
  const inside=[];for(let i=0;i<wi.length;i+=3){const a=wi.slice(i,i+3),x=a.reduce((s,k)=>s+wp[k*3],0)/3,y=a.reduce((s,k)=>s+wp[k*3+1],0)/3,z=a.reduce((s,k)=>s+wp[k*3+2],0)/3;if(field.height(x,z)>y-.05 && !(vaultSample(x,z).u<.19 && field.nearPath(x,z).d<2.6))inside.push(...a);}
- const shell=add(geometry(wp,wc,wu,inside),rock,[0,0,0],[1,1,1],[0,0,0],true,false);shell.name='Vault rock walls and actual ceiling';wallMeshes.push(shell);
+ // Clip complete wall triangles against terrain, preserving UVs and colour.
+ function clippedShell(){const op=[],oc=[],ou=[];
+  const point=k=>[...wp.slice(k*3,k*3+3),...wc.slice(k*3,k*3+3),...wu.slice(k*2,k*2+2)];
+  const value=p=>{const q=vaultSample(p[0],p[2]);return Math.min(field.height(p[0],p[2])-p[1]+.055,Math.max(q.u-.19,field.nearPath(p[0],p[2]).d-2.6));};
+  const lerp=(a,b,t)=>a.map((x,k)=>mix(x,b[k],t));
+  for(let i=0;i<wi.length;i+=3){const tri=[point(wi[i]),point(wi[i+1]),point(wi[i+2])],poly=[];
+   for(let j=0;j<3;j++){const a=tri[j],b=tri[(j+1)%3],fa=value(a),fb=value(b);if(fa>=0)poly.push(a);if((fa>=0)!==(fb>=0)){let lo=0,hi=1;for(let k=0;k<14;k++){const t=(lo+hi)/2;if((value(lerp(a,b,t))>=0)===(fa>=0))lo=t;else hi=t;}poly.push(lerp(a,b,(lo+hi)/2));}}
+   for(let j=1;j<poly.length-1;j++)for(const p of[poly[0],poly[j],poly[j+1]]){op.push(...p.slice(0,3));oc.push(...p.slice(3,6));ou.push(...p.slice(6,8));}
+  }
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(op,3));g.setAttribute('color',new THREE.Float32BufferAttribute(oc,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(ou,2));g.computeVertexNormals();return g;
+ }
+ const shell=add(clippedShell(),rock,[0,0,0],[1,1,1],[0,0,0],true,false);shell.name='Vault rock walls and actual ceiling';wallMeshes.push(shell);
  // Broken masonry ribs spaced at authored turns, not a sequence of identical doorways.
  for(const [ri,complete]of[[17,true],[41,false],[68,true],[99,false]]){const r=rows[ri],angle=Math.atan2(-r.n.z,r.n.x);for(const sign of[-1,1])for(let j=0;j<3;j++)box(toWorld(r,sign*3.18,.45+j*.7),[.5,.67,.8],j%2?masonry:dark,[0,angle,sign*.018],true);
   if(complete)for(let j=0;j<11;j++){const a=(j+.5)/11*Math.PI,l=-3.2*Math.cos(a),y=2.17+2.8*Math.sin(a),o=box(toWorld(r,l,y),[.83,.44,.7],masonry,[0,angle,0],false);o.rotateZ(Math.PI/2-a);o.updateWorldMatrix(true,false);island.addTrimesh(o);}
