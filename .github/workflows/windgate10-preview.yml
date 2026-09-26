@@ -1,0 +1,60 @@
+name: Windgate 10 verified browser preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/windgate10-vault.js'
+      - 'scripts/build-windgate10.mjs'
+      - 'scripts/qa-windgate10.mjs'
+      - '.github/workflows/windgate10-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: windgate10-preview
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /modules/*.js
+            /scripts/*windgate10*.mjs
+            /sandbox-aurora-v7.html
+            /.github/workflows/windgate10-preview.yml
+      - name: Generate additive sample and check syntax
+        run: |
+          node scripts/build-windgate10.mjs
+          node --check modules/aurora-passage.js
+          node --check modules/windgate10-vault-runtime.js
+          node --check modules/windgate10-polish.js
+      - name: Prepare isolated browser tooling
+        run: |
+          mkdir -p /tmp/windgate10-tools
+          cd /tmp/windgate10-tools
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1
+          npx playwright install --with-deps chromium
+          ln -s /tmp/windgate10-tools/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Render and traverse the actual game
+        run: node scripts/qa-windgate10.mjs
+      - name: Publish only verified generated preview files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --sparse modules/aurora-passage.js modules/windgate10-vault-runtime.js modules/windgate10-polish.js sandbox-aurora-v10.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: publish verified curved undercroft preview 10'
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windgate10-render-and-gameplay
+          path: artifacts
+          retention-days: 7
+          if-no-files-found: warn
