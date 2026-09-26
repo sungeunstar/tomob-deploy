@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 const once=(s,a,b)=>{if(s.split(a).length!==2)throw new Error('Missing reviewed finish hook: '+a.slice(0,75));return s.replace(a,b);};
 let v=await fs.readFile('modules/windgate10-vault-runtime.js','utf8'),source=await fs.readFile('modules/aurora-passage.js','utf8'),page=await fs.readFile('sandbox-aurora-v10.html','utf8');
 const start=v.indexOf('function vaultSDF('),end=v.indexOf('export function prepareVault',start);if(start<0||end<0)throw new Error('SDF hook missing');
-v=v.slice(0,start)+`function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+2.2+3.05*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.38-y,y-roof,before,after);}\n`+v.slice(end);
+v=v.slice(0,start)+`function vaultSDF(x,y,z){const q=vaultSample(x,z),r=3.5,a=rows[0],b=rows[rows.length-1],before=-((x-a.p.x)*a.t.x+(z-a.p.z)*a.t.z),after=(x-b.p.x)*b.t.x+(z-b.p.z)*b.t.z,roof=q.y+2.2+3.05*Math.sqrt(Math.max(0,1-(q.d/r)**2));return Math.max(q.d-r,q.y-.035-y,y-roof,before,after);}\n`+v.slice(end);
 v=once(v,'field.vaultReserve=vaultReserve;',`field.vaultReserve=vaultReserve;
  const n=field.segments,sz=field.size;
  for(let j=0;j<=n;j++)for(let i=0;i<=n;i++){const x=(i/n-.5)*sz,z=(j/n-.5)*sz,k=j*(n+1)+i;for(const ri of[0,120]){const r=rows[ri],d=Math.hypot(x-r.p.x,z-r.p.z);if(d>6.5)continue;const fade=1-clamp((d-3.8)/2.7),h=field.heights[k];if(h<r.p.y)field.heights[k]=mix(h,r.p.y,fade*fade*(3-2*fade));}}
@@ -13,6 +13,7 @@ v=once(v,"const cube=new THREE.BoxGeometry(1,1,1)",`// World-space mineral varia
  const cube=new THREE.BoxGeometry(1,1,1)`);
 v=once(v,"dark=mat('#505b50')","dark=mat('#656e60')");
 v=once(v,'for(let i=0;i<75;i++){const r=rows','for(let i=0;i<43;i++){const r=rows');
+v=once(v,'width=3.36','width=3.60');
 v=once(v,'const shell=add(geometry(wp,wc,wu,inside),rock',`// Clip complete wall triangles against terrain, preserving UVs and colour.
  function clippedShell(){const op=[],oc=[],ou=[];
   const point=k=>[...wp.slice(k*3,k*3+3),...wc.slice(k*3,k*3+3),...wu.slice(k*2,k*2+2)];
