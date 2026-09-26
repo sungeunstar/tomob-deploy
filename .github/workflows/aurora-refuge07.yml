@@ -5,6 +5,7 @@ on:
     paths:
       - 'modules/aurora-refuge-field.js'
       - 'modules/aurora-refuge-history.js'
+      - 'modules/aurora-refuge-polish.js'
       - 'scripts/build-aurora-refuge07.mjs'
       - 'scripts/qa-aurora-refuge07.mjs'
       - '.github/workflows/aurora-refuge07.yml'
@@ -26,6 +27,7 @@ jobs:
             /modules/*.js
             /scripts/*aurora*.mjs
             /sandbox-aurora-v6.html
+            /sandbox-aurora-v7.html
             /.github/workflows/aurora-refuge07.yml
           fetch-depth: 1
       - name: Generate additive runtime and inspect syntax
@@ -34,6 +36,7 @@ jobs:
           node --check modules/aurora-refuge.js
           node --check modules/aurora-refuge-field.js
           node --check modules/aurora-refuge-history.js
+          node --check modules/aurora-refuge-polish.js
       - name: Install isolated browser tools
         run: |
           mkdir -p /tmp/windgate-tools
@@ -48,7 +51,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add modules/aurora-refuge.js sandbox-aurora-v7.html
+          git add --sparse modules/aurora-refuge.js modules/aurora-refuge-history.js modules/aurora-refuge-polish.js sandbox-aurora-v7.html
           if ! git diff --cached --quiet; then
             git commit -m 'feat: publish verified Windgate 07 refugee island preview'
             git push origin HEAD:main
