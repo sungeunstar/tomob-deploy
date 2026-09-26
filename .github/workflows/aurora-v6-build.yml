@@ -1,0 +1,45 @@
+name: Aurora 06 assemble
+on:
+  push:
+    paths:
+      - 'modules/aurora-expedition-layout.js'
+      - 'scripts/build-aurora-v6.py'
+      - '.github/workflows/aurora-v6-build.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: aurora-v6-assemble-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Verify baseline and build isolated module
+        run: |
+          test "$(git hash-object modules/aurora-artpass.js)" = fb13b4c67b5e90f107d6f2fe72110c39fb974935
+          python3 scripts/build-aurora-v6.py
+          test "$(git hash-object modules/aurora-expedition.js)" = 2fcde2d7c64dee7617da8cb02f88c7f7f9e3faa3
+          node --input-type=module --check < modules/aurora-expedition.js
+          node --input-type=module --check < modules/aurora-expedition-layout.js
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const text=fs.readFileSync('modules/aurora-expedition-layout.js','utf8');
+          const m=await import('data:text/javascript;base64,'+Buffer.from(text).toString('base64'));
+          const f=m.createExpeditionField(), checks=m.inspectSightlines(f);
+          if(!Array.from(f.heights).every(Number.isFinite)||checks.some(c=>!c.pass)) throw new Error('Terrain or sightline regression');
+          console.log(JSON.stringify({vertices:f.heights.length,sightlines:checks},null,2));
+          JS
+      - name: Commit generated file only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add modules/aurora-expedition.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: materialize reviewed Aurora 06 map module'
+            git push origin HEAD:${{ github.ref_name }}
+          fi
