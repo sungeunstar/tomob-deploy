@@ -1,7 +1,4 @@
-/** Windgate 07. The old route graph is protected; the land outside it is reauthored.
- * Proposed island story, not new global canon: refugees inhabit a drowned hill sanctuary.
- * No gameplay controller, economy, save, or main-world changes.
- */
+/** Windgate 07: proposed refugee-island history, protected native routes. */
 import * as L from './aurora-expedition-layout.js';
 export * from './aurora-expedition-layout.js';
 const {SIZE,N,BUILDINGS,BASINS,fallAxes,SUMMIT,smooth,mix,clamp,axisDistance,basinRadius}=L;
@@ -24,11 +21,17 @@ export function createExpeditionField(){
   const macro=(terrainNoise(wx*.036,wz*.028)-.5)*7.2+(terrainNoise(wx*.078+4,wz*.069)-.5)*2.8;
   const erosion=Math.sin(y*.73+x*.039+z*.025)*(1.0+terrainNoise(x*.08,z*.07))+(terrainNoise(x*.18,z*.18)-.5)*.65;
   let h=y+(macro+erosion*smooth(8,22,y))*(1-protect)*smooth(-7,3,y);
-  if(y<2){const shelf=-6+2.8*terrainNoise(x*.036+5,z*.029);h=Math.max(h,mix(-8,shelf,smooth(.5,1.1,field.boundary(x,z))));}
   const exposed=smooth(52,115,x)*(1-smooth(36,85,z));
   h-=exposed*(1-protect)*smooth(-2,4,y)*(1-smooth(9,19,y))*(2+3*terrainNoise(x*.07,z*.09));
+  // The shore shelf follows an irregular island boundary, not the square sample grid.
+  const bound=field.boundary(x,z),outer=Math.max(smooth(1.06,1.40,bound),smooth(156,177,Math.max(Math.abs(x),Math.abs(z))));
+  if(y<2&&path>8)h=mix(h,-85,outer);
   const river=riverSample(x,z),bowlSafe=BASINS.every(b=>basinRadius(b,x,z)>1.03);
   if(river.d<7&&path>6.5&&bowlSafe){const bed=river.y-.72+.13*Math.sin(z*.6);h=mix(h,bed,1-smooth(1.7,5.8,river.d));}
+  // A real eroded saddle restores only the intentional harbor-to-summit glimpse.
+  // Do not remove the final pass, the forest curtain, or a walkable path.
+  const glimpse=axisDistance([-64,108,3,-84],x,z);
+  if(glimpse.t>.06&&glimpse.t<.58&&glimpse.d<11&&path>4.8){const ceiling=mix(7.15,76,glimpse.t)-1.5;h=mix(h,Math.min(h,ceiling),1-smooth(4.5,11,glimpse.d));}
   field.heights[k]=h;
  }
  field.ecology=(x,z)=>ecology(x,z,field.height(x,z));field.outflow=OUTFLOW;
@@ -38,6 +41,6 @@ export function createExpeditionField(){
  field.points.find(p=>p.id==='harbor').name='난파목으로 다시 세운 항구';
  field.points.find(p=>p.id==='grove').name='잠긴 왕국의 옛 순례길';
  field.points.find(p=>p.id==='shrine').name='깨어난 첫 별의 성소';
- field.naturalization={protectedRouteWidth:10.6,oldVertices:before.length,sharedCollisionGrid:true,outletToSea:true};
+ field.naturalization={protectedRouteWidth:10.6,oldVertices:before.length,sharedCollisionGrid:true,outletToSea:true,irregularDeepShelf:true,physicalHarborSaddle:true};
  return field;
 }
