@@ -38,3 +38,4 @@ try{
  console.log('WINDGATE12_SUMMARY',JSON.stringify({accepted:report.accepted,routes:report.routes.map(r=>[r.id,r.pass]),sightlines:report.sightlines,vault:report.vaultGeometry,errors:report.errors,http:requests}));
  if(!report.accepted)process.exitCode=1;
 }catch(e){report.fatal=e.stack;report.accepted=false;process.exitCode=1;console.error(e);try{report.boot=await page.evaluate(()=>({note:document.getElementById('load-note')?.textContent,errors:window.__auroraErrors}));await page.screenshot({path:out+'/failure.png'});}catch{}}finally{report.errors=[...new Set(errors)];report.httpErrors=requests;await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await browser?.close();server.close();}
+// trigger: Windgate 12 authored preview verification
