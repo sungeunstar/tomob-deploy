@@ -17,7 +17,7 @@ import {initPhysics} from './modules/physics.js';
 import {initWater} from './modules/water.js';
 import {initInput} from './modules/input.js';
 import {initPlayer,KAY_CHARS} from './modules/player.js';
-import {initAuroraRefuge} from './modules/aurora-refuge.js?v=7b';
+import {initAuroraRefuge} from './modules/aurora-refuge.js?v=7c';
 const $=s=>document.getElementById(s),q=new URLSearchParams(location.search),overview=q.get('view')==='overview',delay=ms=>new Promise(r=>setTimeout(r,ms));
 try{
  const ctx=initCore();window.ctx=ctx;ctx.renderer.outputColorSpace=THREE.SRGBColorSpace;ctx.renderer.toneMapping=THREE.ACESFilmicToneMapping;ctx.renderer.toneMappingExposure=1.02;

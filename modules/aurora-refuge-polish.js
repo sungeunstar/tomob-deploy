@@ -21,9 +21,9 @@ export function polishRefuge(ctx,island){
 `);s.fragmentShader='varying vec3 rWorld; varying vec3 rNormal;\n'+NOISE+'\n'+s.fragmentShader;s.fragmentShader=s.fragmentShader.replace('#include <map_fragment>',`#include <map_fragment>
 float rSteep=1.-smoothstep(.50,.83,abs(normalize(rNormal).y));
 float rBroad=rFbm(rWorld.xz*.105+rWorld.y*.018);
-float rStrata=.5+.5*sin(rWorld.y*3.1+rFbm(rWorld.xz*.23)*2.4);
+float rStrata=.5+.5*sin(rWorld.y*1.1+rFbm(rWorld.xz*.15)*5.0);
 float rFine=rFbm(vec2(rWorld.x+rWorld.z*.35,rWorld.y)*1.9);
-diffuseColor.rgb*=mix(.80+.34*rBroad,.66+.24*rBroad+.12*rStrata+.13*rFine,rSteep);
+diffuseColor.rgb*=mix(.80+.34*rBroad,.72+.18*rBroad+.05*rStrata+.13*rFine,rSteep);
 float rDeep=1.-smoothstep(-80.,-5.,rWorld.y);
 diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.024,.075,.078),rDeep);
 `);};m.customProgramCacheKey=()=> 'windgate07-integrated-strata';m.needsUpdate=true;}
@@ -49,7 +49,7 @@ diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.024,.075,.078),rDeep);
   const o=add(slabG,cliffMat,x,y-h*.32,z);o.scale.set(w,h,2.5+rng()*2.4);o.rotation.y=Math.atan2(dx,dz)+(rng()-.5)*.14;o.rotation.z=(rng()-.5)*.13;o.updateMatrixWorld(true);island.addTrimesh(o);placed.push({x,z});
  }
  // The large old rock's exposed edges share weathering but not the same perfect outline.
- const columnG=new THREE.CylinderGeometry(1,1.35,1,6,2,false);gs.add(columnG);
+ const columnG=new THREE.CylinderGeometry(.10,1.35,1,7,4,false);gs.add(columnG);
  for(const [x,z,h,w]of[[-240,-140,36,12],[-260,64,19,9],[245,102,24,11],[217,-196,41,14],[-178,209,16,7]]){const o=add(columnG,cliffMat,x,-4+h*.5,z);o.scale.set(w,h,w*.73);o.rotation.y=rng()*6.28;}
  // Complete the distant ocean around the native detailed 3000m mesh; no surface over ponds.
  const pos=[],ix=[];function rect(x0,x1,z0,z1,nx,nz){const start=pos.length/3;for(let j=0;j<=nz;j++)for(let i=0;i<=nx;i++)pos.push(x0+(x1-x0)*i/nx,0,z0+(z1-z0)*j/nz);for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=start+j*(nx+1)+i;ix.push(k,k+nx+1,k+1,k+1,k+nx+1,k+nx+2);}}
@@ -62,8 +62,7 @@ diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.024,.075,.078),rDeep);
 #include <colorspace_fragment>
 }`});ms.add(skyM);const skyG=new THREE.SphereGeometry(7000,32,18);gs.add(skyG);const sky=new THREE.Mesh(skyG,skyM);sky.name='Refuge sky atmosphere';sky.renderOrder=-100;sky.frustumCulled=false;root.add(sky);
  // Native portal shaders unchanged; restrain the sample's overexposed glow only.
- island.portal.U.uGlow.value.set('#40959c');island.portal.U.uDeep.value.set('#102242');island.portal.setOpen(.82);
- const darkBack=add(new THREE.CircleGeometry(1,40).scale(2.65,4.4,1),mat('#10242f',{side:THREE.DoubleSide}),cx,py+5.65,cz-.95,false,false);darkBack.castShadow=false;darkBack.receiveShadow=false;
+ island.portal.U.uGlow.value.set('#57b8c5');island.portal.U.uDeep.value.set('#102242');island.portal.setOpen(.95);
  // Compact static batching preserves the original collision proxies.
  root.updateMatrixWorld(true);const groups=new Map();for(const o of staticMeshes){if(!groups.has(o.material))groups.set(o.material,[]);groups.get(o.material).push(o);}for(const [m,os]of groups){if(os.length<2)continue;const temp=os.map(o=>{const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrixWorld);for(const a of Object.keys(g.attributes))if(!['position','normal','uv'].includes(a))g.deleteAttribute(a);if(!g.attributes.uv)g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));return g;});const g=mergeGeometries(temp,false);temp.forEach(g=>g.dispose());if(g){os.forEach(o=>o.visible=false);gs.add(g);const o=new THREE.Mesh(g,m);o.name='Batched integrated geology';o.castShadow=o.receiveShadow=true;root.add(o);}}
  const hook=ctx.onUpdate(()=>{sky.position.copy(ctx.camera.position);distant.position.copy(ctx.water.mesh.position);});
