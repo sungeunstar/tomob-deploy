@@ -65,6 +65,16 @@ export function dressWindgate10(ctx,island){
  for(let i=0;i<rows.length;i++){const r=rows[i];for(let j=0;j<=10;j++){const l=(j/10*2-1)*width,edge=Math.abs(l)/width;pos.push(...toWorld(r,l,-.01+edge*edge*.06));const shade=.58+.3*Math.abs(r.u-.5)*2;colors.push(shade,shade,shade);uv.push(j/10,r.u*18);if(i<rows.length-1&&j<10){const k=i*11+j;ix.push(k,k+1,k+11,k+1,k+12,k+11);}}}
  function geometry(p,c,u,i){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));if(c)g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));if(u)g.setAttribute('uv',new THREE.Float32BufferAttribute(u,2));g.setIndex(i);g.computeVertexNormals();return g;}
  const floor=add(geometry(pos,colors,uv,ix),floorMat,[0,0,0],[1,1,1],[0,0,0],true,false);floor.name='Vault continuous walkable floor';
+ // Grounded shoulders join the floor ribbon to the exterior terrain at both mouths.
+ const ap=[],ac=[];
+ for(const [lo,hi] of [[0,24],[97,120]])for(let i=lo;i<hi;i++)for(const side of[-1,1]){
+  const a=rows[i],b=rows[i+1],v=[];
+  for(const r of[a,b]){const inner=toWorld(r,side*3.45,.025),outer=toWorld(r,side*5.1,0);outer[1]=field.height(outer[0],outer[2])+.022;v.push(inner,outer);}
+  if(v[1][1]>a.p.y+.8||v[3][1]>b.p.y+.8)continue;
+  for(const k of [0,2,1,1,2,3]){ap.push(...v[k]);const c=k%2?.9:.8;ac.push(c,c,c);}
+ }
+ const ag=new THREE.BufferGeometry();ag.setAttribute('position',new THREE.Float32BufferAttribute(ap,3));ag.setAttribute('color',new THREE.Float32BufferAttribute(ac,3));ag.computeVertexNormals();
+ add(ag,floorMat,[0,0,0],[1,1,1],[0,0,0],true,false).name='Mouth embankments grounded into terrain';
  // Open-ended inward-facing rock shell clipped where it meets the exterior landscape.
  const wp=[],wc=[],wu=[],wi=[],cross=[[-3.52,-.32],[-3.52,2.2]];
  for(let j=1;j<20;j++){const a=j/20*Math.PI;cross.push([-3.52*Math.cos(a),2.2+3.09*Math.sin(a)]);}cross.push([3.52,2.2],[3.52,-.32]);
