@@ -13,6 +13,18 @@ v=once(v,"const cube=new THREE.BoxGeometry(1,1,1)",`// World-space mineral varia
  const cube=new THREE.BoxGeometry(1,1,1)`);
 v=once(v,"dark=mat('#505b50')","dark=mat('#656e60')");
 v=once(v,'for(let i=0;i<75;i++){const r=rows','for(let i=0;i<43;i++){const r=rows');
+v=once(v,'const shell=add(geometry(wp,wc,wu,inside),rock',`// Clip complete wall triangles against terrain, preserving UVs and colour.
+ function clippedShell(){const op=[],oc=[],ou=[];
+  const point=k=>[...wp.slice(k*3,k*3+3),...wc.slice(k*3,k*3+3),...wu.slice(k*2,k*2+2)];
+  const value=p=>{const q=vaultSample(p[0],p[2]);return Math.min(field.height(p[0],p[2])-p[1]+.055,Math.max(q.u-.19,field.nearPath(p[0],p[2]).d-2.6));};
+  const lerp=(a,b,t)=>a.map((x,k)=>mix(x,b[k],t));
+  for(let i=0;i<wi.length;i+=3){const tri=[point(wi[i]),point(wi[i+1]),point(wi[i+2])],poly=[];
+   for(let j=0;j<3;j++){const a=tri[j],b=tri[(j+1)%3],fa=value(a),fb=value(b);if(fa>=0)poly.push(a);if((fa>=0)!==(fb>=0)){let lo=0,hi=1;for(let k=0;k<14;k++){const t=(lo+hi)/2;if((value(lerp(a,b,t))>=0)===(fa>=0))lo=t;else hi=t;}poly.push(lerp(a,b,(lo+hi)/2));}}
+   for(let j=1;j<poly.length-1;j++)for(const p of[poly[0],poly[j],poly[j+1]]){op.push(...p.slice(0,3));oc.push(...p.slice(3,6));ou.push(...p.slice(6,8));}
+  }
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(op,3));g.setAttribute('color',new THREE.Float32BufferAttribute(oc,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(ou,2));g.computeVertexNormals();return g;
+ }
+ const shell=add(clippedShell(),rock`);
 source=once(source,'if(y<6.7||field.slope(x,z)>.62','if(vaultReserve(x,z,2)||y<6.7||field.slope(x,z)>.62');
 const stamp=(process.env.GITHUB_SHA||'local-review').slice(0,10);source=source.replaceAll('?v=10b','?v='+stamp);page=page.replaceAll('?v=10b','?v='+stamp);
 const outputs={'modules/windgate10-vault-runtime.js':v,'modules/aurora-passage.js':source,'sandbox-aurora-v10.html':page};
