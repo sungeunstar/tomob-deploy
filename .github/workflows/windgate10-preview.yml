@@ -6,6 +6,7 @@ on:
       - 'modules/windgate10-vault.js'
       - 'scripts/build-windgate10.mjs'
       - 'scripts/finish-windgate10.mjs'
+      - 'scripts/signs-windgate10.mjs'
       - 'scripts/qa-windgate10.mjs'
       - '.github/workflows/windgate10-preview.yml'
   workflow_dispatch:
@@ -31,6 +32,7 @@ jobs:
         run: |
           node scripts/build-windgate10.mjs
           node scripts/finish-windgate10.mjs
+          node scripts/signs-windgate10.mjs
           node --check modules/aurora-passage.js
           node --check modules/windgate10-vault-runtime.js
           node --check modules/windgate10-polish.js
