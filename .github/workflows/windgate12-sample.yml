@@ -1,0 +1,13 @@
+name: Windgate 12 height sampler
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/diagnose-windgate12.mjs'
+      - '.github/workflows/windgate12-sample.yml'
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/diagnose-windgate12.mjs
