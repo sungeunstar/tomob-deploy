@@ -1,0 +1,37 @@
+name: Aurora 05 browser QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/aurora-artpass.js'
+      - 'sandbox-aurora-v5.html'
+      - 'scripts/qa-aurora-v5.mjs'
+      - '.github/workflows/aurora-v5-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: aurora-v5-qa
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Prepare isolated test tools
+        run: |
+          mkdir runner && cd runner
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1 sharp@0.33.5
+          npx playwright install --with-deps chromium
+          curl --fail --location --retry 3 "https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/scripts/qa-aurora-v5.mjs" --output qa.mjs
+      - name: Verify preview and capture actual rendered frames
+        run: cd runner && node qa.mjs
+      - name: Save browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-v5-browser-evidence
+          path: runner/artifacts
+          retention-days: 7
+          if-no-files-found: warn
