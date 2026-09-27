@@ -17,6 +17,8 @@ try{
  if(state.ready!=='true')throw new Error('BOOT '+JSON.stringify(state));
  await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
  report.native=await page.evaluate(async()=>{await window.__auroraQA.nativeTest();return window.__auroraQA.testResult;});
+ // nativeTest intentionally exits pointer lock; reacquire it before route traversal.
+ await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
  report.routes=[];for(const id of['mine15','mine15-return','mine','main'])report.routes.push(await page.evaluate(id=>window.__auroraQA.routeTest(id),id));
  report.geometry=await page.evaluate(async()=>{const THREE=await import('three'),a=window.__auroraQA,m=a.island.mine15,ray=new THREE.Raycaster();ray.firstHitOnly=true;const ceilings=[];for(const i of[12,30,48,66]){const p=m.rows[i];ray.set(new THREE.Vector3(p[0],p[1]+.2,p[2]),new THREE.Vector3(0,1,0));ray.far=12;const h=ray.intersectObjects(a.island.collide,true)[0];ceilings.push({i,d:h?.distance,obj:h?.object.name});}const s=m.rows[8],e=m.rows[80],A=new THREE.Vector3(s[0],s[1]+1.5,s[2]),B=new THREE.Vector3(e[0],e[1]+1.5,e[2]),d=B.clone().sub(A);ray.set(A,d.normalize());ray.far=A.distanceTo(B)-.2;return{ceilings,directViewBlocked:ray.intersectObjects(a.island.collide,true).length>0,oreCount:m.oreNodes.length,cut:m.cut};});
  async function shot(id){await page.evaluate(id=>{window.__auroraQA.go(id);for(let i=0;i<60;i++)ctx.tick(1/60);ctx.renderer.render(ctx.scene,ctx.camera);},id);await page.screenshot({path:out+'/'+id+'.png'});}
