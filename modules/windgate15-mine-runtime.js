@@ -42,7 +42,7 @@ export function prepareMine15(field){
  field.mine15={rows:mineRows,curve};
  const oldSupport=field.support.bind(field);
  field.support=(x,z)=>{const q=mineSample15(x,z);return q.d<2.95&&q.u>.01&&q.u<.99?q.y:oldSupport(x,z);};
- const pts=mineRows.map(r=>[r.p.x,r.p.z,r.p.y]);
+ const routeRows=mineRows.filter((_,i)=>i%5===0||i===mineRows.length-1),pts=routeRows.map(r=>[r.p.x,r.p.z,r.p.y]);
  field.segmentsList=field.segmentsList.slice();
  for(let i=0;i<pts.length-1;i++)field.segmentsList.push({a:pts[i],b:pts[i+1],id:'mine15',width:5.6,bridge:true});
  for(let i=pts.length-1;i>0;i--)field.segmentsList.push({a:pts[i],b:pts[i-1],id:'mine15-return',width:5.6,bridge:true});
