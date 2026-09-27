@@ -105,8 +105,11 @@ export async function dressMine15(ctx,island){
  const railG=new THREE.BoxGeometry(.09,.07,1.2),tieG=new THREE.BoxGeometry(1.45,.07,.16);gs.add(railG);gs.add(tieG);
  for(let ri=5;ri<82;ri+=3){const r=mineRows[ri],ang=Math.atan2(r.t.x,r.t.z);for(const side of[-.52,.52])add(railG,metal,toWorld(r,side,.08),[1,1,1],[0,ang,0],false);add(tieG,woodFallback,toWorld(r,0,.025),[1,1,1],[0,ang,0],false);}
  root.updateMatrixWorld(true);
- const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;root.removeFromParent();gs.forEach(g=>{g.disposeBoundsTree?.();g.dispose();});ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());prev();};
- island.mine15={rows:mineRows.map(r=>r.p.toArray()),sample:mineSample15,cut:field.mine15.cut,length:curve.getLength(),oreNodes,wallMeshes};
+ // Retract the third-person camera when a physical mine wall sits between camera and avatar.
+ const ray=new THREE.Raycaster(),eye=new THREE.Vector3(),dir=new THREE.Vector3();ray.firstHitOnly=true;let cameraCorrections=0;
+ const cameraHook=ctx.onUpdate(()=>{if(!ctx.player?.third)return;const p=ctx.player.pos;if(!mineReserve15(p.x,p.z,7))return;eye.set(p.x,p.y+.48,p.z);dir.copy(ctx.camera.position).sub(eye);const length=dir.length();if(length<.25)return;ray.set(eye,dir.normalize());ray.far=length+.3;const hit=ray.intersectObjects(island.collide,true).find(h=>h.distance>.08);if(hit&&hit.distance<length+.12){ctx.camera.position.copy(eye).addScaledVector(dir,Math.max(.25,hit.distance-.28));cameraCorrections++;}});
+ const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(cameraHook);root.removeFromParent();gs.forEach(g=>{g.disposeBoundsTree?.();g.dispose();});ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());prev();};
+ island.mine15={rows:mineRows.map(r=>r.p.toArray()),sample:mineSample15,cut:field.mine15.cut,length:curve.getLength(),oreNodes,wallMeshes,get cameraCorrections(){return cameraCorrections;}};
  island.mineOreNodes=oreNodes;island.qualityVersion='aurora-v15-carved-mine';
  return island.mine15;
 }
