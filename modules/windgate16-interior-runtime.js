@@ -152,11 +152,11 @@ export async function initMineInterior16(ctx,island){
   else if(zone==='mine'&&cooldown<=0&&Math.hypot(p.x-exitTrigger.x,p.z-exitTrigger.z)<1.5){exitMine();}
   if(zone==='mine'&&ctx.player.third){eye.set(p.x,p.y+.48,p.z);dir.copy(ctx.camera.position).sub(eye);const length=dir.length();if(length>.2){ray.set(eye,dir.normalize());ray.far=length+.2;const hit=ray.intersectObjects(proxyMeshes,true).find(h=>h.distance>.08);if(hit&&hit.distance<length+.12){ctx.camera.position.copy(eye).addScaledVector(dir,Math.max(.25,hit.distance-.25));cameraCorrections++;}}}
  });
- async function testMineRoute(reverse=false){
+ async function testMineRoute(reverse=false,step=1/60){
   const emit=(type,code)=>window.dispatchEvent(new KeyboardEvent(type,{code,bubbles:true})),old=ctx.getRenderOverride(),pts=(reverse?samples.slice().reverse():samples).filter((_,i)=>i%4===0||i===samples.length-1),result={reverse,pass:true,failed:null,travel:0};
   try{
-   root.visible=true;zone='mine';setMineLook();const s=pts[0].p;ctx.player.setSpawn(s.x,27.45,s.z);for(let i=0;i<50;i++)ctx.tick(1/60);ctx.setRenderOverride(()=>{});emit('keydown','KeyW');emit('keydown','ShiftLeft');let prev={...ctx.player.pos};
-   for(let j=1;j<pts.length;j++){const t=pts[j].p;let n=0;while(Math.hypot(t.x-ctx.player.pos.x,t.z-ctx.player.pos.z)>.72&&n<220){const p=ctx.player.pos;ctx.player.setYaw(Math.atan2(t.x-p.x,p.z-t.z));ctx.tick(1/60);n++;const q=ctx.player.pos;result.travel+=Math.hypot(q.x-prev.x,q.z-prev.z);prev={...q};if(!Number.isFinite(q.y)||q.y<20){result.pass=false;result.failed={j,reason:'fell',pos:{...q}};break;}}if(!result.pass)break;if(n>=220){result.pass=false;result.failed={j,reason:'blocked',pos:{...ctx.player.pos},target:[t.x,t.z]};break;}}
+   root.visible=true;zone='mine';setMineLook();const s=pts[0].p;ctx.player.setSpawn(s.x,27.45,s.z);for(let i=0;i<30;i++)ctx.tick(step);ctx.setRenderOverride(()=>{});emit('keydown','KeyW');emit('keydown','ShiftLeft');let prev={...ctx.player.pos};
+   for(let j=1;j<pts.length;j++){const t=pts[j].p;let n=0;while(Math.hypot(t.x-ctx.player.pos.x,t.z-ctx.player.pos.z)>.72&&n<150){const p=ctx.player.pos;ctx.player.setYaw(Math.atan2(t.x-p.x,p.z-t.z));ctx.tick(step);n++;const q=ctx.player.pos;result.travel+=Math.hypot(q.x-prev.x,q.z-prev.z);prev={...q};if(!Number.isFinite(q.y)||q.y<20){result.pass=false;result.failed={j,reason:'fell',pos:{...q}};break;}}if(!result.pass)break;if(n>=150){result.pass=false;result.failed={j,reason:'blocked',pos:{...ctx.player.pos},target:[t.x,t.z]};break;}}
   }finally{emit('keyup','KeyW');emit('keyup','ShiftLeft');ctx.setRenderOverride(old);ctx.renderer.render(scene,ctx.camera);}
   result.travel=+result.travel.toFixed(2);return result;
  }
