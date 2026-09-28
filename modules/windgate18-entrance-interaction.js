@@ -13,9 +13,10 @@ export function initMineEntranceInteraction18(ctx,island){
   document.body.appendChild(wrap);
   const fade=document.createElement('div');Object.assign(fade.style,{position:'fixed',inset:'0',zIndex:'9999',background:'#050707',opacity:'0',transition:'opacity 180ms ease',pointerEvents:'none'});document.body.appendChild(fade);
   let active=false,busy=false;
-  const hook=ctx.onUpdate(()=>{const p=ctx.player?.pos;if(!p||busy)return;const near=Math.hypot(p.x-trigger.x,p.z-trigger.z)<trigger.r;active=near;wrap.style.display=near?'flex':'none';});
+  const canEnter=()=>{const p=ctx.player?.pos;return !!p&&Math.hypot(p.x-trigger.x,p.z-trigger.z)<trigger.r;};
+  const hook=ctx.onUpdate(()=>{if(busy)return;active=canEnter();wrap.style.display=active?'flex':'none';});
   async function enter(){
-    if(!active||busy)return;busy=true;wrap.style.display='none';fade.style.opacity='1';
+    if(!canEnter()||busy)return;busy=true;wrap.style.display='none';fade.style.opacity='1';
     const ret='./sandbox-aurora-v18.html?place=mine-yard17&from=mine';
     sessionStorage.setItem('tomob:last-instance','windgate-mine-01');
     sessionStorage.setItem('tomob:instance-return',ret);
@@ -25,6 +26,6 @@ export function initMineEntranceInteraction18(ctx,island){
   const onKey=e=>{if(e.code==='KeyE'&&!e.repeat){e.preventDefault();enter();}};
   addEventListener('keydown',onKey);
   const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(hook);removeEventListener('keydown',onKey);wrap.remove();fade.remove();prev();};
-  island.mineEntrance18={trigger,enter};
+  island.mineEntrance18={trigger,enter,canEnter,get active(){return canEnter();}};
   return island.mineEntrance18;
 }
