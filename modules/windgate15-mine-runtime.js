@@ -9,12 +9,14 @@ const MINE=BUILDINGS.find(b=>b.id==='mine')||{x:-112,z:-48,y:35};
 const APPROACH={x:-97,z:-34,y:33};
 const dx=MINE.x-APPROACH.x,dz=MINE.z-APPROACH.z,len=Math.hypot(dx,dz)||1,fx=dx/len,fz=dz/len;
 const controls=[
- [MINE.x+fx*1.2,MINE.z+fz*1.2,MINE.y+.05],
- [MINE.x+fx*6.8,MINE.z+fz*6.8,MINE.y+.12],
- [MINE.x+fx*12.3-1.5,MINE.z+fz*12.3+1.0,MINE.y+.28],
- [MINE.x+fx*17.0-3.6,MINE.z+fz*17.0+2.4,MINE.y+.45],
- [MINE.x+fx*21.5-3.2,MINE.z+fz*21.5+5.0,MINE.y+.62],
- [MINE.x+fx*25.5-.8,MINE.z+fz*25.5+7.0,MINE.y+.72]
+ // Start at the actual front face of the existing mine facade, then continue through its open doorway.
+ [MINE.x-fx*7.2,MINE.z-fz*7.2,MINE.y+.02],
+ [MINE.x-fx*1.8,MINE.z-fz*1.8,MINE.y+.06],
+ [MINE.x+fx*4.8,MINE.z+fz*4.8,MINE.y+.14],
+ [MINE.x+fx*10.8-1.2,MINE.z+fz*10.8+.8,MINE.y+.28],
+ [MINE.x+fx*16.0-3.2,MINE.z+fz*16.0+2.2,MINE.y+.44],
+ [MINE.x+fx*20.8-2.9,MINE.z+fz*20.8+4.7,MINE.y+.60],
+ [MINE.x+fx*24.8-.9,MINE.z+fz*24.8+6.8,MINE.y+.72]
 ];
 const curve=new THREE.CatmullRomCurve3(controls.map(([x,z,y])=>new THREE.Vector3(x,y,z)),false,'centripetal');
 export const mineRows=Array.from({length:91},(_,i)=>{const p=curve.getPoint(i/90),t=curve.getTangent(i/90);t.y=0;t.normalize();return{p,t,n:new THREE.Vector3(-t.z,0,t.x),u:i/90};});
@@ -47,7 +49,7 @@ export function prepareMine15(field){
  for(let i=0;i<pts.length-1;i++)field.segmentsList.push({a:pts[i],b:pts[i+1],id:'mine15',width:5.6,bridge:true});
  for(let i=pts.length-1;i>0;i--)field.segmentsList.push({a:pts[i],b:pts[i-1],id:'mine15-return',width:5.6,bridge:true});
  field.routeDefs=field.routeDefs.slice();field.routeDefs.push({id:'mine15',name:'바위그늘 광산 내부',width:5.6,points:pts});
- const stations=[['mine-mouth','광산 입구',.04],['mine-bend','광산 안쪽 굽이',.48],['mine-room','광물 작업실',.90]];
+ const stations=[['mine-mouth','광산 입구',.025],['mine-bend','광산 안쪽 굽이',.50],['mine-room','광물 작업실',.88]];
  for(const [id,name,u] of stations){const p=curve.getPoint(u),q=curve.getPoint(clamp(u+.09));field.points.push({id,name,x:p.x,y:p.y,z:p.z,r:5,target:[q.x,q.y+1.5,q.z],text:'산 아래로 이어지는 실제 작업갱'});}
  return field;
 }
@@ -81,8 +83,8 @@ export async function dressMine15(ctx,island){
  const wp=[],wu=[],wi=[];
  for(let i=0;i<mineRows.length;i++){const r=mineRows[i];for(let j=0;j<cross.length;j++){const [l,y]=cross[j];wp.push(...toWorld(r,l,y));wu.push(j/cross.length,r.u*7);if(i<mineRows.length-1&&j<cross.length-1){const k=i*cross.length+j;wi.push(k,k+1,k+cross.length,k+1,k+cross.length+1,k+cross.length);}}}
  const wg=new THREE.BufferGeometry();wg.setAttribute('position',new THREE.Float32BufferAttribute(wp,3));wg.setAttribute('uv',new THREE.Float32BufferAttribute(wu,2));wg.setIndex(wi);wg.computeVertexNormals();const shell=add(wg,wallMat,[0,0,0],[1,1,1],[0,0,0],true);shell.name='Mine rock walls and ceiling';wallMeshes.push(shell);
- // Closed ore-room end cap.
- const end=mineRows[mineRows.length-1],endAng=Math.atan2(end.t.x,end.t.z);add(new THREE.BoxGeometry(6.1,4.4,.55),wallMat,toWorld(end,0,2.0),[1,1,1],[0,endAng,0],true).name='Mine ore-room back wall';
+ // The uncut mountain beyond the last row is the natural back wall; no duplicate collider here.
+ const end=mineRows[mineRows.length-1];
  // Mine-kit props only: supports, lanterns, crates, planks and ores.
  const KIT=new URL('../mine-kit/',import.meta.url).href,loader=new FBXLoader(),texLoader=new THREE.TextureLoader(),cache=new Map();
  const files={support1:'Models/Props/Support1.fbx',support2:'Models/Props/Support2.fbx',lantern:'Models/Props/Lantern.fbx',crate:'Models/Props/Crate.fbx',planks:'Models/Props/Planks.fbx',ore:'Models/Rocks/Ore.fbx',rock1:'Models/Rocks/Rock1.fbx'};
@@ -110,6 +112,6 @@ export async function dressMine15(ctx,island){
  const cameraHook=ctx.onUpdate(()=>{if(!ctx.player?.third)return;const p=ctx.player.pos;if(!mineReserve15(p.x,p.z,7))return;eye.set(p.x,p.y+.48,p.z);dir.copy(ctx.camera.position).sub(eye);const length=dir.length();if(length<.25)return;ray.set(eye,dir.normalize());ray.far=length+.3;const hit=ray.intersectObjects(island.collide,true).find(h=>h.distance>.08);if(hit&&hit.distance<length+.12){ctx.camera.position.copy(eye).addScaledVector(dir,Math.max(.25,hit.distance-.28));cameraCorrections++;}});
  const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(cameraHook);root.removeFromParent();gs.forEach(g=>{g.disposeBoundsTree?.();g.dispose();});ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());prev();};
  island.mine15={rows:mineRows.map(r=>r.p.toArray()),sample:mineSample15,cut:field.mine15.cut,length:curve.getLength(),oreNodes,wallMeshes,get cameraCorrections(){return cameraCorrections;}};
- island.mineOreNodes=oreNodes;island.qualityVersion='aurora-v15c-clear-mine';
+ island.mineOreNodes=oreNodes;island.qualityVersion='aurora-v15d-open-mouth';
  return island.mine15;
 }
