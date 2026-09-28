@@ -23,9 +23,8 @@ export function initMineEntranceInteraction18(ctx,island){
     await new Promise(r=>setTimeout(r,220));
     location.href='./mine-windgate-01.html?return='+encodeURIComponent(ret);
   }
-  const onKey=e=>{if(e.code==='KeyE'&&!e.repeat){e.preventDefault();enter();}};
-  addEventListener('keydown',onKey);
-  const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(hook);removeEventListener('keydown',onKey);wrap.remove();fade.remove();prev();};
+  const offE=ctx.input?.register?ctx.input.register('KeyE',()=>enter(),{when:()=>canEnter()}):(()=>{const h=e=>{if(e.code==='KeyE'&&!e.repeat)enter();};addEventListener('keydown',h);return()=>removeEventListener('keydown',h);})();
+  const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(hook);offE?.();wrap.remove();fade.remove();prev();};
   island.mineEntrance18={trigger,enter,canEnter,get active(){return canEnter();}};
   return island.mineEntrance18;
 }
