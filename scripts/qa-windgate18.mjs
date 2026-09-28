@@ -25,7 +25,8 @@ try{
  const triggerVisible=await page.evaluate(()=>[...document.querySelectorAll('div')].some(x=>x.textContent.includes('바위그늘 광산 들어가기')&&getComputedStyle(x).display!=='none'));
  report.entryPrompt=triggerVisible;
  if(!triggerVisible)throw new Error('Mine E prompt not visible at entrance trigger');
- const nav=page.waitForURL(/mine-windgate-01\.html/,{timeout:10000});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await nav;
+ await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
+ const nav=page.waitForURL(/mine-windgate-01\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await nav;
 
  await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.body.dataset.fail==='true',null,{timeout:55000});
  report.mineBoot=await page.evaluate(()=>({ready:document.body.dataset.ready,fail:document.body.dataset.fail,r:window.__mineQA?.report(),errors:window.__mineErrors}));
@@ -40,7 +41,8 @@ try{
  const exitVisible=await page.evaluate(()=>[...document.querySelectorAll('div')].some(x=>x.textContent.includes('섬으로 나가기')&&getComputedStyle(x).display!=='none'));
  report.exitPrompt=exitVisible;
  if(!exitVisible)throw new Error('Mine exit E prompt not visible');
- const back=page.waitForURL(/sandbox-aurora-v18\.html/,{timeout:10000});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await back;
+ await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
+ const back=page.waitForURL(/sandbox-aurora-v18\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await back;
 
  report.accepted=report.entryPrompt&&report.main.pass&&report.pocket.pass&&report.exitPrompt&&report.mineBoot.r?.oreNodes===5&&report.errors.length===0;
  if(!report.accepted)process.exitCode=1;
