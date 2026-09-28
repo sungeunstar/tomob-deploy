@@ -93,10 +93,7 @@ export async function authorWindgate17(ctx,island){
     const awning=new THREE.Mesh(hg,hm);awning.position.set(harbor.x+6.2,hy+3.1,harbor.z+3.5);awning.rotation.x=-Math.PI/2+.16;awning.rotation.z=.12;root.add(awning);
   }
 
-  // --- Summit: reduce clutter, add only a few weathered stones beyond the existing portal.
-  for(const [a,r,s] of [[.7,12.2,1.15],[2.3,11.5,.85],[4.7,13.0,1.0]]){
-    const x=SUMMIT.x+Math.cos(a)*r,z=SUMMIT.z+Math.sin(a)*r;await place('rock2',x,z,a,'rock',s);
-  }
+  // Summit dressing is fully owned by windgate17-summit-manual.js.
 
   island.field.points.push({id:'mine-yard17',name:'바위그늘 광산 앞마당',x:approach.x,y:island.groundAt(approach.x,approach.z,100),z:approach.z,r:6,target:[mine.x,mine.y+2,mine.z],text:'암맥을 따라 만들어진 작업 광산'});
   island.authored17={mineYard:true,harborCluster:true,summitRestraint:true,terrainCarved:false,decorativeColliders:false,hiddenLegacyMineProps:hiddenLegacy.length,lowPolyMineShoulders:true};
