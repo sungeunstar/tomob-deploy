@@ -22,7 +22,6 @@ try{
  report.island=await page.evaluate(()=>({ready:document.body.dataset.ready,build:window.__auroraQA?.report().build,errors:window.__auroraErrors,trigger:window.__auroraQA?.island.mineEntrance18?.trigger}));
  if(report.island.ready!=='true')throw new Error('ISLAND BOOT '+JSON.stringify(report.island));
  await page.evaluate(()=>{const a=window.__auroraQA.island.mineEntrance18.trigger;ctx.player.setSpawn(a.x,window.__auroraQA.island.groundAt(a.x,a.z,100)+1.5,a.z);for(let i=0;i<45;i++)ctx.tick(1/60);});
- await page.screenshot({path:out+'/island-entry-prompt.png'});
  const triggerVisible=await page.evaluate(()=>[...document.querySelectorAll('div')].some(x=>x.textContent.includes('바위그늘 광산 들어가기')&&getComputedStyle(x).display!=='none'));
  report.entryPrompt=triggerVisible;
  if(!triggerVisible)throw new Error('Mine E prompt not visible at entrance trigger');
@@ -34,9 +33,7 @@ try{
  report.main=await page.evaluate(()=>window.__mineQA.testRoute('main',1/30));
  report.pocket=await page.evaluate(()=>window.__mineQA.testRoute('pocket',1/30));
  await page.evaluate(()=>{const m=window.__mineQA.mine;ctx.player.setSpawn(14,1.55,46);ctx.player.setThird(true);ctx.player.setYaw(Math.PI*.65);for(let i=0;i<50;i++)ctx.tick(1/60);ctx.renderer.render(ctx.scene,ctx.camera);});
- await page.screenshot({path:out+'/deep-room.png'});
  await page.evaluate(()=>{ctx.player.setSpawn(-23,1.55,22);ctx.player.setYaw(Math.PI/2);for(let i=0;i<45;i++)ctx.tick(1/60);ctx.renderer.render(ctx.scene,ctx.camera);});
- await page.screenshot({path:out+'/ore-pocket.png'});
 
  // Exit interaction.
  await page.evaluate(()=>{ctx.player.setSpawn(0,1.55,1.4);for(let i=0;i<45;i++)ctx.tick(1/60);});
@@ -47,5 +44,5 @@ try{
 
  report.accepted=report.entryPrompt&&report.main.pass&&report.pocket.pass&&report.exitPrompt&&report.mineBoot.r?.oreNodes===5&&report.errors.length===0;
  if(!report.accepted)process.exitCode=1;
-}catch(e){report.fatal=e.stack;process.exitCode=1;try{await page?.screenshot({path:out+'/failure.png'});}catch{}}
+}catch(e){report.fatal=e.stack;process.exitCode=1;void 0}
 finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await browser?.close();server.close();}
