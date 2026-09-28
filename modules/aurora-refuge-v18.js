@@ -2,7 +2,7 @@
 import {dressRefuge} from './aurora-refuge-history.js';
 import {polishRefuge} from './aurora-refuge-polish.js';
 import {authorWindgate17} from './windgate17-authored-exterior.js?v=17b';
-import {initMineEntranceInteraction18} from './windgate18-entrance-interaction.js';
+import {initMineEntranceInteraction18} from './windgate18-entrance-interaction.js?v=18b';
 /** Aurora 06: a new sightline-led map using the existing native game modules.
  * The source of terrain geometry is aurora-refuge-field.js, not an imported island asset.
  * Native player/physics/water/portal and original KayKit/wharf files are not modified.
