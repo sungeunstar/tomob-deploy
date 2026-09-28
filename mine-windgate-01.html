@@ -32,7 +32,7 @@ try{
  let fps=0,count=0,last=performance.now();
  const area=()=>{const p=ctx.player.pos;if(p.z<15)return'입구 작업갱';if(p.x<-8)return'철·구리 광맥 포켓';if(p.z<29)return'분기 작업 허브';if(p.z<42)return'레일 작업갱';if(p.z<51&&p.x>8)return'깊은 광물 작업실';return'귀환 우회 갱도';};
  const report=()=>({build:'windgate-mine-01',position:{...ctx.player.pos},area:area(),oreNodes:mine.oreNodes.length,cameraCorrections:mine.cameraCorrections,animation:window.__curAnim?.()||null,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,fps,errors:window.__mineErrors.slice(-10)});
- ctx.onUpdate(()=>{count++;const now=performance.now();if(now-last>800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;const p=ctx.player.pos;$('area').textContent=area();$('pos').textContent=\`\${p.x.toFixed(0)}, \${p.z.toFixed(0)} · \${p.y.toFixed(1)}m\`;$('fps').textContent=fps+' FPS';if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}});
+ ctx.onUpdate(()=>{count++;const now=performance.now();if(now-last>800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;const p=ctx.player.pos;$('area').textContent=area();$('pos').textContent=`${p.x.toFixed(0)}, ${p.z.toFixed(0)} · ${p.y.toFixed(1)}m`;$('fps').textContent=fps+' FPS';if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}});
  window.__mineQA={ctx,mine,report,testRoute:mine.testRoute};
  ctx.start();for(let i=0;i<100&&!window.__curAnim;i++)await delay(100);document.body.dataset.ready='true';$('load').remove();console.info('[mine01]',report());
 }catch(e){console.error('[mine01 boot]',e);$('load').innerHTML='<b>초기화 실패</b><div>'+e.message+'</div>';document.body.dataset.fail='true';}
