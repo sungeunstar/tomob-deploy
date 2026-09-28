@@ -26,7 +26,7 @@ try{
  report.entryPrompt=triggerVisible;
  if(!triggerVisible)throw new Error('Mine E prompt not visible at entrance trigger');
  await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
- const nav=page.waitForURL(/mine-windgate-01\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await nav;
+ const nav=page.waitForURL(/mine-windgate-01\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.keyboard.press('e');await nav;
 
  await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.body.dataset.fail==='true',null,{timeout:55000});
  report.mineBoot=await page.evaluate(()=>({ready:document.body.dataset.ready,fail:document.body.dataset.fail,r:window.__mineQA?.report(),errors:window.__mineErrors}));
@@ -42,7 +42,7 @@ try{
  report.exitPrompt=exitVisible;
  if(!exitVisible)throw new Error('Mine exit E prompt not visible');
  await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
- const back=page.waitForURL(/sandbox-aurora-v18\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyE',key:'e',bubbles:true})));await back;
+ const back=page.waitForURL(/sandbox-aurora-v18\.html/,{timeout:15000,waitUntil:'domcontentloaded'});await page.keyboard.press('e');await back;
 
  report.accepted=report.entryPrompt&&report.main.pass&&report.pocket.pass&&report.exitPrompt&&report.mineBoot.r?.oreNodes===5&&report.errors.length===0;
  if(!report.accepted)process.exitCode=1;
