@@ -73,11 +73,11 @@ export async function dressMine15(ctx,island){
  const add=(g,m,p=[0,0,0],s=[1,1,1],rot=[0,0,0],solid=false)=>{gs.add(g);const o=new THREE.Mesh(g,m);o.position.set(...p);o.scale.set(...s);o.rotation.set(...rot);o.castShadow=o.receiveShadow=true;root.add(o);o.updateWorldMatrix(true,false);if(solid)island.addTrimesh(o);return o;};
  const toWorld=(r,l,y)=>[r.p.x+r.n.x*l,r.p.y+y,r.p.z+r.n.z*l];
  // Continuous floor.
- const fp=[],fu=[],fi=[],width=3.05;
+ const fp=[],fu=[],fi=[],width=3.20;
  for(let i=0;i<mineRows.length;i++){const r=mineRows[i];for(let j=0;j<=8;j++){const l=(j/8*2-1)*width;fp.push(...toWorld(r,l,.0));fu.push(j/8,r.u*8);if(i<mineRows.length-1&&j<8){const k=i*9+j;fi.push(k,k+1,k+9,k+1,k+10,k+9);}}}
  const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fp,3));fg.setAttribute('uv',new THREE.Float32BufferAttribute(fu,2));fg.setIndex(fi);fg.computeVertexNormals();add(fg,floorMat,[0,0,0],[1,1,1],[0,0,0],true).name='Mine continuous floor';
  // Rock shell.
- const cross=[[-3.22,-.28],[-3.22,1.72]];for(let j=1;j<18;j++){const a=j/18*Math.PI;cross.push([-3.22*Math.cos(a),1.72+2.58*Math.sin(a)]);}cross.push([3.22,1.72],[3.22,-.28]);
+ const cross=[[-3.38,-.28],[-3.38,1.72]];for(let j=1;j<18;j++){const a=j/18*Math.PI;cross.push([-3.38*Math.cos(a),1.72+2.58*Math.sin(a)]);}cross.push([3.38,1.72],[3.38,-.28]);
  const wp=[],wu=[],wi=[];
  for(let i=0;i<mineRows.length;i++){const r=mineRows[i];for(let j=0;j<cross.length;j++){const [l,y]=cross[j];wp.push(...toWorld(r,l,y));wu.push(j/cross.length,r.u*7);if(i<mineRows.length-1&&j<cross.length-1){const k=i*cross.length+j;wi.push(k,k+1,k+cross.length,k+1,k+cross.length+1,k+cross.length);}}}
  const wg=new THREE.BufferGeometry();wg.setAttribute('position',new THREE.Float32BufferAttribute(wp,3));wg.setAttribute('uv',new THREE.Float32BufferAttribute(wu,2));wg.setIndex(wi);wg.computeVertexNormals();const shell=add(wg,wallMat,[0,0,0],[1,1,1],[0,0,0],true);shell.name='Mine rock walls and ceiling';wallMeshes.push(shell);
@@ -96,11 +96,11 @@ export async function dressMine15(ctx,island){
  const props={wood:mat('#fff',{map:woodMap,normalMap:woodN}),lantern:mat('#fff',{map:lanMap,normalMap:lanN,transparent:true,alphaTest:.1}),crate:mat('#fff',{map:crateMap,normalMap:crateN}),rock:mat('#fff',{map:rockMap,normalMap:rockN})};
  async function proto(key){if(!cache.has(key)){const o=await loader.loadAsync(new URL(files[key],KIT).href);o.scale.setScalar(.01);o.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(o),c=bb.getCenter(new THREE.Vector3());o.position.x-=c.x;o.position.z-=c.z;o.position.y-=bb.min.y;o.updateMatrixWorld(true);cache.set(key,o);}return cache.get(key).clone(true);}
  async function placeAtRow(key,ri,lateral=0,kind='wood',scale=1,solid=false,yawOffset=0){const r=mineRows[ri],o=await proto(key),p=toWorld(r,lateral,0);o.position.set(...p);o.rotation.y=Math.atan2(r.t.x,r.t.z)+yawOffset;o.scale.multiplyScalar(scale);o.name='mine-kit/'+key;root.add(o);o.traverse(m=>{if(m.isMesh){m.material=props[kind]||woodFallback;m.castShadow=m.receiveShadow=true;if(solid)island.addTrimesh(m);}});return o;}
- for(const [ri,key] of [[10,'support1'],[24,'support2'],[39,'support1'],[55,'support2'],[70,'support1']])await placeAtRow(key,ri,0,'wood',1,true);
+ for(const [ri,key] of [[10,'support1'],[24,'support2'],[39,'support1'],[55,'support2'],[70,'support1']])await placeAtRow(key,ri,0,'wood',.92,false);
  for(const [ri,side] of [[17,-1],[45,1],[67,-1]]){const r=mineRows[ri],o=await placeAtRow('lantern',ri,side*2.55,'lantern',.9,false,side<0?.15:-.15),p=o.position;const l=new THREE.PointLight('#ffc47a',9,13,1.7);l.position.set(p.x,r.p.y+2.45,p.z);root.add(l);lights.push(l);}
  await placeAtRow('crate',8,-2.2,'crate',.9,false,.2);await placeAtRow('crate',12,2.15,'crate',.72,false,-.3);await placeAtRow('planks',28,-2.2,'wood',1,false,.4);
  const oreTypes=[['철광석',0x6b7686,.68,.38],['구리',0xc16a38,.82,.34],['코발트',0x2f55d4,.55,.28],['석탄',0x25272b,.06,.74],['금',0xe6b73a,.94,.24]];
- for(const [idx,ri,side,scale] of [[0,22,1,1],[1,34,-1,.9],[2,52,1,1.05],[3,66,-1,.92],[4,79,1,1.0]]){const [name,color,metalness,roughness]=oreTypes[idx],r=mineRows[ri],o=await proto('ore'),p=toWorld(r,side*2.45,.05);o.position.set(...p);o.rotation.y=Math.atan2(r.t.x,r.t.z)+side*.45;o.scale.multiplyScalar(scale);o.name='mine ore / '+name;o.userData.ore=name;const om=props.rock.clone();om.color.setHex(color);om.metalness=metalness;om.roughness=roughness;om.emissive=new THREE.Color(color).multiplyScalar(.07);om.emissiveIntensity=.12;ms.add(om);o.traverse(m=>{if(m.isMesh){m.material=om;m.userData.ore=name;m.castShadow=m.receiveShadow=true;}});root.add(o);oreNodes.push(o);}
+ for(const [idx,ri,side,scale] of [[0,22,1,.68],[1,34,-1,.62],[2,52,1,.70],[3,66,-1,.62],[4,79,1,.66]]){const [name,color,metalness,roughness]=oreTypes[idx],r=mineRows[ri],o=await proto('ore'),p=toWorld(r,side*2.82,.05);o.position.set(...p);o.rotation.y=Math.atan2(r.t.x,r.t.z)+side*.45;o.scale.multiplyScalar(scale);o.name='mine ore / '+name;o.userData.ore=name;const om=props.rock.clone();om.color.setHex(color);om.metalness=metalness;om.roughness=roughness;om.emissive=new THREE.Color(color).multiplyScalar(.07);om.emissiveIntensity=.12;ms.add(om);o.traverse(m=>{if(m.isMesh){m.material=om;m.userData.ore=name;m.castShadow=m.receiveShadow=true;}});root.add(o);oreNodes.push(o);}
  // Low rails guide the eye, not the collision route.
  const railG=new THREE.BoxGeometry(.09,.07,1.2),tieG=new THREE.BoxGeometry(1.45,.07,.16);gs.add(railG);gs.add(tieG);
  for(let ri=5;ri<82;ri+=3){const r=mineRows[ri],ang=Math.atan2(r.t.x,r.t.z);for(const side of[-.52,.52])add(railG,metal,toWorld(r,side,.08),[1,1,1],[0,ang,0],false);add(tieG,woodFallback,toWorld(r,0,.025),[1,1,1],[0,ang,0],false);}
@@ -110,6 +110,6 @@ export async function dressMine15(ctx,island){
  const cameraHook=ctx.onUpdate(()=>{if(!ctx.player?.third)return;const p=ctx.player.pos;if(!mineReserve15(p.x,p.z,7))return;eye.set(p.x,p.y+.48,p.z);dir.copy(ctx.camera.position).sub(eye);const length=dir.length();if(length<.25)return;ray.set(eye,dir.normalize());ray.far=length+.3;const hit=ray.intersectObjects(island.collide,true).find(h=>h.distance>.08);if(hit&&hit.distance<length+.12){ctx.camera.position.copy(eye).addScaledVector(dir,Math.max(.25,hit.distance-.28));cameraCorrections++;}});
  const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;ctx.offUpdate(cameraHook);root.removeFromParent();gs.forEach(g=>{g.disposeBoundsTree?.();g.dispose();});ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());prev();};
  island.mine15={rows:mineRows.map(r=>r.p.toArray()),sample:mineSample15,cut:field.mine15.cut,length:curve.getLength(),oreNodes,wallMeshes,get cameraCorrections(){return cameraCorrections;}};
- island.mineOreNodes=oreNodes;island.qualityVersion='aurora-v15-carved-mine';
+ island.mineOreNodes=oreNodes;island.qualityVersion='aurora-v15c-clear-mine';
  return island.mine15;
 }
