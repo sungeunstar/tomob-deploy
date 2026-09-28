@@ -83,16 +83,16 @@ function ascentSculpt20(x,z,path){
   delta+=f.h*w; mask=Math.max(mask,w);
  }
  // Preserve a human-width core but allow weathering to reach much closer to its edges.
- const edge=smooth(1.65,3.4,path);
- const weather=(terrainNoise(x*.095+41,z*.089-17)-.5)*1.45+
-               (terrainNoise(x*.22-5,z*.19+9)-.5)*.55;
+ const edge=smooth(2.45,4.45,path);
+ const weather=(terrainNoise(x*.095+41,z*.089-17)-.5)*1.05+
+               (terrainNoise(x*.22-5,z*.19+9)-.5)*.38;
  return {delta:delta*edge,weather:weather*mask*edge,mask};
 }
 function ruinBed20(x,z,path){
  let d=0;
  for(const f of RUIN_BED20){const r=ellip20(f,x,z);d+=f.h*(1-smooth(.25,1.08,r));}
  // keep the walk line clear while making the ruin floor feel inherited from the terrain.
- return d*smooth(1.35,3.6,path);
+ return d*smooth(2.15,4.55,path);
 }
 export function riverSample(x,z){let result={d:Infinity,y:0,t:0};for(let i=0;i<OUTFLOW.length-1;i++){const a=OUTFLOW[i],b=OUTFLOW[i+1],q=axisDistance([a[0],a[1],b[0],b[1]],x,z);if(q.d<result.d)result={...q,y:mix(a[2],b[2],q.t)};}return result;}
 export function ecology(x,z,y){const wet=Math.min(...BASINS.map(b=>Math.max(0,(basinRadius(b,x,z)-1)*Math.min(b.rx,b.rz))),riverSample(x,z).d);const cluster=terrainNoise(x*.026+9,z*.026-4)*.64+terrainNoise(x*.071,z*.071)*.36;return {wet,cluster,wind:clamp((y-36)/31),coast:y<7};}
@@ -139,6 +139,6 @@ export function createExpeditionField(){
  field.points.find(p=>p.id==='harbor').name='난파목으로 다시 세운 항구';
  field.points.find(p=>p.id==='grove').name='잠긴 왕국의 옛 순례길';
  field.points.find(p=>p.id==='shrine').name='깨어난 첫 별의 성소';
- field.naturalization={protectedRouteWidth:7.2,ascentCoreWidth:3.3,oldVertices:before.length,sharedCollisionGrid:true,outletToSea:true,irregularDeepShelf:true,physicalHarborSaddle:true,authoredLandforms20:AUTHORED_LANDFORMS20.map(x=>x.id),coastNotches20:COAST_NOTCHES20.length,landmarkCorridors20:SIGHT_CORRIDORS20.length,ascentForms20:ASCENT_FORMS20.length,ruinBedForms20:RUIN_BED20.length};
+ field.naturalization={protectedRouteWidth:7.2,ascentCoreWidth:4.9,oldVertices:before.length,sharedCollisionGrid:true,outletToSea:true,irregularDeepShelf:true,physicalHarborSaddle:true,authoredLandforms20:AUTHORED_LANDFORMS20.map(x=>x.id),coastNotches20:COAST_NOTCHES20.length,landmarkCorridors20:SIGHT_CORRIDORS20.length,ascentForms20:ASCENT_FORMS20.length,ruinBedForms20:RUIN_BED20.length};
  return field;
 }
