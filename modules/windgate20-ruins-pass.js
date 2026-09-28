@@ -28,11 +28,8 @@ export function authorRuins20(ctx,island){
     const p=new THREE.Vector3();o.getWorldPosition(p);
     if(Math.hypot(p.x-44,p.z+43)>18)return;
     if(o.name==='Broken wayside sanctuary'||o.name==='windgate19/outcrop/ruins-fold'){
-      o.visible=false;hidden.push(o);return;
-    }
-    const t=o.geometry?.type;
-    if((t==='CylinderGeometry'||t==='BoxGeometry')&&!o.name?.startsWith('windgate20/')){
-      // legacy v7 shrine primitives around the grove only.
+      // These legacy pieces are visual-only. Keep old solid pillars visible so their
+      // existing Rapier colliders never become invisible walls.
       o.visible=false;hidden.push(o);
     }
   });
