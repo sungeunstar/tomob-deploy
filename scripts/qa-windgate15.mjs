@@ -10,9 +10,9 @@ const report={errors:[],http:[]};let browser,page;
 try{
  browser=await chromium.launch({headless:true,args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
  page=await browser.newPage({viewport:{width:1280,height:800}});page.setDefaultTimeout(180000);
- page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('Failed to load resource'))report.errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)report.http.push({url:r.url(),status:r.status()});});
+ page.on('pageerror',e=>report.errors.push(e.stack||e.message));page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('Failed to load resource'))report.errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)report.http.push({url:r.url(),status:r.status()});});
  const base='http://127.0.0.1:8787/tomob-deploy/sandbox-aurora-v15.html';
- await page.goto(base+'?qa=1&place=mine-mouth',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.getElementById('load-note')?.textContent.includes('초기화 실패'));
+ await page.goto(base+'?qa=1&place=mine-mouth',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.getElementById('load-note')?.textContent.includes('초기화 실패')||window.__auroraErrors?.length>0,null,{timeout:60000});
  const state=await page.evaluate(()=>({ready:document.body.dataset.ready,errors:window.__auroraErrors,build:window.__auroraQA?.report().build,mine:window.__auroraQA?.island.mine15}));
  if(state.ready!=='true')throw new Error('BOOT '+JSON.stringify(state));
  await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
