@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOMOB · 바위그늘 광산</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b0d0c;color:#eeeadd;font:13px/1.5 system-ui,'Malgun Gothic',sans-serif}canvas{display:block}
+#hud{position:fixed;left:22px;top:18px;z-index:10;pointer-events:none;text-shadow:0 2px 6px #000}.eyebrow{font-size:10px;letter-spacing:2px;color:#c9b58d}h1{font-size:22px;margin:2px 0;font-weight:560}#area{color:#e4c88d}#pos{font:10px ui-monospace,monospace;opacity:.6;margin-top:4px}
+#hint{position:fixed;left:22px;bottom:24px;z-index:10;background:#14201de6;border-left:2px solid #be9e68;padding:10px 14px;pointer-events:none}#fps{position:fixed;right:18px;bottom:18px;z-index:10;background:#111b18dd;padding:5px 8px;font:11px ui-monospace}
+#load{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0d0c;gap:12px}progress{width:220px;accent-color:#9d855e}
+#qa{display:none;position:fixed;right:18px;top:18px;max-width:420px;max-height:60vh;overflow:auto;background:#091210ee;color:#b7d3bd;font:11px ui-monospace;padding:10px;white-space:pre-wrap;z-index:20}
+#cross{position:fixed;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:#ffffff88;z-index:8;pointer-events:none}
+</style>
+<script>window.__mineErrors=[];const oe=console.error.bind(console);console.error=(...a)=>{window.__mineErrors.push(a.map(String).join(' '));oe(...a)};addEventListener('error',e=>window.__mineErrors.push(e.message));addEventListener('unhandledrejection',e=>window.__mineErrors.push(String(e.reason)));</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="load"><small>TOMOB / MINE INSTANCE / 01</small><h2>바위그늘 광산</h2><div>작업갱과 광맥을 불러오는 중</div><progress></progress></div>
+<div id="hud"><div class="eyebrow">TOMOB / MINE INSTANCE 01</div><h1>바위그늘 광산</h1><div id="area">입구 작업갱</div><div id="pos"></div></div>
+<div id="hint"><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프 · <b>F</b> 시점<br>입구 근처에서 <b>E</b> 섬으로 나가기</div>
+<div id="fps"></div><div id="cross"></div><pre id="qa"></pre>
+<script type="module">
+import * as THREE from 'three';
+import {initCore} from './modules/core.js';
+import {initPhysics} from './modules/physics.js';
+import {initInput} from './modules/input.js';
+import {initPlayer,KAY_CHARS} from './modules/player.js';
+import {initWindgateMine01} from './modules/windgate-mine-01.js?v=18a';
+const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),delay=ms=>new Promise(r=>setTimeout(r,ms));
+try{
+ const ctx=initCore();window.ctx=ctx;ctx.scene.background=new THREE.Color('#0b0d0c');ctx.scene.fog=new THREE.Fog('#0b0d0c',8,52);
+ ctx.hemi.color.set('#8d968d');ctx.hemi.groundColor.set('#171a18');ctx.hemi.intensity=.42;ctx.sun.intensity=.08;ctx.fill.intensity=.10;ctx.amb.intensity=.08;
+ await initPhysics(ctx);initInput(ctx);const mine=await initWindgateMine01(ctx);
+ const char=KAY_CHARS[q.get('char')]||KAY_CHARS.knight;initPlayer(ctx,{spawn:mine.spawn,charUrl:char});ctx.player.setThird(true);ctx.player.setYaw(Math.PI);ctx.player.setPitch(.08);ctx.onUpdate(()=>ctx.stepPhysics());
+ let fps=0,count=0,last=performance.now();
+ const area=()=>{const p=ctx.player.pos;if(p.z<15)return'입구 작업갱';if(p.x<-8)return'철·구리 광맥 포켓';if(p.z<29)return'분기 작업 허브';if(p.z<42)return'레일 작업갱';if(p.z<51&&p.x>8)return'깊은 광물 작업실';return'귀환 우회 갱도';};
+ const report=()=>({build:'windgate-mine-01',position:{...ctx.player.pos},area:area(),oreNodes:mine.oreNodes.length,cameraCorrections:mine.cameraCorrections,animation:window.__curAnim?.()||null,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,fps,errors:window.__mineErrors.slice(-10)});
+ ctx.onUpdate(()=>{count++;const now=performance.now();if(now-last>800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;const p=ctx.player.pos;$('area').textContent=area();$('pos').textContent=\`\${p.x.toFixed(0)}, \${p.z.toFixed(0)} · \${p.y.toFixed(1)}m\`;$('fps').textContent=fps+' FPS';if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}});
+ window.__mineQA={ctx,mine,report,testRoute:mine.testRoute};
+ ctx.start();for(let i=0;i<100&&!window.__curAnim;i++)await delay(100);document.body.dataset.ready='true';$('load').remove();console.info('[mine01]',report());
+}catch(e){console.error('[mine01 boot]',e);$('load').innerHTML='<b>초기화 실패</b><div>'+e.message+'</div>';document.body.dataset.fail='true';}
+</script></body></html>
