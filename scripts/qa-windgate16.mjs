@@ -18,8 +18,8 @@ try{
  await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.getElementById('load-note')?.textContent.includes('초기화 실패')||window.__auroraErrors?.length>0,null,{timeout:60000});
  report.boot=await page.evaluate(()=>({ready:document.body.dataset.ready,note:document.getElementById('load-note')?.textContent,errors:window.__auroraErrors,r:window.__auroraQA?.report()}));
  if(report.boot.ready!=='true')throw new Error('BOOT '+JSON.stringify(report.boot));
- report.forward=await page.evaluate(()=>window.__auroraQA.island.zone.testMineRoute(false));
- report.reverse=await page.evaluate(()=>window.__auroraQA.island.zone.testMineRoute(true));
+ report.forward=await page.evaluate(()=>window.__auroraQA.island.zone.testMineRoute(false,1/30));
+ report.reverse=await page.evaluate(()=>window.__auroraQA.island.zone.testMineRoute(true,1/30));
  report.transition=await page.evaluate(async()=>{
    const z=window.__auroraQA.island.zone,a=window.__auroraQA.island;
    await z.exitMine({instant:true});const outside=z.current;
