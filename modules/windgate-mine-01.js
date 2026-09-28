@@ -109,14 +109,14 @@ export async function initWindgateMine01(ctx){
  const camHook=ctx.onUpdate(()=>{if(!ctx.player?.third)return;const p=ctx.player.pos;eye.set(p.x,p.y+.48,p.z);dir.copy(ctx.camera.position).sub(eye);const len=dir.length();if(len<.2)return;ray.set(eye,dir.normalize());ray.far=len+.2;const h=ray.intersectObjects(proxy,true).find(h=>h.distance>.08);if(h&&h.distance<len+.1){ctx.camera.position.copy(eye).addScaledVector(dir,Math.max(.25,h.distance-.25));cameraCorrections++;}});
 
  const routes={
-  main:[[0,2],[0,14],[0,22],[8,22],[14,22],[14,38],[14,46],[8,46],[4,46],[0,38],[0,28],[0,22],[0,14],[0,2]],
-  pocket:[[0,22],[-6,22],[-18,22],[-23,22],[-18,22],[-6,22],[0,22]]
+  main:[[0,2],[0,22],[14,22],[14,46],[8,46],[0,38],[0,22],[0,2]],
+  pocket:[[0,22],[-18,22],[-23,22],[-18,22],[0,22]]
  };
  async function testRoute(name='main',step=1/60){
    const pts=routes[name];if(!pts)throw new Error('Unknown route '+name);
    const emit=(type,code)=>window.dispatchEvent(new KeyboardEvent(type,{code,bubbles:true})),old=ctx.getRenderOverride(),result={name,pass:true,failed:null,travel:0};ctx.setRenderOverride(()=>{});
    try{const s=pts[0];ctx.player.setSpawn(s[0],1.55,s[1]);for(let i=0;i<30;i++)ctx.tick(step);emit('keydown','KeyW');emit('keydown','ShiftLeft');let prev={...ctx.player.pos};
-     for(let j=1;j<pts.length;j++){const t=pts[j];let n=0;while(Math.hypot(t[0]-ctx.player.pos.x,t[1]-ctx.player.pos.z)>.72&&n<160){const p=ctx.player.pos;ctx.player.setYaw(Math.atan2(t[0]-p.x,p.z-t[1]));ctx.tick(step);n++;const q=ctx.player.pos;result.travel+=Math.hypot(q.x-prev.x,q.z-prev.z);prev={...q};if(!Number.isFinite(q.y)||q.y<-5){result.pass=false;result.failed={j,reason:'fell',pos:{...q}};break;}}if(!result.pass)break;if(n>=160){result.pass=false;result.failed={j,reason:'blocked',pos:{...ctx.player.pos},target:t};break;}}
+     for(let j=1;j<pts.length;j++){const t=pts[j];let n=0;while(Math.hypot(t[0]-ctx.player.pos.x,t[1]-ctx.player.pos.z)>.72&&n<120){const p=ctx.player.pos;ctx.player.setYaw(Math.atan2(t[0]-p.x,p.z-t[1]));ctx.tick(step);n++;const q=ctx.player.pos;result.travel+=Math.hypot(q.x-prev.x,q.z-prev.z);prev={...q};if(!Number.isFinite(q.y)||q.y<-5){result.pass=false;result.failed={j,reason:'fell',pos:{...q}};break;}}if(!result.pass)break;if(n>=120){result.pass=false;result.failed={j,reason:'blocked',pos:{...ctx.player.pos},target:t};break;}}
    }finally{emit('keyup','KeyW');emit('keyup','ShiftLeft');ctx.setRenderOverride(old);ctx.renderer.render(scene,ctx.camera);}result.travel=+result.travel.toFixed(2);return result;
  }
 
