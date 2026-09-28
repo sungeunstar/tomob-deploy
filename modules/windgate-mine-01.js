@@ -40,9 +40,14 @@ export async function initWindgateMine01(ctx){
    addCollider(mid.x,-.18,mid.z,width/2,.18,len/2+.08,yaw);
    addCollider(mid.x,height+.18,mid.z,width/2,.18,len/2+.08,yaw);
    visBox(mid.x,-.10,mid.z,[width/2,.10,len/2],ground,yaw);
-   // side walls
+   visBox(mid.x,height+.10,mid.z,[width/2,.14,len/2],rockDark,yaw);
+   // side walls: visual and physics share the same transform.
    const nx=-Math.cos(yaw),nz=Math.sin(yaw),off=width/2+.18;
-   for(const side of[-1,1])addCollider(mid.x+nx*side*off,height/2,mid.z+nz*side*off,.25,height/2,len/2+.12,yaw);
+   for(const side of[-1,1]){
+     const wx=mid.x+nx*side*off,wz=mid.z+nz*side*off;
+     addCollider(wx,height/2,wz,.25,height/2,len/2+.12,yaw);
+     visBox(wx,height/2,wz,[.24,height/2,len/2+.10],rock,yaw);
+   }
    // irregular rock dressing on both sides
    const count=Math.max(3,Math.floor(len/2.2));
    for(let i=0;i<=count;i++){const t=i/count,p=A.clone().lerp(B,t);for(const side of[-1,1]){if(rnd()<.18)continue;const o=new THREE.Mesh(rockG,rnd()<.3?rockDark:rock);o.position.set(p.x+nx*side*(width/2+.45+(rnd()-.5)*.4),.55+rnd()*1.4,p.z+nz*side*(width/2+.45+(rnd()-.5)*.4));const s=.75+rnd()*1.25;o.scale.set(s,1.1+rnd()*1.5,s*.9);o.rotation.set((rnd()-.5)*.2,rnd()*6.28,(rnd()-.5)*.16);o.castShadow=o.receiveShadow=true;root.add(o);}}
@@ -52,11 +57,18 @@ export async function initWindgateMine01(ctx){
  }
  function room(x,z,w,d,openings={}){
    addCollider(x,-.18,z,w/2,.18,d/2);visBox(x,-.10,z,[w/2,.10,d/2],ground);
-   addCollider(x,5.3,z,w/2,.18,d/2);
+   addCollider(x,5.3,z,w/2,.18,d/2);visBox(x,5.22,z,[w/2,.14,d/2],rockDark);
    // wall helper with a central 4m opening if requested
    const wall=(side,open)=>{
-     if(side==='north'||side==='south'){const zz=z+(side==='north'?d/2+.18:-d/2-.18),len=w;if(open){const part=(len-4.2)/4;for(const s of[-1,1])addCollider(x+s*(2.1+part),2.55,zz,part,2.55,.25);}else addCollider(x,2.55,zz,w/2,2.55,.25);}
-     else {const xx=x+(side==='east'?w/2+.18:-w/2-.18),len=d;if(open){const part=(len-4.2)/4;for(const s of[-1,1])addCollider(xx,2.55,z+s*(2.1+part),.25,2.55,part);}else addCollider(xx,2.55,z,.25,2.55,d/2);}
+     if(side==='north'||side==='south'){
+       const zz=z+(side==='north'?d/2+.18:-d/2-.18),len=w;
+       if(open){const part=(len-4.2)/4;for(const s of[-1,1]){const xx=x+s*(2.1+part);addCollider(xx,2.55,zz,part,2.55,.25);visBox(xx,2.55,zz,[part,2.55,.24],rock);}}
+       else {addCollider(x,2.55,zz,w/2,2.55,.25);visBox(x,2.55,zz,[w/2,2.55,.24],rock);}
+     } else {
+       const xx=x+(side==='east'?w/2+.18:-w/2-.18),len=d;
+       if(open){const part=(len-4.2)/4;for(const s of[-1,1]){const zz=z+s*(2.1+part);addCollider(xx,2.55,zz,.25,2.55,part);visBox(xx,2.55,zz,[.24,2.55,part],rock);}}
+       else {addCollider(xx,2.55,z,.25,2.55,d/2);visBox(xx,2.55,z,[.24,2.55,d/2],rock);}
+     }
    };
    wall('north',openings.north);wall('south',openings.south);wall('east',openings.east);wall('west',openings.west);
    // boulders sit outside the walkable footprint
@@ -103,7 +115,7 @@ export async function initWindgateMine01(ctx){
  const canExit=()=>{const p=ctx.player?.pos;return !!p&&Math.hypot(p.x-exitPos.x,p.z-exitPos.z)<exitPos.r;};
  const hook=ctx.onUpdate(()=>{exitActive=canExit();prompt.style.display=exitActive&&!busy?'flex':'none';});
  async function leave(){if(!canExit()||busy)return;busy=true;prompt.style.display='none';fade.style.opacity='1';await new Promise(r=>setTimeout(r,220));const q=new URLSearchParams(location.search),ret=q.get('return')||sessionStorage.getItem('tomob:instance-return')||'./sandbox-aurora-v18.html?place=mine-yard17&from=mine';location.href=ret;}
- const onKey=e=>{if(e.code==='KeyE'&&!e.repeat){e.preventDefault();leave();}};addEventListener('keydown',onKey);
+ const offE=ctx.input?.register?ctx.input.register('KeyE',()=>leave(),{when:()=>canExit()}):(()=>{const h=e=>{if(e.code==='KeyE'&&!e.repeat)leave();};addEventListener('keydown',h);return()=>removeEventListener('keydown',h);})();
 
  // Camera collision against authored proxy walls.
  const ray=new THREE.Raycaster(),eye=new THREE.Vector3(),dir=new THREE.Vector3();ray.firstHitOnly=true;let cameraCorrections=0;
@@ -123,7 +135,7 @@ export async function initWindgateMine01(ctx){
 
  const spawn={x:0,y:1.55,z:3.2};
  const api={root,spawn,collide:proxy,oreNodes,routes,testRoute,groundAt:()=>0,canExit,get cameraCorrections(){return cameraCorrections;},dispose(){
-   ctx.offUpdate(hook);ctx.offUpdate(camHook);removeEventListener('keydown',onKey);prompt.remove();fade.remove();root.removeFromParent();
+   ctx.offUpdate(hook);ctx.offUpdate(camHook);offE?.();prompt.remove();fade.remove();root.removeFromParent();
    for(const c of colliders)try{world.removeCollider(c,true);}catch{}gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());
  }};
  ctx.terrain=api;ctx.mine=api;return api;
