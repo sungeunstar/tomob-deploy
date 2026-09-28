@@ -2,7 +2,7 @@
 import {dressRefuge} from './aurora-refuge-history-v17.js?v=17h1';
 import {polishRefuge} from './aurora-refuge-polish.js';
 import {authorWindgate17} from './windgate17-authored-exterior.js?v=17d';
-import {authorSummit17} from './windgate17-summit-manual.js?v=17s2';
+import {authorSummit17} from './windgate17-summit-manual.js?v=17s3';
 /** Aurora 06: a new sightline-led map using the existing native game modules.
  * The source of terrain geometry is aurora-refuge-field.js, not an imported island asset.
  * Native player/physics/water/portal and original KayKit/wharf files are not modified.
@@ -110,10 +110,29 @@ export async function initAuroraRefuge(ctx,options={}){
  const sp=[],se=[];for(const a of fallAxes)for(let i=0;i<65;i++){sp.push(a[2]+(rng()-.5)*a[6],a[5]+.1,a[3]+(rng()-.5)*1.5);se.push(rng());}const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));sg.setAttribute('seed',new THREE.Float32BufferAttribute(se,1));G.add(sg);root.add(new THREE.Points(sg,sprayMat));
  const foamMat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,uniforms:{t:clock},vertexShader:`varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:NOISE+`uniform float t;varying vec2 v;void main(){vec2 p=(v-.5)*2.;float r=length(p);float n=fbm(p*7.-t*.2);float ring=pow(max(0.,sin(r*21.-t*2.+n*3.)),7.)*.2;float a=(1.-smoothstep(.2,1.,r))*(smoothstep(.4,.75,n)*.36+ring);gl_FragColor=vec4(.79,.87,.78,a);}`});M.add(foamMat);
  for(const a of fallAxes){const g=new THREE.PlaneGeometry(a[6]*2,a[6]*1.4);g.rotateX(-Math.PI/2);const o=mesh(g,foamMat,a[2],a[5]+.045,a[3]+.55,[1,1,1],false,false);o.castShadow=false;}
- // Summit: irregular platform outline and segmented, bevelled masonry.
+ // Summit: hand-authored foundation. No circular cylinder stack.
  const py=SUMMIT.y,cx=SUMMIT.x,cz=SUMMIT.z;
- for(let i=0;i<3;i++){const g=new THREE.CylinderGeometry(10.7-i*.6,11-i*.6,.22,32),p=g.attributes.position;for(let j=0;j<p.count;j++){const x=p.getX(j),z=p.getZ(j),a=Math.atan2(z,x),q=1+.024*Math.sin(a*7+.3)+.014*Math.cos(a*11);p.setXYZ(j,x*q,p.getY(j),z*q);}g.computeVertexNormals();mesh(g,i===0?dark:stone,cx,py+.11+i*.20,cz,[1,1,1],true);}
- const pavers=[];for(let i=0;i<65;i++){const x=cx+(rng()-.5)*18,z=cz+(rng()-.5)*16;if(Math.hypot(x-cx,z-cz)>8.9)continue;pavers.push({x,y:py+.635,z,s:[.85+rng()*.6,.07,.7+rng()*.4],rot:(rng()-.5)*.14,c:rng()<.3?'#8f9b8b':'#b2b7a7'});}inst(boxG,stone,pavers,'Weathered floor pavers');
+ const summitOutline=[
+  [-6.6,9.0],[-3.7,10.35],[-.4,10.75],[3.2,10.18],[6.4,8.7],[8.8,6.1],[10.05,2.8],[9.75,-1.2],
+  [8.7,-5.0],[6.0,-7.9],[2.4,-9.35],[-1.7,-9.7],[-5.3,-8.6],[-8.0,-6.2],[-9.55,-2.8],[-9.7,1.0],[-8.7,5.0]
+ ];
+ const summitPos=[0,.64,0],summitIx=[],summitN=summitOutline.length;
+ for(let i=0;i<summitN;i++){
+  const [x,z]=summitOutline[i],y=.625+.025*Math.sin(i*1.71);
+  summitPos.push(x,y,z);
+ }
+ for(let i=0;i<summitN;i++){
+  const [x,z]=summitOutline[i],r=1.045+.018*Math.sin(i*2.3);
+  summitPos.push(x*r,.06,z*r);
+ }
+ for(let i=0;i<summitN;i++){
+  const n=(i+1)%summitN;
+  summitIx.push(0,1+i,1+n);
+  const ti=1+i,tn=1+n,bi=1+summitN+i,bn=1+summitN+n;
+  summitIx.push(ti,bi,tn,tn,bi,bn);
+ }
+ const summitG=new THREE.BufferGeometry();summitG.setAttribute('position',new THREE.Float32BufferAttribute(summitPos,3));summitG.setIndex(summitIx);summitG.computeVertexNormals();
+ const summitFoundation=mesh(summitG,stone,cx,py,cz,[1,1,1],true,false);summitFoundation.name='Hand-authored summit foundation / visual and physics';
  function archStone(a0,a1,ri,ro){const s=new THREE.Shape();s.absarc(0,0,ro,a0,a1,false);s.absarc(0,0,ri,a1,a0,true);s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:1.30,bevelEnabled:true,bevelSize:.07,bevelThickness:.06,bevelSegments:1,steps:1,curveSegments:4});g.translate(0,0,-.65);return g;}
  const radius=3.25,baseY=py+.62,springY=py+6.65;
  for(const x of[cx-radius-.39,cx+radius+.39]){box(x,baseY+.17,cz,[1.55,.34,1.9],dark,true);for(let i=0;i<5;i++){const o=box(x,baseY+1+i*1.064,cz,[1.04,1.025,1.38],i%3?stone:dark);o.rotation.y=(i%2?1:-1)*.035;solid(o);}box(x,py+6.44,cz,[1.55,.34,1.78],stone,true);}
@@ -164,6 +183,6 @@ export async function initAuroraRefuge(ctx,options={}){
  ctx.terrain=api;hook=ctx.onUpdate(dt=>{if(!disposed)ticks.forEach(f=>f(dt));});
  api.ready=Promise.all(jobs).then(async()=>{if(disposed)return api;root.updateMatrixWorld(true);const groups=new Map();for(const o of batch){if(o.material.visible===false)continue;if(!groups.has(o.material))groups.set(o.material,[]);groups.get(o.material).push(o);}for(const [m,os]of groups){if(os.length<3)continue;const gs=os.map(o=>{const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrixWorld);for(const a of Object.keys(g.attributes))if(!['position','normal','uv'].includes(a))g.deleteAttribute(a);if(!g.attributes.uv)g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));return g;});const g=mergeGeometries(gs,false);gs.forEach(g=>g.dispose());if(g){os.forEach(o=>o.visible=false);mesh(g,m,0,0,0,[1,1,1],false,false).name='Batched static dressing';}}
   try{const bvh=await import('three-mesh-bvh');if(disposed)return api;if(!THREE.BufferGeometry.prototype.computeBoundsTree){THREE.BufferGeometry.prototype.computeBoundsTree=bvh.computeBoundsTree;THREE.BufferGeometry.prototype.disposeBoundsTree=bvh.disposeBoundsTree;}THREE.Mesh.prototype.raycast=bvh.acceleratedRaycast;for(const o of collide)if(!o.isInstancedMesh)o.traverse(m=>{if(m.isMesh&&m.geometry?.attributes.position?.count>=96&&!m.geometry.boundsTree)m.geometry.computeBoundsTree();});api.bvh=true;}catch(e){assets.errors.push('BVH: '+e.message);}root.updateMatrixWorld(true);return api;});
- const baseReady=api.ready;api.ready=baseReady.then(async()=>{await dressRefuge(ctx,api);polishRefuge(ctx,api);await authorWindgate17(ctx,api);authorSummit17(ctx,api);api.qualityVersion='aurora-v17c-hand-authored-summit';return api;});
+ const baseReady=api.ready;api.ready=baseReady.then(async()=>{await dressRefuge(ctx,api);polishRefuge(ctx,api);await authorWindgate17(ctx,api);authorSummit17(ctx,api);api.qualityVersion='aurora-v17e-hand-authored-summit';return api;});
  return api;
 }
