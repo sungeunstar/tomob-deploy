@@ -32,29 +32,7 @@ export function authorSummit17(ctx,island){
     }
   });
 
-  // Irregular stone terrace skin over the stable invisible/legacy walk surface.
-  const seg=28,top=[],low=[],positions=[],indices=[];
-  for(let i=0;i<seg;i++){
-    const a=i/seg*Math.PI*2;
-    const front=Math.abs(THREE.MathUtils.euclideanModulo(a-Math.PI/2+Math.PI,Math.PI*2)-Math.PI)<.58;
-    const baseR=front?10.0:10.45;
-    const r=baseR+Math.sin(a*3.1+.7)*.52+Math.sin(a*7.3)*.24+(rng()-.5)*.22;
-    const rt=r+.75+.18*Math.sin(a*5.2);
-    const y=py+.655+.025*Math.sin(a*4.5);
-    top.push([cx+Math.cos(a)*r,y,cz+Math.sin(a)*r]);
-    low.push([cx+Math.cos(a)*rt,py+.18+.04*Math.sin(a*2.2),cz+Math.sin(a)*rt]);
-  }
-  positions.push(cx,py+.66,cz);
-  for(const p of top)positions.push(...p);
-  for(const p of low)positions.push(...p);
-  for(let i=0;i<seg;i++){
-    const n=(i+1)%seg;
-    indices.push(0,1+i,1+n);
-    const ti=1+i,tn=1+n,li=1+seg+i,ln=1+seg+n;
-    indices.push(ti,li,tn,tn,li,ln);
-  }
-  const terraceG=new THREE.BufferGeometry();terraceG.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));terraceG.setIndex(indices);terraceG.computeVertexNormals();G.add(terraceG);
-  const terrace=new THREE.Mesh(terraceG,stone);terrace.name='Hand-authored irregular summit terrace';terrace.castShadow=terrace.receiveShadow=true;root.add(terrace);
+  // Foundation geometry is authored directly in aurora-refuge-v17.js.
 
   // Sparse intentional pavers: route into portal, not a random tiled circle.
   const pavers=[
@@ -116,7 +94,7 @@ export function authorSummit17(ctx,island){
   add(boxG,dark,cx-7.45,py+2.15,cz-5.62,[1.45,.26,.58],-.09);
 
   island.field.points.push({id:'summit17',name:'깨어난 첫 별의 성소 · 수작업',x:cx,y:py+.7,z:cz+9.0,r:5,target:[cx,py+5.5,cz],text:'바람에 깎인 옛 성소'});
-  island.summit17={manual:true,hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,approachStairs:stairZ.length,edgeRocks:rocks.length};
+  island.summit17={manual:true,hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,foundationSource:'aurora-refuge-v17',approachStairs:stairZ.length,edgeRocks:rocks.length};
   const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;hidden.forEach(o=>o.visible=true);root.removeFromParent();G.forEach(g=>g.dispose());M.forEach(m=>m.dispose());prev();};
   return island.summit17;
 }
