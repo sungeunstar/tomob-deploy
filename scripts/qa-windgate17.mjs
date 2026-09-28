@@ -14,12 +14,12 @@ try{
  page.on('console',m=>{if(m.type()==='error'&&!m.text().includes('Failed to load resource'))report.errors.push(m.text());});
  page.on('response',r=>{if(r.status()>=400)report.http.push({url:r.url(),status:r.status()});});
  const base='http://127.0.0.1:8787/tomob-deploy/sandbox-aurora-v17.html';
- await page.goto(base+'?view=overview&place=mine-yard17',{waitUntil:'domcontentloaded'});
+ await page.goto(base+'?view=overview&place=summit17',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.body.dataset.ready==='true'||document.getElementById('load-note')?.textContent.includes('초기화 실패')||window.__auroraErrors?.length>0,null,{timeout:65000});
  report.overview=await page.evaluate(()=>({ready:document.body.dataset.ready,note:document.getElementById('load-note')?.textContent,errors:window.__auroraErrors,r:window.__auroraQA?.report()}));
  if(report.overview.ready!=='true')throw new Error('OVERVIEW '+JSON.stringify(report.overview));
- await page.screenshot({path:out+'/mine-yard-overview.png'});
- await page.goto(base+'?qa=1&place=mine-yard17',{waitUntil:'domcontentloaded'});
+ await page.screenshot({path:out+'/summit-overview.png'});
+ await page.goto(base+'?qa=1&place=summit17',{waitUntil:'domcontentloaded'});
  await page.waitForFunction(()=>document.body.dataset.ready==='true',null,{timeout:65000});
  report.play=await page.evaluate(()=>window.__auroraQA.report());
  await page.locator('canvas').first().click({position:{x:640,y:460},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
@@ -28,8 +28,8 @@ try{
    ctx.setRenderOverride(()=>{});emit('keydown','KeyW');for(let i=0;i<35;i++)ctx.tick(1/60);emit('keyup','KeyW');ctx.setRenderOverride(old);ctx.renderer.render(ctx.scene,ctx.camera);
    const p=ctx.player.pos;return{moved:Math.hypot(p.x-start.x,p.z-start.z),start,end:{...p},pass:Math.hypot(p.x-start.x,p.z-start.z)>.18&&Number.isFinite(p.y)};
  });
- await page.screenshot({path:out+'/mine-yard-player.png'});
- const a=report.play.authored;
- report.accepted=!!a&&a.mineYard===true&&a.terrainCarved===false&&a.decorativeColliders===false&&report.move.pass&&report.errors.length===0&&report.play.assets.errors.length===0;
+ await page.screenshot({path:out+'/summit-player.png'});
+ const a=report.play.authored,s=report.play.summit;
+ report.accepted=!!a&&a.mineYard===true&&a.terrainCarved===false&&a.decorativeColliders===false&&!!s&&s.manual===true&&s.terrainCarved===false&&s.newGameplayColliders===0&&s.approachStairs===5&&report.move.pass&&report.errors.length===0&&report.play.assets.errors.length===0;
  if(!report.accepted)process.exitCode=1;
 }catch(e){report.fatal=e.stack;process.exitCode=1;try{await page?.screenshot({path:out+'/failure.png'});}catch{}}finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await browser?.close();server.close();}
