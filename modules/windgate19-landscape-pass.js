@@ -146,12 +146,12 @@ export async function authorWindgate19(ctx,island){
   }
 
   island.field.points.push(
-    {id:'forest-room18',name:'굽은 숲 · 시야 차단 구간',x:-24,y:safeGround(-24,49),z:49,r:6,target:[-38,17,39]},
-    {id:'ascent18',name:'마지막 바위 고개 · 시야 차단 구간',x:-18,y:safeGround(-18,-68),z:-68,r:6,target:[-9,63,-82]}
+    {id:'forest-room19',name:'굽은 숲 · 시야 차단 구간',x:-24,y:safeGround(-24,49),z:49,r:6,target:[-38,17,39]},
+    {id:'ascent19',name:'마지막 바위 고개 · 시야 차단 구간',x:-18,y:safeGround(-18,-68),z:-68,r:6,target:[-9,63,-82]}
   );
   island.landscape19={
     authoredRooms:true,
-    routeKerbstonesHidden:hidden.length,
+    routeKerbstonesHidden19:hidden.length,
     treeBelts:BELTS.map(x=>x.id),
     trees:treeCount,
     outcrops:outcropCount,
