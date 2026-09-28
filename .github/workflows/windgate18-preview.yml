@@ -1,0 +1,45 @@
+name: Windgate 18 mine instance verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/windgate18-entrance-interaction.js'
+      - 'modules/windgate-mine-01.js'
+      - 'modules/aurora-refuge-v18.js'
+      - 'sandbox-aurora-v18.html'
+      - 'mine-windgate-01.html'
+      - 'scripts/qa-windgate18.mjs'
+      - '.github/workflows/windgate18-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windgate18-preview
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        run: |
+          node --check modules/windgate18-entrance-interaction.js
+          node --check modules/windgate-mine-01.js
+          node --check modules/aurora-refuge-v18.js
+      - name: Browser tooling
+        run: |
+          mkdir -p /tmp/wg18 && cd /tmp/wg18
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1
+          npx playwright install --with-deps chromium
+          ln -s /tmp/wg18/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: E interaction and mine traversal
+        run: node scripts/qa-windgate18.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windgate18-instance-evidence
+          path: artifacts/windgate18
+          retention-days: 7
+          if-no-files-found: warn
