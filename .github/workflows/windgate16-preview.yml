@@ -1,0 +1,42 @@
+name: Windgate 16 mine interior verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/windgate16-interior-runtime.js'
+      - 'modules/aurora-refuge-v16.js'
+      - 'sandbox-aurora-v16.html'
+      - 'scripts/qa-windgate16.mjs'
+      - '.github/workflows/windgate16-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windgate16-preview
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        run: |
+          node --check modules/windgate16-interior-runtime.js
+          node --check modules/aurora-refuge-v16.js
+      - name: Browser tooling
+        run: |
+          mkdir -p /tmp/wg16 && cd /tmp/wg16
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1
+          npx playwright install --with-deps chromium
+          ln -s /tmp/wg16/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Native interior traversal
+        run: node scripts/qa-windgate16.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windgate16-interior-evidence
+          path: artifacts/windgate16
+          retention-days: 7
+          if-no-files-found: warn
