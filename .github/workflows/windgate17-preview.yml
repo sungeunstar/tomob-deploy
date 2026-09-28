@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'modules/windgate17-authored-exterior.js'
+      - 'modules/windgate17-summit-manual.js'
       - 'modules/aurora-refuge-v17.js'
       - 'sandbox-aurora-v17.html'
       - 'scripts/qa-windgate17.mjs'
@@ -23,6 +24,7 @@ jobs:
       - name: Syntax
         run: |
           node --check modules/windgate17-authored-exterior.js
+          node --check modules/windgate17-summit-manual.js
           node --check modules/aurora-refuge-v17.js
       - name: Browser tooling
         run: |
