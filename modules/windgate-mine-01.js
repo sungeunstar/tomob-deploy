@@ -115,7 +115,7 @@ export async function initWindgateMine01(ctx){
  const canExit=()=>{const p=ctx.player?.pos;return !!p&&Math.hypot(p.x-exitPos.x,p.z-exitPos.z)<exitPos.r;};
  const hook=ctx.onUpdate(()=>{exitActive=canExit();prompt.style.display=exitActive&&!busy?'flex':'none';});
  async function leave(){if(!canExit()||busy)return;busy=true;prompt.style.display='none';fade.style.opacity='1';await new Promise(r=>setTimeout(r,220));const q=new URLSearchParams(location.search),ret=q.get('return')||sessionStorage.getItem('tomob:instance-return')||'./sandbox-aurora-v18.html?place=mine-yard17&from=mine';location.href=ret;}
- const offE=ctx.input?.register?ctx.input.register('KeyE',()=>leave(),{when:()=>canExit()}):(()=>{const h=e=>{if(e.code==='KeyE'&&!e.repeat)leave();};addEventListener('keydown',h);return()=>removeEventListener('keydown',h);})();
+ const onKey=e=>{if(e.code!=='KeyE'||e.repeat||!canExit())return;const mode=ctx.input?.mode?.();if(mode&&mode!=='foot')return;e.preventDefault();leave();};addEventListener('keydown',onKey);const offE=()=>removeEventListener('keydown',onKey);
 
  // Camera collision against authored proxy walls.
  const ray=new THREE.Raycaster(),eye=new THREE.Vector3(),dir=new THREE.Vector3();ray.firstHitOnly=true;let cameraCorrections=0;
