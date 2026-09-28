@@ -100,8 +100,9 @@ export async function initWindgateMine01(ctx){
  const fade=document.createElement('div');Object.assign(fade.style,{position:'fixed',inset:'0',zIndex:'9999',background:'#050707',opacity:'0',transition:'opacity 180ms ease',pointerEvents:'none'});document.body.appendChild(fade);
  let exitActive=false,busy=false;
  const exitPos={x:0,z:1.4,r:3.0};
- const hook=ctx.onUpdate(()=>{const p=ctx.player?.pos;if(!p)return;exitActive=Math.hypot(p.x-exitPos.x,p.z-exitPos.z)<exitPos.r;prompt.style.display=exitActive&&!busy?'flex':'none';});
- async function leave(){if(!exitActive||busy)return;busy=true;prompt.style.display='none';fade.style.opacity='1';await new Promise(r=>setTimeout(r,220));const q=new URLSearchParams(location.search),ret=q.get('return')||sessionStorage.getItem('tomob:instance-return')||'./sandbox-aurora-v18.html?place=mine-yard17&from=mine';location.href=ret;}
+ const canExit=()=>{const p=ctx.player?.pos;return !!p&&Math.hypot(p.x-exitPos.x,p.z-exitPos.z)<exitPos.r;};
+ const hook=ctx.onUpdate(()=>{exitActive=canExit();prompt.style.display=exitActive&&!busy?'flex':'none';});
+ async function leave(){if(!canExit()||busy)return;busy=true;prompt.style.display='none';fade.style.opacity='1';await new Promise(r=>setTimeout(r,220));const q=new URLSearchParams(location.search),ret=q.get('return')||sessionStorage.getItem('tomob:instance-return')||'./sandbox-aurora-v18.html?place=mine-yard17&from=mine';location.href=ret;}
  const onKey=e=>{if(e.code==='KeyE'&&!e.repeat){e.preventDefault();leave();}};addEventListener('keydown',onKey);
 
  // Camera collision against authored proxy walls.
@@ -121,7 +122,7 @@ export async function initWindgateMine01(ctx){
  }
 
  const spawn={x:0,y:1.55,z:3.2};
- const api={root,spawn,collide:proxy,oreNodes,routes,testRoute,groundAt:()=>0,get cameraCorrections(){return cameraCorrections;},dispose(){
+ const api={root,spawn,collide:proxy,oreNodes,routes,testRoute,groundAt:()=>0,canExit,get cameraCorrections(){return cameraCorrections;},dispose(){
    ctx.offUpdate(hook);ctx.offUpdate(camHook);removeEventListener('keydown',onKey);prompt.remove();fade.remove();root.removeFromParent();
    for(const c of colliders)try{world.removeCollider(c,true);}catch{}gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());ts.forEach(t=>t.dispose());lights.forEach(l=>l.removeFromParent());
  }};
