@@ -30,6 +30,7 @@ try{
  const play=await page.evaluate(()=>({ready:document.body.dataset.ready,errors:window.__auroraErrors}));
  if(play.ready!=='true')throw new Error('PLAY_BOOT '+JSON.stringify(play));
  await page.locator('canvas').first().click({position:{x:640,y:450},force:true});await page.waitForFunction(()=>document.pointerLockElement!==null);
+ await page.evaluate(()=>ctx.player.setThird(false));
  report.routes=[];
  for(const id of['mine15','mine15-return'])report.routes.push(await page.evaluate(id=>window.__auroraQA.routeTest(id),id));
 
