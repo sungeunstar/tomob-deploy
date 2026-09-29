@@ -278,7 +278,7 @@ export async function initPatmosLandmark(ctx){
   }
 
   const api={
-    root,points,spawn:{x:0,y:dockY+2.4,z:310},size:SIZE,qualityVersion:'patmos-landmark-v1',
+    root,points,spawn:{x:0,y:dockY+2.4,z:275},size:SIZE,qualityVersion:'patmos-landmark-v1',
     field:{height:terrainHeight,points,support:groundAt},groundAt,
     stats:{terrainMeters:SIZE,cliffFractures:cliffs.length,terraces:terraces.length,houses:hutSites.length,bridges:bridges.length,routeNodes:routeNodes.length,cityLights:lights.length},
     dispose(){for(const c of colliders)try{world.removeCollider(c,true);}catch{}root.removeFromParent();G.forEach(g=>g.dispose());M.forEach(m=>m.dispose());}
