@@ -3,6 +3,7 @@ import {dressRefuge} from './aurora-refuge-history-v17.js?v=17h1';
 import {polishRefuge} from './aurora-refuge-polish.js';
 import {authorWindgate17} from './windgate17-authored-exterior.js?v=17d';
 import {authorSummit17} from './windgate17-summit-manual.js?v=17s6';
+import {authorWaterfall17} from './windgate17-waterfall-manual.js?v=17w1';
 /** Aurora 06: a new sightline-led map using the existing native game modules.
  * The source of terrain geometry is aurora-refuge-field.js, not an imported island asset.
  * Native player/physics/water/portal and original KayKit/wharf files are not modified.
@@ -183,6 +184,6 @@ export async function initAuroraRefuge(ctx,options={}){
  ctx.terrain=api;hook=ctx.onUpdate(dt=>{if(!disposed)ticks.forEach(f=>f(dt));});
  api.ready=Promise.all(jobs).then(async()=>{if(disposed)return api;root.updateMatrixWorld(true);const groups=new Map();for(const o of batch){if(o.material.visible===false)continue;if(!groups.has(o.material))groups.set(o.material,[]);groups.get(o.material).push(o);}for(const [m,os]of groups){if(os.length<3)continue;const gs=os.map(o=>{const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrixWorld);for(const a of Object.keys(g.attributes))if(!['position','normal','uv'].includes(a))g.deleteAttribute(a);if(!g.attributes.uv)g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));return g;});const g=mergeGeometries(gs,false);gs.forEach(g=>g.dispose());if(g){os.forEach(o=>o.visible=false);mesh(g,m,0,0,0,[1,1,1],false,false).name='Batched static dressing';}}
   try{const bvh=await import('three-mesh-bvh');if(disposed)return api;if(!THREE.BufferGeometry.prototype.computeBoundsTree){THREE.BufferGeometry.prototype.computeBoundsTree=bvh.computeBoundsTree;THREE.BufferGeometry.prototype.disposeBoundsTree=bvh.disposeBoundsTree;}THREE.Mesh.prototype.raycast=bvh.acceleratedRaycast;for(const o of collide)if(!o.isInstancedMesh)o.traverse(m=>{if(m.isMesh&&m.geometry?.attributes.position?.count>=96&&!m.geometry.boundsTree)m.geometry.computeBoundsTree();});api.bvh=true;}catch(e){assets.errors.push('BVH: '+e.message);}root.updateMatrixWorld(true);return api;});
- const baseReady=api.ready;api.ready=baseReady.then(async()=>{await dressRefuge(ctx,api);polishRefuge(ctx,api);await authorWindgate17(ctx,api);authorSummit17(ctx,api);api.qualityVersion='aurora-v17e-hand-authored-summit';return api;});
+ const baseReady=api.ready;api.ready=baseReady.then(async()=>{await dressRefuge(ctx,api);polishRefuge(ctx,api);await authorWindgate17(ctx,api);authorWaterfall17(ctx,api);authorSummit17(ctx,api);api.qualityVersion='aurora-v17f-waterfall-and-summit';return api;});
  return api;
 }
