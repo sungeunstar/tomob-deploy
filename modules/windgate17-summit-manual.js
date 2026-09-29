@@ -1,4 +1,4 @@
-/** Windgate 17 summit s4 — hand-authored terrain patch around the portal.
+/** Windgate 17 summit s5 — hand-authored terrain patch around the portal.
  * Visual terrain integration only. Existing stable collision surfaces remain unchanged.
  */
 import * as THREE from 'three';
@@ -7,7 +7,7 @@ import {SUMMIT} from './aurora-refuge-field.js';
 const rng=(()=>{let s=171104;return()=>((s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296);})();
 
 export function authorSummit17(ctx,island){
-  const root=new THREE.Group();root.name='Windgate 17 / summit hand terrain s4';island.root.add(root);
+  const root=new THREE.Group();root.name='Windgate 17 / summit hand terrain s5';island.root.add(root);
   const G=new Set(),M=new Set(),hidden=[];
   const mat=(c,o={})=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:.96,flatShading:true,...o});M.add(m);return m;};
   const bedrock=mat('#7c887e'),edgeRock=mat('#68766e'),oldStone=mat('#91998e'),darkStone=mat('#606c65'),moss=mat('#6e8055'),soil=mat('#80745f');
@@ -70,6 +70,58 @@ export function authorSummit17(ctx,island){
     add(boxG,i%3===0?darkStone:oldStone,cx+ox,y,cz+oz,[w,h,d],ry);
   });
 
+  // s5 naturalized ascent: terrain-hugging scars and irregular shoulders.
+  // These are visual-only so the native walkable terrain remains the gameplay SSOT.
+  function terrainPatch(points,m,yOffset=.035){
+    const verts=[],ix=[];
+    const center=points.reduce((a,p)=>[a[0]+p[0]/points.length,a[1]+p[1]/points.length],[0,0]);
+    verts.push(center[0],island.field.height(center[0],center[1])+yOffset,center[1]);
+    for(const [x,z] of points)verts.push(x,island.field.height(x,z)+yOffset,z);
+    for(let i=0;i<points.length;i++)ix.push(0,i+1,(i+1)%points.length+1);
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));g.setIndex(ix);g.computeVertexNormals();G.add(g);
+    const o=add(g,m,0,0,0);o.castShadow=false;return o;
+  }
+
+  // The ascent intentionally meanders. Patches overlap the old clean cut and make
+  // the readable route alternate between exposed earth, bedrock and thin grass.
+  const ascent=[
+    {z:31.5,x:-2.4,w:5.0,d:4.5,ry:-.13},
+    {z:27.6,x:-.6,w:4.2,d:3.8,ry:.09},
+    {z:24.2,x:1.35,w:4.8,d:3.5,ry:.16},
+    {z:20.8,x:.4,w:4.0,d:3.2,ry:-.08},
+    {z:17.8,x:-1.05,w:4.3,d:3.0,ry:-.16}
+  ];
+  for(let i=0;i<ascent.length;i++){
+    const a=ascent[i],x=cx+a.x,z=cz+a.z,c=Math.cos(a.ry),s=Math.sin(a.ry),hw=a.w/2,hd=a.d/2;
+    const local=[[-hw,-hd],[hw*.92,-hd*.72],[hw,hd*.58],[hw*.45,hd],[-hw*.7,hd*.86],[-hw,hd*.12]];
+    const pts=local.map(([px,pz])=>[x+px*c+pz*s,z-px*s+pz*c]);
+    terrainPatch(pts,i%2?soil:bedrock,.028+i*.003);
+  }
+
+  // Break the perfectly trimmed trail silhouette with side shoulders and eroded gaps.
+  const shoulders=[
+    [-5.2,30.8,1.9,.62,1.45,.18],[3.9,29.5,1.45,.48,1.1,-.20],
+    [-4.6,26.6,1.3,.44,1.25,-.12],[4.8,25.1,1.75,.56,1.45,.22],
+    [-5.0,22.4,1.55,.52,1.2,.16],[4.2,20.2,1.25,.43,1.05,-.18],
+    [-4.3,18.0,1.7,.55,1.25,-.10],[4.4,16.8,1.35,.46,1.1,.17]
+  ];
+  for(const [ox,oz,sx,sy,sz,ry] of shoulders){
+    const x=cx+ox,z=cz+oz,gy=island.field.height(x,z);
+    add(rockG,rng()<.48?edgeRock:bedrock,x,gy-.18,z,[sx,sy,sz],ry+(rng()-.5)*.22,0,(rng()-.5)*.08);
+  }
+
+  // Sparse fragments of an old retaining wall: enough history to read as ruins,
+  // but deliberately incomplete so the mountain still feels dominant.
+  const retaining=[
+    [-5.8,27.8,1.15,.42,.50,-.10],[-4.9,26.8,.86,.34,.48,.03],
+    [5.0,23.4,1.0,.38,.52,.14],[5.6,22.5,.72,.30,.45,.22],
+    [-5.2,19.9,.82,.32,.46,-.16],[4.9,17.9,.94,.34,.48,.11]
+  ];
+  for(const [ox,oz,w,h,d,ry] of retaining){
+    const x=cx+ox,z=cz+oz,y=island.field.height(x,z);
+    add(boxG,rng()<.35?darkStone:oldStone,x,y+h*.22,z,[w,h,d],ry,0,(rng()-.5)*.07);
+  }
+
   // Portal aisle: sparse old pavers only where feet would naturally pass.
   const pavers=[
     [-.35,7.1,1.45,.64,.10],[.28,5.7,1.75,.66,-.06],[-.15,4.15,1.35,.60,.05],
@@ -129,8 +181,8 @@ export function authorSummit17(ctx,island){
   else island.field.points.push({id:'summit17',name:'깨어난 첫 별의 성소 · 수작업',x:cx,y:island.field.height(cx,cz+8.6),z:cz+8.6,r:5,target:[cx,py+5.5,cz],text:'바람에 깎인 옛 성소'});
 
   island.summit17={
-    manual:true,version:'s4',hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,
-    irregularSlab:true,approachSteps:approach.length,edgeClusters:clusters.length,giantBoulders:false
+    manual:true,version:'s5',hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,
+    irregularSlab:true,approachSteps:approach.length,edgeClusters:clusters.length,giantBoulders:false,ascentNaturalized:true,retainingFragments:retaining.length
   };
   const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;hidden.forEach(o=>o.visible=true);root.removeFromParent();G.forEach(g=>g.dispose());M.forEach(m=>m.dispose());prev();};
   return island.summit17;
