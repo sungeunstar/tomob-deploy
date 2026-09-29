@@ -17,7 +17,7 @@ import {initPhysics} from './modules/physics.js';
 import {initWater} from './modules/water.js';
 import {initInput} from './modules/input.js';
 import {initPlayer,KAY_CHARS} from './modules/player.js';
-import {initAuroraRefuge} from './modules/aurora-refuge-v17.js?v=17h';
+import {initAuroraRefuge} from './modules/aurora-refuge-v17.js?v=17i';
 const $=s=>document.getElementById(s),q=new URLSearchParams(location.search),overview=q.get('view')==='overview',delay=ms=>new Promise(r=>setTimeout(r,ms));
 try{
  const ctx=initCore();window.ctx=ctx;ctx.renderer.outputColorSpace=THREE.SRGBColorSpace;ctx.renderer.toneMapping=THREE.ACESFilmicToneMapping;ctx.renderer.toneMappingExposure=1.02;
@@ -33,7 +33,7 @@ try{
  function aim(){if(!overview)return;ctx.camera.fov=43;ctx.camera.updateProjectionMatrix();if(inspection){const p=inspection,v=views[p.id]||{eye:[p.x+27,p.y+21,p.z+32],at:[p.x,p.y+3,p.z]};ctx.camera.position.set(...v.eye);ctx.camera.lookAt(...v.at);}else{ctx.camera.position.set(214,198,240);ctx.camera.lookAt(0,23,-4);}}
  if(overview){$('cross').style.display='none';$('hint').textContent='장소를 선택하면 가까이 볼 수 있어요.';ctx.onUpdate(aim);}
  ctx.onUpdate(()=>ctx.stepPhysics());
- const report=()=>{const p=ctx.player.pos;return{build:island.qualityVersion,ready,controller:'modules/player.js (unchanged)',characterReady:typeof window.__curAnim==='function',animation:window.__curAnim?.()||null,position:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3)},ground:+island.groundAt(p.x,p.z,p.y+.2).toFixed(3),assets:island.assets,details:island.detailStats,history:island.historyStats,polish:island.polishStats,authored:island.authored17||null,summit:island.summit17||null,waterfall:island.waterfall17||null,naturalization:island.field.naturalization,basins:island.basinQA,sightlines:island.sightlines,bvh:!!island.bvh,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,wallClockFPS:fps,frames,errors:window.__auroraErrors.slice(-8),nativeTest:window.__auroraQA?.testResult||null};};
+ const report=()=>{const p=ctx.player.pos;return{build:island.qualityVersion,ready,controller:'modules/player.js (unchanged)',characterReady:typeof window.__curAnim==='function',animation:window.__curAnim?.()||null,position:{x:+p.x.toFixed(3),y:+p.y.toFixed(3),z:+p.z.toFixed(3)},ground:+island.groundAt(p.x,p.z,p.y+.2).toFixed(3),assets:island.assets,details:island.detailStats,history:island.historyStats,polish:island.polishStats,authored:island.authored17||null,summit:island.summit17||null,waterfall:island.waterfall17||null,finalMap:island.finalMap17||null,naturalization:island.field.naturalization,basins:island.basinQA,sightlines:island.sightlines,bvh:!!island.bvh,drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,wallClockFPS:fps,frames,errors:window.__auroraErrors.slice(-8),nativeTest:window.__auroraQA?.testResult||null};};
  let areaId='';
  ctx.onUpdate(()=>{const p=ctx.player.pos;const area=island.field.points.find(a=>Math.hypot(a.x-p.x,a.z-p.z)<10);if(area&&area.id!==areaId){areaId=area.id;$('location').textContent=area.name;}});
  ctx.onUpdate(()=>{frames++;count++;const now=performance.now();if(now-last>=800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;const p=ctx.player.pos;$('pos').textContent=`${p.x.toFixed(0)}, ${p.z.toFixed(0)} · ${p.y.toFixed(1)}m`;$('fps').textContent=`${fps} FPS`;if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify(report(),null,2);}}});
