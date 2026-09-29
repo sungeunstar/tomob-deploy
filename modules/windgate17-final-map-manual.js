@@ -1,4 +1,4 @@
-/** Windgate 17 final map manual pass f1.
+/** Windgate 17 final map manual pass f2.
  * Finishes mine integration, route reveals, harbor landing and island silhouettes.
  * Visual-only: native terrain, route heights and collision remain unchanged.
  */
@@ -9,7 +9,7 @@ const rngFor=seed=>()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/42949672
 
 export function authorFinalMap17(ctx,island){
   const rng=rngFor(290926),field=island.field;
-  const root=new THREE.Group();root.name='Windgate 17 / final map hand pass f1';island.root.add(root);
+  const root=new THREE.Group();root.name='Windgate 17 / final map hand pass f2';island.root.add(root);
   const G=new Set(),M=new Set();
   const mat=(c,o={})=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:.97,flatShading:true,...o});M.add(m);return m;};
   const rock=mat('#697970'),rockDark=mat('#566861'),rockPale=mat('#879288'),soil=mat('#776c57'),soilDark=mat('#625a4c');
@@ -140,10 +140,14 @@ export function authorFinalMap17(ctx,island){
   let routeFragments=0;
   for(const [x,z,ry] of pavingSites){
     if(field.slope(x,z)>.85)continue;
-    const y=field.height(x,z);
     for(let i=0;i<3;i++){
       const side=i%2?1:-1,ox=Math.cos(ry)*side*(3.0+i*.30),oz=-Math.sin(ry)*side*(3.0+i*.30);
-      add(boxG,i===0?oldStone:rockPale,x+ox,y+.10,z+oz,[.64+.12*i,.11,.52+.08*(i%2)],ry+(rng()-.5)*.12,0,(rng()-.5)*.05,'windgate17/old route fragment');
+      const px=x+ox,pz=z+oz,localSlope=field.slope(px,pz);
+      // Every fragment samples its own contact point. On a cliff shoulder the old
+      // implementation inherited the path-centre height and could visibly float.
+      if(localSlope>.72)continue;
+      const y=field.height(px,pz)-.025;
+      add(boxG,i===0?oldStone:rockPale,px,y,pz,[.64+.12*i,.11,.52+.08*(i%2)],ry+(rng()-.5)*.12,0,(rng()-.5)*.035,'windgate17/old route fragment');
       routeFragments++;
     }
   }
@@ -219,7 +223,7 @@ export function authorFinalMap17(ctx,island){
   const grovePoint=field.points.find(p=>p.id==='grove');if(grovePoint)grovePoint.text='옛길의 잔해 사이로 정상의 방향이 다시 열린다';
 
   island.finalMap17={
-    manual:true,version:'f1',terrainCarved:false,newGameplayColliders:0,
+    manual:true,version:'f2',terrainCarved:false,newGameplayColliders:0,
     mine:mineStats,routeReveal:{gates:revealGates.length,trees:revealTrees,rocks:revealRocks,paving:routeFragments},
     harbor:harborStats,silhouette:{crownRocks,crownTrees,clusters:crowns.length},groundScars:scars.length
   };
