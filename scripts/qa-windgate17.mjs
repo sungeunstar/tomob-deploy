@@ -30,6 +30,6 @@ try{
  });
  await page.screenshot({path:out+'/summit-player.png'});
  const a=report.play.authored,s=report.play.summit;
- report.accepted=!!a&&a.mineYard===true&&a.terrainCarved===false&&a.decorativeColliders===false&&!!s&&s.manual===true&&s.terrainCarved===false&&s.newGameplayColliders===0&&s.approachStairs===6&&s.irregularSlab===true&&s.giantBoulders===false&&report.move.pass&&report.errors.length===0&&report.play.assets.errors.length===0;
+ report.accepted=!!a&&a.mineYard===true&&a.terrainCarved===false&&a.decorativeColliders===false&&!!s&&s.manual===true&&s.terrainCarved===false&&s.newGameplayColliders===0&&s.approachSteps===6&&s.irregularSlab===true&&s.giantBoulders===false&&report.move.pass&&report.errors.length===0&&report.play.assets.errors.length===0;
  if(!report.accepted)process.exitCode=1;
 }catch(e){report.fatal=e.stack;process.exitCode=1;try{await page?.screenshot({path:out+'/failure.png'});}catch{}}finally{await fs.writeFile(out+'/report.json',JSON.stringify(report,null,2));await browser?.close();server.close();}
