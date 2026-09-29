@@ -183,7 +183,7 @@ export function authorFinalMap17(ctx,island){
   const cargo=[
     [-72,104,1.05,.72,.82,.08],[-75,102,.82,.58,.72,-.14],[-54,104,.92,.62,.80,.11]
   ];
-  for(const [x,z,sx,sy,sz,ry] of cargo){const y=field.height(x,z);add(boxG,timber,x,y+sy*.48,z,[sx,sy,sz],ry,'','','windgate17/harbor cargo');harborStats.cargo++;}
+  for(const [x,z,sx,sy,sz,ry] of cargo){const y=field.height(x,z);add(boxG,timber,x,y+sy*.48,z,[sx,sy,sz],ry,0,0,'windgate17/harbor cargo');harborStats.cargo++;}
 
   // Sand and trampled shore patches tie timber objects back into the ground.
   patch([[-82,109],[-75,107],[-70,111],[-74,115],[-81,114]],sand,.018,'windgate17/harbor shore scar');
