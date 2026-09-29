@@ -1,0 +1,46 @@
+name: Windgate 20b hand polish verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'modules/windgate20b-polish.js'
+      - 'modules/aurora-refuge-v20b.js'
+      - 'sandbox-aurora-v20b.html'
+      - 'modules/aurora-refuge-v20.js'
+      - 'modules/windgate20-landscape-pass.js'
+      - 'modules/windgate20-ruins-pass.js'
+      - 'scripts/qa-windgate20b.mjs'
+      - '.github/workflows/windgate20b-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windgate20b-preview
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax
+        run: |
+          node --check modules/windgate20b-polish.js
+          node --check modules/aurora-refuge-v20b.js
+          node --check scripts/qa-windgate20b.mjs
+      - name: Browser tooling
+        run: |
+          mkdir -p /tmp/wg20b && cd /tmp/wg20b
+          npm init -y
+          npm install --no-audit --no-fund playwright@1.51.1
+          npx playwright install --with-deps chromium
+          ln -s /tmp/wg20b/node_modules "$GITHUB_WORKSPACE/node_modules"
+      - name: Render and native-route verification
+        run: node scripts/qa-windgate20b.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windgate20b-evidence
+          path: artifacts/windgate20b
+          retention-days: 7
+          if-no-files-found: warn
