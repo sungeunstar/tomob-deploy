@@ -125,14 +125,14 @@ export function authorRuins20(ctx,island){
   // --- 6. Collapse logic: rubble fans away from the surviving wall, with larger pieces near the source.
   const rubble=[];
   for(let i=0;i<34;i++){
-    const t=i/33,a=-2.5+rand()*1.75,r=2.5+Math.pow(rand(),.65)*10.5;
+    const t=i/33,a=-2.5+rng()*1.75,r=2.5+Math.pow(rng(),.65)*10.5;
     const x=49.5+Math.cos(a)*r,z=-44.5+Math.sin(a)*r;
     if(Math.hypot(x-44,z+43)<3.6)continue;
     if(island.field.nearPath(x,z).d<2.2)continue;
-    const s=.32+(1-t)*.55+rand()*.35;
+    const s=.32+(1-t)*.55+rng()*.35;
     rubble.push([x,z,s]);
   }
-  rubble.forEach(([x,z,s],i)=>rock(x,z,s*(.8+rand()*.7),s*.45,s*(.7+rand()*.55),rand()*6.28,i%5===0?limestone:oldStone));
+  rubble.forEach(([x,z,s],i)=>rock(x,z,s*(.8+rng()*.7),s*.45,s*(.7+rng()*.55),rng()*6.28,i%5===0?limestone:oldStone));
 
   // Moss is concentrated where stone meets ground, not sprayed uniformly.
   for(const [x,z,s] of [[36.5,-44.2,.65],[51.2,-47.0,.8],[48.7,-52.1,.62],[39.4,-50.5,.55],[53.0,-42.0,.5]]){
