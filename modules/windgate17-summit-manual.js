@@ -1,4 +1,4 @@
-/** Windgate 17 summit s5 — hand-authored terrain patch around the portal.
+/** Windgate 17 summit s6 — hand-authored terrain patch around the portal.
  * Visual terrain integration only. Existing stable collision surfaces remain unchanged.
  */
 import * as THREE from 'three';
@@ -7,7 +7,7 @@ import {SUMMIT} from './aurora-refuge-field.js';
 const rng=(()=>{let s=171104;return()=>((s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296);})();
 
 export function authorSummit17(ctx,island){
-  const root=new THREE.Group();root.name='Windgate 17 / summit hand terrain s5';island.root.add(root);
+  const root=new THREE.Group();root.name='Windgate 17 / summit hand terrain s6';island.root.add(root);
   const G=new Set(),M=new Set(),hidden=[];
   const mat=(c,o={})=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:.96,flatShading:true,...o});M.add(m);return m;};
   const bedrock=mat('#7c887e'),edgeRock=mat('#68766e'),oldStone=mat('#91998e'),darkStone=mat('#606c65'),moss=mat('#6e8055'),soil=mat('#80745f');
@@ -137,6 +137,85 @@ export function authorSummit17(ctx,island){
   ];
   for(const [ox,oz,w,h,d,ry] of foundations)add(boxG,ox<0?darkStone:oldStone,cx+ox,topY-.05+h*.4,cz+oz,[w,h,d],ry);
 
+  // s6 sanctuary ruin plan: the footprint of a former building should still be readable.
+  // Keep the +Z approach and central portal aisle open; ruins frame the space instead of filling it.
+  const ruinFloor=mat('#858b80',{roughness:1}),columnStone=mat('#8b9187');
+  const drumG=new THREE.CylinderGeometry(1,1,1,8);G.add(drumG);
+
+  function ruinStrip(ax,az,bx,bz,width=.58,y=.045,m=ruinFloor){
+    const dx=bx-ax,dz=bz-az,len=Math.hypot(dx,dz),mx=cx+(ax+bx)/2,mz=cz+(az+bz)/2;
+    const o=add(boxG,m,mx,topY+y,mz,[width,.08,len/2],Math.atan2(dx,dz));o.castShadow=false;return o;
+  }
+  // Foundation ghost: readable only at the edges, never a clean complete rectangle.
+  ruinStrip(-6.2,-6.2,-2.1,-6.2,.50,.025);
+  ruinStrip(2.0,-6.2,6.0,-6.2,.52,.025);
+  ruinStrip(-6.25,-5.8,-6.25,-1.3,.48,.022);
+  ruinStrip(-6.25,.4,-6.25,2.8,.46,.022);
+  ruinStrip(6.05,-5.8,6.05,-2.0,.48,.022);
+  ruinStrip(6.05,-.6,6.05,1.7,.44,.022);
+
+  function brokenWall(ax,az,bx,bz,course=2,seed=.31){
+    const dx=bx-ax,dz=bz-az,len=Math.hypot(dx,dz),steps=Math.max(2,Math.floor(len/.92));
+    const yaw=Math.atan2(dx,dz);
+    for(let i=0;i<steps;i++){
+      const t=(i+.5)/steps;
+      if(((i+Math.floor(seed*10))%7)===3)continue;
+      const x=cx+ax+dx*t,z=cz+az+dz*t;
+      const hCourses=Math.max(1,course-((i+Math.floor(seed*13))%4===0?1:0));
+      for(let r=0;r<hCourses;r++){
+        if(r>0&&(i+Math.floor(seed*17))%5===1)continue;
+        const w=.78+((i+r)%3)*.08,h=.34+((i+r)%2)*.04,d=.48;
+        const o=add(boxG,(i+r)%5===0?darkStone:oldStone,x+(rng()-.5)*.08,topY+.13+r*.36,z+(rng()-.5)*.08,[w,h,d],yaw+(rng()-.5)*.06,0,(rng()-.5)*.035);
+        o.name='windgate17/sanctuary broken wall';
+      }
+    }
+  }
+
+  // Rear wall and two side returns create the suggestion of a roofed sanctuary.
+  brokenWall(-6.15,-6.0,-2.15,-6.0,2,.22);
+  brokenWall(2.1,-6.0,5.95,-6.0,2,.48);
+  brokenWall(-6.05,-5.55,-6.05,-1.4,2,.67);
+  brokenWall(-6.05,.45,-6.05,2.55,1,.31);
+  brokenWall(5.9,-5.5,5.9,-2.0,2,.53);
+  brokenWall(5.9,-.55,5.9,1.55,1,.74);
+
+  // Broken columns: some still standing, others collapsed toward the old nave.
+  const columns=[
+    [-4.45,-3.65,1.75,0], [4.45,-3.65,1.28,0],
+    [-4.25,1.35,.92,0], [4.35,.95,.68,0]
+  ];
+  for(const [ox,oz,h,lean] of columns){
+    add(drumG,columnStone,cx+ox,topY+h*.28,cz+oz,[.52,h*.55,.52],0,0,lean);
+    add(boxG,darkStone,cx+ox,topY+.10,cz+oz,[.75,.16,.75],(rng()-.5)*.12);
+  }
+  // Fallen drums and lintels point toward the collapse, creating directional history.
+  add(drumG,oldStone,cx-3.45,topY+.34,cz-1.95,[.50,1.20,.50],.18,0,Math.PI/2-.08);
+  add(drumG,darkStone,cx+4.95,topY+.30,cz-1.10,[.46,.98,.46],-.22,0,Math.PI/2+.12);
+  add(boxG,oldStone,cx-3.15,topY+.40,cz-5.15,[2.25,.34,.50],-.11,0,.08);
+  add(boxG,darkStone,cx+3.25,topY+.29,cz-5.25,[1.65,.28,.46],.16,0,-.06);
+
+  // Three collapse fans: rubble density increases close to the broken structural corners.
+  const collapseFans=[
+    [-5.55,-5.30,1.55,10],[5.45,-4.95,1.45,9],[-5.60,1.15,1.25,7]
+  ];
+  let ruinRubble=0;
+  for(const [ox,oz,rad,count] of collapseFans){
+    for(let i=0;i<count;i++){
+      const a=(i/count)*Math.PI*2+rng()*.7,r=.35+rng()*rad;
+      const x=cx+ox+Math.cos(a)*r,z=cz+oz+Math.sin(a)*r;
+      // Leave the central nave clear.
+      if(Math.abs(x-cx)<2.15&&z>cz-4.8)continue;
+      const s=.22+rng()*.48;
+      add(rockG,rng()<.28?darkStone:oldStone,x,topY+.10+rng()*.12,z,[s,s*.45,s*.72],rng()*Math.PI,0,(rng()-.5)*.22);
+      ruinRubble++;
+    }
+  }
+
+  // A rear threshold and side altar fragment provide a human-scale focal hierarchy.
+  add(boxG,darkStone,cx,topY+.11,cz-5.62,[1.95,.16,.62],.02);
+  add(boxG,oldStone,cx-4.55,topY+.42,cz-4.95,[1.20,.58,.85],-.08);
+  add(boxG,darkStone,cx-4.55,topY+.82,cz-4.95,[.88,.20,.66],-.08);
+
   // Small bedrock groups around the edge; never one giant isolated sphere.
   const clusters=[
     [-7.9,5.0,1.7,1.0,1.35],[-8.5,1.1,1.4,.8,1.15],[-7.2,-5.2,1.8,.95,1.5],
@@ -181,8 +260,8 @@ export function authorSummit17(ctx,island){
   else island.field.points.push({id:'summit17',name:'깨어난 첫 별의 성소 · 수작업',x:cx,y:island.field.height(cx,cz+8.6),z:cz+8.6,r:5,target:[cx,py+5.5,cz],text:'바람에 깎인 옛 성소'});
 
   island.summit17={
-    manual:true,version:'s5',hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,
-    irregularSlab:true,approachSteps:approach.length,edgeClusters:clusters.length,giantBoulders:false,ascentNaturalized:true,retainingFragments:retaining.length
+    manual:true,version:'s6',hiddenLegacy:hidden.length,terrainCarved:false,newGameplayColliders:0,
+    irregularSlab:true,approachSteps:approach.length,edgeClusters:clusters.length,giantBoulders:false,ascentNaturalized:true,retainingFragments:retaining.length,sanctuaryFootprint:true,brokenWallRuns:6,columns:columns.length,ruinRubble
   };
   const prev=island.dispose;let dead=false;island.dispose=()=>{if(dead)return;dead=true;hidden.forEach(o=>o.visible=true);root.removeFromParent();G.forEach(g=>g.dispose());M.forEach(m=>m.dispose());prev();};
   return island.summit17;
