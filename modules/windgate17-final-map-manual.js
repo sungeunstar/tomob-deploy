@@ -157,7 +157,7 @@ export function authorFinalMap17(ctx,island){
   const postZ=[113,118,123,128,133];
   for(const z of postZ){
     for(const side of[-1,1]){
-      const x=DOCK.x+side*6.1,y=field.height(DOCK.x,Math.min(z,DOCK.shoreZ));
+      const x=DOCK.x+side*6.1,y=field.height(x,Math.min(z,DOCK.shoreZ));
       const h=2.0+(z%3)*.18;
       beam([x,y-.55,z],[x+(rng()-.5)*.12,y+h,z+(rng()-.5)*.14],.13,z>126?timberDark:timber,'windgate17/harbor weathered post');
       harborStats.dockPosts++;
@@ -173,14 +173,15 @@ export function authorFinalMap17(ctx,island){
     [-86,105,3.1,.12],[-44,106,2.8,-.15]
   ];
   for(const [x,z,len,ry] of drift){
-    const y=field.height(x,z)+.16;
     const dx=Math.sin(ry)*len*.5,dz=Math.cos(ry)*len*.5;
-    beam([x-dx,y,z-dz],[x+dx,y+.10,z+dz],.14,rng()<.25?timberDark:timber,'windgate17/washed timber');harborStats.driftwood++;
+    const ax=x-dx,az=z-dz,bx=x+dx,bz=z+dz;
+    const ay=field.height(ax,az)+.08,by=field.height(bx,bz)+.08;
+    beam([ax,ay,az],[bx,by,bz],.14,rng()<.25?timberDark:timber,'windgate17/washed timber');harborStats.driftwood++;
   }
   // Interrupted old seawall: enough to imply a former stone harbor, broken where refugees rebuilt in wood.
   for(const [x,z,w,ry] of[[-94,108,3.2,.12],[-90,111,2.2,.18],[-39,112,2.8,-.15],[-35,109,2.1,-.10]]){
-    const y=field.height(x,z);
-    add(boxG,oldStone,x,y+.20,z,[w,.36,.62],ry,0,(rng()-.5)*.04,'windgate17/broken seawall');harborStats.seawall++;
+    const y=field.height(x,z)-.03;
+    add(boxG,oldStone,x,y,z,[w,.36,.62],ry,0,(rng()-.5)*.025,'windgate17/broken seawall');harborStats.seawall++;
     if(rng()>.35){stone(x+(rng()-.5)*2,z+(rng()-.5)*1.2,.7,.32,.55,rockPale,-.05,rng()*Math.PI,'windgate17/seawall rubble');harborStats.seawall++;}
   }
   // Cargo kept to the margins of spawn.
@@ -223,7 +224,7 @@ export function authorFinalMap17(ctx,island){
   const grovePoint=field.points.find(p=>p.id==='grove');if(grovePoint)grovePoint.text='옛길의 잔해 사이로 정상의 방향이 다시 열린다';
 
   island.finalMap17={
-    manual:true,version:'f2',terrainCarved:false,newGameplayColliders:0,
+    manual:true,version:'f2',terrainCarved:false,newGameplayColliders:0,groundContactFix:true,
     mine:mineStats,routeReveal:{gates:revealGates.length,trees:revealTrees,rocks:revealRocks,paving:routeFragments},
     harbor:harborStats,silhouette:{crownRocks,crownTrees,clusters:crowns.length},groundScars:scars.length
   };
