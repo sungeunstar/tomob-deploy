@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOMOB · 밧모 해역 · Landmark v1</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9db8bd;color:#eee7d7;font:13px/1.55 system-ui,'Malgun Gothic',sans-serif}canvas{display:block}
+button,select,a{font:inherit;background:#17272bdc;color:inherit;border:1px solid #ffffff2b;border-radius:5px;padding:8px 11px;text-decoration:none;cursor:pointer}
+#hud{position:fixed;left:22px;top:18px;z-index:5;pointer-events:none;text-shadow:0 2px 7px #172326}.eyebrow{font-size:10px;letter-spacing:2.2px;color:#d8b78e}h1{font-size:24px;margin:2px 0;font-weight:560;letter-spacing:-1px}#location{color:#e3c291}#pos{font:10px ui-monospace,monospace;opacity:.65;margin-top:6px}
+#tools{position:fixed;right:18px;top:18px;z-index:10;display:flex;gap:7px}details{background:#14262bdd;border:1px solid #ffffff22;border-radius:5px}summary{padding:8px 11px;cursor:pointer}.inner{display:grid;gap:7px;padding:4px 11px 11px}
+#hint{position:fixed;left:22px;bottom:24px;z-index:5;background:#17272bc9;border-left:2px solid #b77e54;padding:10px 14px;pointer-events:none}#hint b{color:#efbf8e}
+#fps{position:fixed;right:18px;bottom:18px;z-index:5;background:#14262bc9;padding:6px 9px;font:11px ui-monospace,monospace}
+#load{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#101b1f;gap:13px;text-align:center}#load h2{font-size:30px;font-weight:500;margin:0}progress{width:230px;accent-color:#b97854}
+#qa{display:none;position:fixed;right:18px;top:160px;z-index:15;max-width:430px;max-height:65vh;overflow:auto;background:#0b1519ed;color:#add6bf;padding:11px;white-space:pre-wrap;font:11px/1.42 ui-monospace,monospace}
+#scale{position:fixed;left:22px;top:104px;z-index:5;pointer-events:none;color:#fff0d2a8;font-size:11px}
+@media(max-width:720px){#tools{top:110px;right:10px}#hud{left:12px;top:10px}#hint{left:12px;bottom:72px;font-size:11px}}
+</style>
+<script>window.__patmosErrors=[];addEventListener('error',e=>window.__patmosErrors.push(e.message));addEventListener('unhandledrejection',e=>window.__patmosErrors.push(String(e.reason)));</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="load"><small>TOMOB / LANDMARK 02 / PATMOS</small><h2>밧모 해역</h2><div>1.2km급 절벽 도시를 불러오는 중</div><progress></progress></div>
+<div id="hud"><div class="eyebrow">TOMOB / LANDMARK 02 / PATMOS</div><h1>절벽에 매달린 도시</h1><div id="location">숨은 밧모 항구</div><div id="pos"></div></div>
+<div id="scale">LANDMARK PROTOTYPE · 1.2 KM REGION · V1</div>
+<div id="tools"><a id="overview" href="?view=overview">전체 지형</a><details><summary>장소 둘러보기</summary><div class="inner"><select id="places"><option value="">장소 선택</option></select><button id="reset">항구로</button><small>장소 이동은 검수용입니다.</small></div></details></div>
+<div id="hint">화면 클릭 → 마우스 시점<br><b>WASD</b> 이동 · <b>Shift</b> 달리기 · <b>Space</b> 점프 · <b>F</b> 시점</div>
+<div id="fps"></div><pre id="qa"></pre>
+<script type="module">
+import * as THREE from 'three';
+import {initCore} from './modules/core.js';
+import {initPhysics} from './modules/physics.js';
+import {initWater} from './modules/water.js';
+import {initInput} from './modules/input.js';
+import {initPlayer,KAY_CHARS} from './modules/player.js';
+import {initPatmosLandmark} from './modules/patmos-landmark-v1.js?v=1a';
+
+const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),overview=q.get('view')==='overview';
+try{
+ const ctx=initCore({sky:0xa8c1c6});window.ctx=ctx;
+ ctx.renderer.outputColorSpace=THREE.SRGBColorSpace;ctx.renderer.toneMapping=THREE.ACESFilmicToneMapping;ctx.renderer.toneMappingExposure=.92;
+ ctx.scene.background.set('#a9c0c4');ctx.scene.fog=new THREE.FogExp2('#a9c0c4',.00072);
+ ctx.hemi.color.set('#e7e7d7');ctx.hemi.groundColor.set('#506761');ctx.hemi.intensity=1.22;
+ ctx.sun.color.set('#ffd7ad');ctx.sun.intensity=1.82;ctx.sun.position.set(-280,520,350);
+ Object.assign(ctx.sun.shadow.camera,{left:-420,right:420,top:420,bottom:-420,near:10,far:1200});ctx.sun.shadow.camera.updateProjectionMatrix();ctx.sun.shadow.normalBias=.18;
+ ctx.fill.color.set('#9eb9bf');ctx.fill.intensity=.36;ctx.amb.intensity=.10;
+ await initPhysics(ctx);initWater(ctx,{waveAmp:.48,size:9000});ctx.water.mat.uniforms.uSwell.value=.38;
+ initInput(ctx);
+ const island=await initPatmosLandmark(ctx);
+ const character=KAY_CHARS[q.get('char')]||KAY_CHARS.knight;
+ initPlayer(ctx,{spawn:island.spawn,charUrl:character});ctx.player.setThird(true);ctx.player.setYaw(.02);ctx.player.setPitch(.12);
+ ctx.onUpdate(()=>ctx.stepPhysics());
+
+ const views={
+  harbor:{eye:[340,150,500],at:[0,55,60]},
+  lower:{eye:[-390,210,240],at:[-140,90,-15]},
+  market:{eye:[210,115,80],at:[0,55,-150]},
+  bridge:{eye:[330,285,130],at:[10,155,-150]},
+  watch:{eye:[430,330,-25],at:[105,220,-250]},
+  citadel:{eye:[350,450,-40],at:[0,285,-340]}
+ };
+ let inspection=null,last=performance.now(),frames=0,count=0,fps=0,area='';
+ function aim(){
+   if(!overview)return;
+   ctx.camera.fov=42;ctx.camera.updateProjectionMatrix();
+   if(inspection){const v=views[inspection.id]||{eye:[inspection.x+180,inspection.y+120,inspection.z+190],at:[inspection.x,inspection.y,inspection.z]};ctx.camera.position.set(...v.eye);ctx.camera.lookAt(...v.at);}
+   else{ctx.camera.position.set(760,590,840);ctx.camera.lookAt(0,100,-60);}
+ }
+ if(overview){ctx.onUpdate(aim);$('hint').textContent='장소를 선택하면 각 구역을 가까이 볼 수 있습니다.';}
+ function go(id){
+   const p=island.points.find(x=>x.id===id);if(!p)return;inspection=p;$('location').textContent=p.name;$('places').value=p.id;
+   if(!overview){const y=island.groundAt(p.x,p.z,p.y+90);ctx.player.setSpawn(p.x,y+2.2,p.z);if(p.target){const dx=p.target[0]-p.x,dz=p.target[2]-p.z;ctx.player.setYaw(Math.atan2(dx,-dz));}}
+ }
+ for(const p of island.points){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;$('places').appendChild(o);}
+ $('places').onchange=()=>go($('places').value);
+ $('reset').onclick=()=>{ctx.player.setSpawn(island.spawn.x,island.spawn.y,island.spawn.z);inspection=null;$('location').textContent='숨은 밧모 항구';};
+ const next=new URL(location.href);overview?next.searchParams.delete('view'):next.searchParams.set('view','overview');$('overview').href=next.href;$('overview').textContent=overview?'본편 조작':'전체 지형';
+
+ ctx.onUpdate(()=>{
+   frames++;count++;
+   const p=ctx.player.pos,near=island.points.find(x=>Math.hypot(x.x-p.x,x.z-p.z)<32);
+   if(near&&near.id!==area){area=near.id;$('location').textContent=near.name;}
+   const now=performance.now();
+   if(now-last>800){fps=+(count*1000/(now-last)).toFixed(1);count=0;last=now;$('fps').textContent=fps+' FPS';$('pos').textContent=`${p.x.toFixed(0)}, ${p.z.toFixed(0)} · ${p.y.toFixed(1)}m`;
+     if(q.has('qa')){$('qa').style.display='block';$('qa').textContent=JSON.stringify({build:island.qualityVersion,stats:island.stats,position:{x:+p.x.toFixed(1),y:+p.y.toFixed(1),z:+p.z.toFixed(1)},drawCalls:ctx.renderer.info.render.calls,triangles:ctx.renderer.info.render.triangles,fps,errors:window.__patmosErrors.slice(-8)},null,2);}
+   }
+ });
+ window.__patmos={ctx,island,go,aim};
+ ctx.start();
+ if(q.get('place'))go(q.get('place'));
+ document.body.dataset.ready='true';$('load').remove();
+}catch(e){console.error(e);$('load').querySelector('div').textContent='초기화 실패: '+e.message;$('load').querySelector('progress')?.remove();}
+</script></body></html>
