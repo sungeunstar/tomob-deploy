@@ -29,7 +29,7 @@ import {initPhysics} from './modules/physics.js';
 import {initWater} from './modules/water.js';
 import {initInput} from './modules/input.js';
 import {initPlayer,KAY_CHARS} from './modules/player.js';
-import {initPatmosHarborV5} from './modules/patmos-harbor-v5.js?v=5b';
+import {initPatmosHarborV5} from './modules/patmos-harbor-v5.js?v=5c';
 
 const $=id=>document.getElementById(id),q=new URLSearchParams(location.search),overview=q.get('view')==='overview';
 try{
@@ -42,7 +42,7 @@ try{
  ctx.fill.color.set('#a9c4ca');ctx.fill.intensity=.58;ctx.amb.intensity=.18;
  await initPhysics(ctx);initWater(ctx,{waveAmp:.30,size:7000});ctx.water.mat.uniforms.uSwell.value=.22;
  initInput(ctx);
- const island=await initPatmosHarborV3(ctx);
+ const island=await initPatmosHarborV5(ctx);
  const character=KAY_CHARS[q.get('char')]||KAY_CHARS.knight;
  initPlayer(ctx,{spawn:island.spawn,charUrl:character});ctx.player.setThird(true);ctx.player.setYaw(Math.PI);ctx.player.setPitch(.055);
  ctx.onUpdate(()=>ctx.stepPhysics());
