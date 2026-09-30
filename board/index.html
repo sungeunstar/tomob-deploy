@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#07141d" />
+  <title>TOMOB · 항로전 MVP</title>
+  <style>
+:root{
+  --bg:#061017;--panel:#0a1821e8;--panel2:#0c202b;--line:#214150;--text:#eef7f6;--muted:#8ba5ac;
+  --cyan:#4ed7d2;--gold:#d7b56d;--red:#d96b61;--remnant:#93bd64;--watch:#6a9fd8;--bank:#d8b86f;--neutral:#9eaaa8;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% -20%,#123240 0,#07151d 38%,#03090e 100%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Pretendard",sans-serif}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff04 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#0008,transparent 85%)}button,input,select{font:inherit}button{cursor:pointer}.muted{color:var(--muted)}
+.topbar{height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;border-bottom:1px solid #1b3642;background:#061018e8;backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}.brand{display:flex;gap:14px;align-items:center}.logo{width:88px;max-height:42px;object-fit:contain}.eyebrow,.panel-kicker{font-size:10px;letter-spacing:.2em;color:#62b3b8;font-weight:800}.subtitle{font-size:13px;color:#9bb1b6;margin-top:4px}.top-stats{display:flex;gap:8px}.stat{min-width:84px;border:1px solid #24414c;background:#07151d;padding:8px 12px;border-radius:10px}.stat span{display:block;font-size:9px;color:#759098;text-transform:uppercase;letter-spacing:.14em}.stat strong{display:block;margin-top:2px;font-size:15px;color:#e8f6f5}
+.shell{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;padding:14px;max-width:1500px;margin:auto}.panel{background:linear-gradient(180deg,#0b1a23ec,#07141ced);border:1px solid #1e3a46;border-radius:14px;box-shadow:0 20px 60px #0005;overflow:hidden}.board-wrap{padding:15px}.panel-head{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 12px}.panel-head h1{font-size:20px;margin:3px 0 0;letter-spacing:.03em}.turn-badge{border:1px solid #2c5964;padding:7px 12px;border-radius:999px;font-size:12px;background:#0c2630;color:#cbeeed}.turn-badge.remnant{border-color:#6f9c4e;color:#cfeab8}.turn-badge.watch{border-color:#507fae;color:#c8e2fb}.turn-badge.bank{border-color:#977d45;color:#f4dfaa}
+.board{height:min(68vh,720px);min-height:540px;position:relative;border:1px solid #1d3a47;border-radius:12px;overflow:hidden;background:radial-gradient(circle at 52% 46%,#124052 0,#0a2b3a 38%,#061a25 70%,#05131b 100%)}.board:before,.board:after{content:"";position:absolute;inset:-40%;border:1px solid #7fe7f015;border-radius:46%;transform:rotate(-7deg);pointer-events:none}.board:after{inset:-25%;transform:rotate(13deg);border-color:#99e9ff0b}.sea-glow{position:absolute;inset:0;background:radial-gradient(circle at 45% 45%,transparent 0 33%,#04101977 78%);pointer-events:none}.route-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2}.island-layer{position:absolute;inset:0;z-index:4}.route{stroke:#356273;stroke-width:3;opacity:.58;cursor:pointer;transition:.16s}.route:hover,.route.selected{stroke:#8ff3ef;opacity:1;stroke-width:5}.route.control-remnant{stroke:var(--remnant);opacity:.88}.route.control-watch{stroke:var(--watch);opacity:.88}.route.pirate-remnant{stroke:var(--remnant);stroke-dasharray:9 7;opacity:1}.route.pirate-watch{stroke:var(--watch);stroke-dasharray:9 7;opacity:1}.route.closed{stroke:#546167;stroke-dasharray:4 7;opacity:.28}.pirate-icon{font-size:21px;fill:#f4dfaa;paint-order:stroke;stroke:#061018;stroke-width:4px;pointer-events:none}
+.island{position:absolute;transform:translate(-50%,-50%);width:88px;height:62px;border:0;background:transparent;color:#fff;padding:0;text-align:center}.island .rock{position:absolute;inset:5px 8px 9px;border:1px solid #46616a;clip-path:polygon(17% 28%,38% 5%,73% 13%,96% 44%,78% 84%,49% 96%,14% 83%,1% 51%);background:linear-gradient(145deg,#2f4549,#172c33 62%,#0a1f29);box-shadow:0 7px 14px #0007, inset 0 0 18px #82cbd018;transition:.15s}.island:hover .rock,.island.selected .rock{filter:brightness(1.25);transform:scale(1.06);border-color:#91e5df}.island .name{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);font-size:10px;font-weight:800;white-space:nowrap;text-shadow:0 2px 6px #000}.island .alt{position:absolute;top:-3px;right:4px;font-size:9px;padding:2px 5px;border-radius:8px;background:#06131bd8;border:1px solid #34515a;color:#b5c8cc}.island .builds{position:absolute;left:50%;top:24px;transform:translateX(-50%);font-size:10px;white-space:nowrap}.island.owner-remnant .rock{border-color:#739b53;background:linear-gradient(145deg,#526a43,#1e352c 68%,#10251f)}.island.owner-watch .rock{border-color:#5a8ab9;background:linear-gradient(145deg,#415f77,#1b3348 68%,#0f2233)}.island.owner-bank .rock{border-color:#aa8e50;background:linear-gradient(145deg,#685b3c,#352c1c 68%,#211b12)}.island.sunk{opacity:.22;filter:grayscale(1);pointer-events:none}.island.sunk .rock{transform:scale(.74) rotate(8deg)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:12px 4px 0;color:#8ba5ac;font-size:11px}.legend span{display:flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.dot.remnant{background:var(--remnant)}.dot.watch{background:var(--watch)}.dot.bank{background:var(--bank)}.dot.neutral{background:var(--neutral)}.pirate-mark{font-style:normal;color:#efd58d}
+.side{display:flex;flex-direction:column;gap:12px}.players-panel,.action-panel,.hand-panel,.chat-panel{padding:13px}.player-row{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #17313c}.player-row:last-child{border:0}.sigil{width:38px;height:38px;object-fit:contain;border-radius:8px}.bank-sigil{width:38px;height:38px;border:1px solid #917948;border-radius:50%;display:grid;place-items:center;color:#edd79c;font-family:serif;font-weight:900}.pname{font-size:12px;font-weight:800}.faction-name{font-size:10px;color:var(--muted);margin-top:2px}.pstats{text-align:right;font-size:11px}.pstats strong{display:block;font-size:16px;color:#f4dfaa}.route-score{color:#79d6d2;font-size:10px}.support-tag{display:inline-block;padding:2px 6px;border:1px solid #8e7441;border-radius:999px;color:#e9cd89;font-size:9px;margin-left:5px}
+.action-header{font-size:14px;font-weight:800;margin-top:5px}.selection-info{margin:10px 0;padding:10px;border-radius:10px;background:#07131a;border:1px solid #17313c;font-size:11px;line-height:1.55}.action-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}.action-buttons button,.hand button,.chat-form button,.entry-actions button,.room-code-box button,.modal-card button{border:1px solid #2d5360;background:#0e2832;color:#dff5f2;padding:9px 10px;border-radius:9px;font-size:11px;font-weight:700}.action-buttons button:hover,.hand button:hover,.chat-form button:hover,.modal-card button:hover{border-color:#67c7c8;background:#123641}.action-buttons .danger{border-color:#6b3935;color:#efaaa2}.action-buttons .gold{border-color:#6d5b37;color:#f3d48e}.action-buttons .wide{grid-column:1/-1}.action-buttons button:disabled{opacity:.35;cursor:not-allowed}.hand{display:flex;gap:7px;overflow-x:auto;padding-top:8px}.card{min-width:116px;border:1px solid #29515c;background:linear-gradient(180deg,#102934,#091a22);border-radius:10px;padding:9px}.card strong{display:block;font-size:11px}.card small{display:block;color:#8fa8ae;font-size:9px;line-height:1.35;margin:4px 0 8px}.card button{width:100%;padding:6px}
+.chat-log{height:118px;overflow:auto;margin-top:8px;padding:7px;background:#061219;border:1px solid #17313c;border-radius:9px;font-size:10px}.chat-msg{margin-bottom:6px;color:#c1d5d8}.chat-msg b{color:#7ddad5}.chat-form{display:flex;gap:6px;margin-top:7px}.chat-form input,.entry-card input,.modal-card input,.modal-card select{min-width:0;flex:1;background:#061219;border:1px solid #264652;color:#e8f6f5;border-radius:9px;padding:9px;outline:none}.chat-form input:focus,.entry-card input:focus,.modal-card input:focus,.modal-card select:focus{border-color:#66c8c7}.chat-form button{padding-inline:12px}
+.lower-grid{max-width:1500px;margin:0 auto 24px;padding:0 14px;display:grid;grid-template-columns:1fr 350px;gap:14px}.event-panel,.rules-panel{padding:13px}.event-log{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.event{border-left:2px solid #2d5a68;background:#07141b;padding:7px 9px;font-size:10px;color:#a9c0c5}.event strong{color:#e9f7f5}.mini-rules{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.mini-rules div{background:#07141b;border:1px solid #17313c;border-radius:9px;padding:8px}.mini-rules strong{font-size:18px;color:#6ed7d4;display:block}.mini-rules span{font-size:9px;color:#8ba5ac}
+.overlay{position:fixed;inset:0;background:#02070bd8;backdrop-filter:blur(12px);display:none;place-items:center;z-index:50;padding:18px}.overlay.open{display:grid}.entry-card,.lobby-card{width:min(580px,100%);background:linear-gradient(180deg,#0b1c25,#06131a);border:1px solid #2a4b58;border-radius:18px;padding:22px;box-shadow:0 30px 100px #000a}.entry-brand{text-align:center;margin-bottom:16px}.entry-brand img{width:140px;max-height:60px;object-fit:contain}.entry-brand p{font-size:12px;color:#93a9ae}.entry-card label{font-size:10px;color:#8ba5ac}.entry-card label input{display:block;width:100%;margin-top:5px}.label-title{font-size:10px;color:#8ba5ac;margin:14px 0 7px}.faction-pick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.faction-card{border:1px solid #23434f;background:#081923;border-radius:12px;color:#dfeeee;padding:12px 8px}.faction-card img{width:44px;height:44px;object-fit:contain;display:block;margin:auto}.faction-card span{font-weight:900;font-size:12px;display:block;margin-top:6px}.faction-card small{font-size:9px;color:#819a9f}.faction-card.selected{border-color:#66d0cc;box-shadow:inset 0 0 18px #2cc8c31a}.bank-seal{width:44px;height:44px!important;border:1px solid #9c814a;border-radius:50%;display:grid!important;place-items:center;margin:auto!important;font-size:20px!important;font-family:serif;color:#e9d291}.entry-actions{display:grid;gap:8px;margin-top:15px}.entry-actions .primary,.primary{background:linear-gradient(180deg,#1c5d66,#113c47);border-color:#4aa9ac!important;color:white!important}.join-row{display:flex;gap:7px}.join-row input{text-transform:uppercase}.entry-status{text-align:center;color:#7f9aa0;font-size:10px;line-height:1.5;margin-top:10px}.room-code-box{display:flex;align-items:center;gap:10px;background:#07141b;border:1px solid #203b46;border-radius:12px;padding:12px;margin:14px 0}.room-code-box span{font-size:9px;color:#6e8990}.room-code-box strong{font-size:22px;letter-spacing:.16em;color:#67d7d2}.room-code-box button{margin-left:auto}.lobby-seats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.lobby-seat{border:1px solid #203c47;border-radius:12px;padding:11px;text-align:center;background:#081821}.lobby-seat img{width:40px;height:40px;object-fit:contain}.lobby-seat .bank-seal{margin:auto}.lobby-seat strong{font-size:11px;display:block;margin-top:5px}.lobby-seat span{font-size:9px;color:#80999f}.lobby-seat.empty{opacity:.42}.wide{width:100%;margin-top:14px;padding:11px!important}.wide:disabled{opacity:.4}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:#02070bb0;z-index:60;padding:18px}.modal.open{display:grid}.modal-card{width:min(430px,100%);background:#091922;border:1px solid #2b4c58;border-radius:15px;padding:18px}.modal-card h3{margin:0 0 5px;font-size:16px}.modal-card p{font-size:11px;color:#90a8ae;line-height:1.5}.modal-card label{display:block;font-size:10px;color:#91a8ad;margin:10px 0}.modal-card input,.modal-card select{width:100%;display:block;margin-top:5px}.modal-actions{display:flex;gap:7px;margin-top:14px}.modal-actions button{flex:1}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;background:#102832;border:1px solid #3d7680;border-radius:10px;padding:10px 14px;font-size:11px;z-index:90;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:980px){.shell,.lower-grid{grid-template-columns:1fr}.board{height:60vh;min-height:480px}.side{display:grid;grid-template-columns:1fr 1fr}.chat-panel{grid-column:1/-1}.event-log{grid-template-columns:1fr 1fr}.topbar{height:auto;padding:10px 14px}.subtitle{display:none}.top-stats .stat{min-width:65px;padding:6px 8px}.logo{width:70px}}
+@media(max-width:620px){.shell{padding:8px}.board-wrap{padding:9px}.board{min-height:430px;height:58vh}.side{grid-template-columns:1fr}.chat-panel{grid-column:auto}.lower-grid{padding:0 8px}.top-stats{gap:3px}.stat{min-width:54px!important}.stat span{font-size:8px}.stat strong{font-size:12px}.faction-pick{grid-template-columns:1fr}.faction-card{display:grid;grid-template-columns:44px 1fr;align-items:center;text-align:left}.faction-card img,.faction-card .bank-seal{grid-row:1/3;margin:0!important}.faction-card span,.faction-card small{margin:0}.lobby-seats{grid-template-columns:1fr}.event-log{grid-template-columns:1fr}.island{width:72px;height:55px}.island .name{font-size:9px}}
+
+</style>
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../intro/logo.png" alt="TOMOB" class="logo" />
+        <div>
+          <div class="eyebrow">THE FIRST STAR · BOARD MVP</div>
+          <div class="subtitle">가라앉는 세계에서 마지막 항로를 차지하라</div>
+        </div>
+      </div>
+      <div class="top-stats">
+        <div class="stat"><span>라운드</span><strong id="roundStat">—</strong></div>
+        <div class="stat"><span>해수면</span><strong id="seaStat">—</strong></div>
+        <div class="stat"><span>방</span><strong id="roomStat">—</strong></div>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="board-wrap panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-kicker">WORLD MAP</div>
+            <h1>아라랏 해역</h1>
+          </div>
+          <div id="turnBadge" class="turn-badge">대기 중</div>
+        </div>
+
+        <div id="board" class="board" aria-label="TOMOB 게임판">
+          <svg id="routeLayer" class="route-layer" viewBox="0 0 1000 650" preserveAspectRatio="none"></svg>
+          <div id="islandLayer" class="island-layer"></div>
+          <div class="sea-glow"></div>
+        </div>
+
+        <div class="legend">
+          <span><i class="dot remnant"></i>남은 자</span>
+          <span><i class="dot watch"></i>파수꾼</span>
+          <span><i class="dot bank"></i>아라랏 은행</span>
+          <span><i class="dot neutral"></i>중립</span>
+          <span><i class="pirate-mark">☠</i>해적 항로</span>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section id="playersPanel" class="panel players-panel"></section>
+
+        <section class="panel action-panel">
+          <div class="panel-kicker">TURN ACTION</div>
+          <div id="actionHeader" class="action-header">게임에 참가하세요.</div>
+          <div id="selectionInfo" class="selection-info muted">섬이나 항로를 선택하면 행동이 표시됩니다.</div>
+          <div id="actionButtons" class="action-buttons"></div>
+        </section>
+
+        <section class="panel hand-panel">
+          <div class="panel-kicker">STRATEGY HAND</div>
+          <div id="hand" class="hand"><span class="muted">—</span></div>
+        </section>
+
+        <section class="panel chat-panel">
+          <div class="panel-kicker">NEGOTIATION</div>
+          <div id="chatLog" class="chat-log"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" maxlength="120" placeholder="협상 메시지…" autocomplete="off" />
+            <button type="submit">전송</button>
+          </form>
+        </section>
+      </aside>
+    </main>
+
+    <section class="lower-grid">
+      <section class="panel event-panel">
+        <div class="panel-kicker">VOYAGE LOG</div>
+        <div id="eventLog" class="event-log"></div>
+      </section>
+      <section class="panel rules-panel">
+        <div class="panel-kicker">MVP RULE</div>
+        <div class="mini-rules">
+          <div><strong>2</strong><span>턴당 행동</span></div>
+          <div><strong>8</strong><span>최대 라운드</span></div>
+          <div><strong>1–2</strong><span>D6 재앙 발생</span></div>
+          <div><strong>24</strong><span>은행 승리 자산</span></div>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <div id="entryOverlay" class="overlay open">
+    <div class="entry-card">
+      <div class="entry-brand">
+        <img src="../intro/logo.png" alt="TOMOB" />
+        <p>온라인 항로전 플레이테스트</p>
+      </div>
+      <label>플레이어 이름<input id="playerName" maxlength="14" placeholder="이름" /></label>
+      <div class="label-title">세력 선택</div>
+      <div id="factionPick" class="faction-pick">
+        <button data-faction="remnant" class="faction-card selected">
+          <img src="../assets/sigils/remnant.png" alt="" /><span>남은 자</span><small>항로 확장</small>
+        </button>
+        <button data-faction="watch" class="faction-card">
+          <img src="../assets/sigils/watch.png" alt="" /><span>파수꾼</span><small>항로 수호</small>
+        </button>
+        <button data-faction="bank" class="faction-card bank-card">
+          <span class="bank-seal">A</span><span>아라랏 은행</span><small>금융 · 담보</small>
+        </button>
+      </div>
+      <div class="entry-actions">
+        <button id="createRoom" class="primary">새 방 만들기</button>
+        <div class="join-row">
+          <input id="roomCodeInput" maxlength="6" placeholder="방 코드" />
+          <button id="joinRoom">방 참가</button>
+        </div>
+      </div>
+      <div id="entryStatus" class="entry-status">3명이 각각 다른 세력을 선택하면 시작할 수 있습니다.</div>
+    </div>
+  </div>
+
+  <div id="lobbyOverlay" class="overlay">
+    <div class="lobby-card">
+      <div class="panel-kicker">ROOM LOBBY</div>
+      <h2>아라랏 해역 원정 준비</h2>
+      <div class="room-code-box"><span>ROOM</span><strong id="lobbyCode">------</strong><button id="copyRoom">초대 링크 복사</button></div>
+      <div id="lobbySeats" class="lobby-seats"></div>
+      <button id="startGame" class="primary wide" disabled>3인 준비 후 게임 시작</button>
+      <div id="lobbyHint" class="entry-status">방장이 게임을 시작합니다.</div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal"><div id="modalCard" class="modal-card"></div></div>
+  <div id="toast" class="toast"></div>
+
+  <script>
+(() => {
+  'use strict';
+
+  const FACTIONS = {
+    remnant: { name:'남은 자', color:'#93bd64', sigil:'../assets/sigils/remnant.png' },
+    watch: { name:'파수꾼', color:'#6a9fd8', sigil:'../assets/sigils/watch.png' },
+    bank: { name:'아라랏 은행', color:'#d8b86f', sigil:null }
+  };
+  const TURN_ORDER = ['remnant','watch','bank'];
+  const MAX_ROUNDS = 8;
+  const BANK_WIN_ASSET = 24;
+  const ISLANDS = [
+    {id:'patmos', name:'밧모', x:11,y:56, alt:3, owner:'remnant'},
+    {id:'greenwake', name:'초록 물길', x:21,y:31, alt:2, owner:'remnant'},
+    {id:'peak', name:'봉우리', x:35,y:18, alt:5, owner:null},
+    {id:'mist', name:'안개섬', x:43,y:43, alt:2, owner:null},
+    {id:'ararat', name:'아라랏', x:51,y:67, alt:6, owner:'bank'},
+    {id:'fragment', name:'분깃의 섬', x:55,y:25, alt:1, owner:null},
+    {id:'kabe', name:'카브', x:68,y:47, alt:4, owner:null},
+    {id:'sheol', name:'스올', x:83,y:25, alt:5, owner:'watch'},
+    {id:'sunken', name:'잠긴 왕국', x:89,y:56, alt:2, owner:'watch'},
+    {id:'iron', name:'철의 곶', x:72,y:75, alt:4, owner:null},
+    {id:'delta', name:'낮은 삼각주', x:35,y:79, alt:1, owner:null},
+    {id:'lighthouse', name:'별빛 망대', x:18,y:80, alt:3, owner:null}
+  ];
+  const ROUTES = [
+    ['patmos','greenwake'],['patmos','lighthouse'],['patmos','mist'],
+    ['greenwake','peak'],['greenwake','mist'],['peak','fragment'],['peak','mist'],
+    ['mist','fragment'],['mist','ararat'],['mist','delta'],
+    ['fragment','kabe'],['fragment','sheol'],['fragment','ararat'],
+    ['kabe','sheol'],['kabe','sunken'],['kabe','iron'],['kabe','ararat'],
+    ['sheol','sunken'],['sunken','iron'],['iron','ararat'],['iron','delta'],
+    ['ararat','delta'],['delta','lighthouse'],['lighthouse','mist']
+  ].map((r,i)=>({id:`r${i}`,a:r[0],b:r[1],pirate:null}));
+  const CARD_DEFS = {
+    windfall:{name:'시장 호황',desc:'즉시 금화 +2',effect:'gold2'},
+    surge:{name:'총동원령',desc:'이번 턴 행동 +1',effect:'action1'},
+    settlers:{name:'신속한 협상',desc:'다음 섬 장악 비용 -1',effect:'claim1'},
+    letter:{name:'사략 허가증',desc:'다음 해적 배치 비용 -1',effect:'pirate1'}
+  };
+  const CARD_POOL = ['windfall','windfall','surge','settlers','settlers','letter','letter'];
+
+  let peer=null, hostConn=null, isHost=false, roomCode='', myFaction=null, myName='';
+  let state=null, connections=new Map(), selectedIsland=null, selectedRoute=null;
+  let toastTimer=null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const rnd = n => Math.floor(Math.random()*n);
+  const roomRand = () => Math.random().toString(36).slice(2,8).toUpperCase().replace(/[^A-Z0-9]/g,'X');
+
+  function initialState(hostFaction, hostName){
+    const players={remnant:null,watch:null,bank:null};
+    players[hostFaction]={name:hostName,host:true};
+    return {
+      version:1, started:false, ended:false, winner:null, round:1, seaLevel:0, turnIndex:0,
+      actionsLeft:2, players,
+      islands:ISLANDS.map(i=>({...i,sunk:false,buildings:{port:false,trade:false,fort:false}})),
+      routes:ROUTES.map(r=>({...r})),
+      gold:{remnant:5,watch:5,bank:14},
+      hands:{remnant:[],watch:[],bank:[]},
+      buffs:{remnant:{claim:0,pirate:0},watch:{claim:0,pirate:0},bank:{claim:0,pirate:0}},
+      bankSupport:null, loans:[], loanSeq:1,
+      log:[{text:'아라랏 해역이 열렸습니다.',ts:Date.now()}], chat:[]
+    };
+  }
+
+  function island(id,s=state){return s?.islands.find(x=>x.id===id)}
+  function route(id,s=state){return s?.routes.find(x=>x.id===id)}
+  function routeClosed(r,s=state){return island(r.a,s)?.sunk || island(r.b,s)?.sunk}
+  function isMilitary(f){return f==='remnant'||f==='watch'}
+  function otherMilitary(f){return f==='remnant'?'watch':'remnant'}
+  function currentFaction(s=state){return TURN_ORDER[s?.turnIndex||0]}
+  function playerReady(f,s=state){return !!s?.players?.[f]}
+  function ownedIslands(f,s=state){return s.islands.filter(i=>!i.sunk&&i.owner===f)}
+  function bankAssets(s=state){
+    const receivables=s.loans.filter(l=>l.status==='open').reduce((n,l)=>n+l.repay,0);
+    return s.gold.bank + receivables + ownedIslands('bank',s).length*3;
+  }
+  function routeController(r,s=state){
+    if(routeClosed(r,s)) return null;
+    if(r.pirate && isMilitary(r.pirate)) return r.pirate;
+    const a=island(r.a,s),b=island(r.b,s);
+    return a.owner===b.owner && isMilitary(a.owner) ? a.owner : null;
+  }
+  function routeScore(f,s=state){return s.routes.filter(r=>routeController(r,s)===f).length}
+  function adjacentOwned(targetId,f,s=state){
+    return s.routes.some(r=>!routeClosed(r,s)&&!((r.pirate)&&r.pirate!==f)&&((r.a===targetId&&island(r.b,s)?.owner===f)||(r.b===targetId&&island(r.a,s)?.owner===f)));
+  }
+  function portAdjacent(targetId,f,s=state){
+    return s.routes.some(r=>!routeClosed(r,s)&&((r.a===targetId&&island(r.b,s)?.owner===f&&island(r.b,s).buildings.port)||(r.b===targetId&&island(r.a,s)?.owner===f&&island(r.a,s).buildings.port)));
+  }
+  function routeTouchesOwned(r,f,s=state){return island(r.a,s)?.owner===f||island(r.b,s)?.owner===f}
+  function logEvent(text){state.log.unshift({text,ts:Date.now()});state.log=state.log.slice(0,30)}
+
+  function startTurn(f){
+    if(state.ended) return;
+    state.actionsLeft=2;
+    const income=ownedIslands(f).reduce((n,i)=>n+1+(i.buildings.trade?1:0),0);
+    state.gold[f]+=income;
+    const card=CARD_POOL[rnd(CARD_POOL.length)];
+    state.hands[f].push({id:`c${Date.now()}${Math.random()}`,type:card});
+    logEvent(`${FACTIONS[f].name} 턴 시작 · 섬 수입 +${income} · 전략카드 1장`);
+  }
+
+  function resolveLoans(){
+    for(const l of state.loans){
+      if(l.status!=='open'||l.dueRound>state.round) continue;
+      if(state.gold[l.target]>=l.repay){
+        state.gold[l.target]-=l.repay; state.gold.bank+=l.repay; l.status='paid';
+        logEvent(`${FACTIONS[l.target].name}이 아라랏 은행에 ${l.repay} 금화를 상환했습니다.`);
+      }else{
+        const col=island(l.collateral);
+        if(col && !col.sunk && col.owner===l.target){
+          col.owner='bank'; l.status='seized';
+          logEvent(`채무 불이행 · ${col.name}이 아라랏 은행 담보로 넘어갔습니다.`);
+        }else{
+          l.status='default'; logEvent(`${FACTIONS[l.target].name}의 대출이 부도 처리되었습니다.`);
+        }
+      }
+    }
+  }
+
+  function resolveDisaster(){
+    const die=1+rnd(6);
+    logEvent(`침수 주사위 결과 ${die}`);
+    if(die>2) return;
+    const deck=[1,1,1,1,2,2,2,3];
+    const rise=deck[rnd(deck.length)];
+    state.seaLevel+=rise;
+    logEvent(`재앙 발생 · 해수면 +${rise}m → 현재 ${state.seaLevel}m`);
+    const newly=[];
+    for(const i of state.islands){
+      if(!i.sunk && state.seaLevel>=i.alt){ i.sunk=true; newly.push(i.name); }
+    }
+    for(const r of state.routes){if(routeClosed(r)) r.pirate=null;}
+    if(newly.length) logEvent(`침수: ${newly.join(', ')}`);
+  }
+
+  function finalizeGame(){
+    state.ended=true;
+    const assets=bankAssets();
+    const r=routeScore('remnant'), w=routeScore('watch');
+    if(assets>=BANK_WIN_ASSET) state.winner='bank';
+    else if(r>w) state.winner='remnant';
+    else if(w>r) state.winner='watch';
+    else state.winner='tie';
+    logEvent(state.winner==='tie'?'게임 종료 · 남은 자와 파수꾼 항로 동률':`게임 종료 · ${FACTIONS[state.winner].name} 승리`);
+  }
+
+  function nextTurn(){
+    state.turnIndex++;
+    if(state.turnIndex>=TURN_ORDER.length){
+      state.turnIndex=0;
+      resolveDisaster();
+      if(state.round>=MAX_ROUNDS){finalizeGame();return;}
+      state.round++;
+      resolveLoans();
+    }
+    startTurn(currentFaction());
+  }
+
+  function consumeAction(){state.actionsLeft=Math.max(0,state.actionsLeft-1)}
+
+  function applyAction(f,act){
+    if(!state) return {ok:false,msg:'방 상태가 없습니다.'};
+    if(act.type==='chat'){
+      const text=String(act.text||'').trim().slice(0,120); if(!text) return {ok:false};
+      state.chat.push({name:state.players[f]?.name||FACTIONS[f].name,faction:f,text,ts:Date.now()});state.chat=state.chat.slice(-40);
+      return {ok:true};
+    }
+    if(act.type==='start'){
+      if(!isHost) return {ok:false,msg:'방장만 시작할 수 있습니다.'};
+      if(!TURN_ORDER.every(x=>playerReady(x))) return {ok:false,msg:'세 세력이 모두 참가해야 합니다.'};
+      state.started=true; logEvent('세 진영이 출항했습니다.'); startTurn(currentFaction()); return {ok:true};
+    }
+    if(!state.started||state.ended) return {ok:false,msg:'진행 중인 게임이 아닙니다.'};
+    if(f!==currentFaction()) return {ok:false,msg:'현재 당신의 턴이 아닙니다.'};
+    if(act.type!=='endTurn' && act.type!=='useCard' && state.actionsLeft<=0) return {ok:false,msg:'남은 행동이 없습니다.'};
+
+    if(act.type==='endTurn'){ nextTurn(); return {ok:true}; }
+
+    if(act.type==='useCard'){
+      const idx=state.hands[f].findIndex(c=>c.id===act.cardId); if(idx<0) return {ok:false,msg:'카드를 찾을 수 없습니다.'};
+      const c=state.hands[f][idx], def=CARD_DEFS[c.type];
+      if(def.effect==='gold2') state.gold[f]+=2;
+      if(def.effect==='action1') state.actionsLeft+=1;
+      if(def.effect==='claim1') state.buffs[f].claim+=1;
+      if(def.effect==='pirate1') state.buffs[f].pirate+=1;
+      state.hands[f].splice(idx,1); logEvent(`${FACTIONS[f].name} · ${def.name} 사용`); return {ok:true};
+    }
+
+    if(act.type==='claim'){
+      if(!isMilitary(f)) return {ok:false,msg:'아라랏 은행은 섬을 점령하지 않습니다.'};
+      const i=island(act.islandId); if(!i||i.sunk) return {ok:false,msg:'장악할 수 없는 섬입니다.'};
+      if(i.owner===f) return {ok:false,msg:'이미 지배 중입니다.'};
+      if(i.owner==='bank') return {ok:false,msg:'은행 보유 섬은 매각을 통해서만 취득합니다.'};
+      if(!adjacentOwned(i.id,f)) return {ok:false,msg:'자신의 섬에서 열린 항로로 연결되어야 합니다.'};
+      let cost=i.owner?4:2;
+      if(i.owner && i.buildings.fort) cost+=2;
+      if(portAdjacent(i.id,f)) cost-=1;
+      if(state.buffs[f].claim>0){cost-=1;state.buffs[f].claim--;}
+      cost=Math.max(1,cost);
+      if(state.gold[f]<cost) return {ok:false,msg:`금화 ${cost}이 필요합니다.`};
+      const prev=i.owner; state.gold[f]-=cost; i.owner=f; consumeAction();
+      logEvent(`${FACTIONS[f].name}이 ${i.name}을 장악했습니다${prev?` (${FACTIONS[prev]?.name||'중립'}에서 탈취)`:''}.`); return {ok:true};
+    }
+
+    if(act.type==='pirate'){
+      if(!isMilitary(f)) return {ok:false,msg:'은행은 해적을 고용하지 않습니다.'};
+      const r=route(act.routeId); if(!r||routeClosed(r)) return {ok:false,msg:'폐쇄된 항로입니다.'};
+      if(!routeTouchesOwned(r,f)) return {ok:false,msg:'자신의 섬과 닿은 항로에만 해적을 보낼 수 있습니다.'};
+      let cost=r.pirate&&r.pirate!==f?3:2;
+      if(state.buffs[f].pirate>0){cost-=1;state.buffs[f].pirate--;}
+      if(r.pirate===f) return {ok:false,msg:'이미 당신의 해적이 통제 중입니다.'};
+      if(state.gold[f]<cost) return {ok:false,msg:`금화 ${cost}이 필요합니다.`};
+      state.gold[f]-=cost;r.pirate=f;consumeAction();logEvent(`${FACTIONS[f].name} 해적이 항로를 장악했습니다.`);return {ok:true};
+    }
+
+    if(act.type==='clearPirate'){
+      if(!isMilitary(f)) return {ok:false,msg:'은행은 해적과 전투하지 않습니다.'};
+      const r=route(act.routeId); if(!r?.pirate||r.pirate===f) return {ok:false,msg:'제거할 적 해적이 없습니다.'};
+      if(!routeTouchesOwned(r,f)) return {ok:false,msg:'자신의 섬과 닿은 항로만 정리할 수 있습니다.'};
+      const cost=2;if(state.gold[f]<cost)return{ok:false,msg:'금화 2가 필요합니다.'};
+      state.gold[f]-=cost;const old=r.pirate;r.pirate=null;consumeAction();logEvent(`${FACTIONS[f].name}이 ${FACTIONS[old].name} 해적을 몰아냈습니다.`);return{ok:true};
+    }
+
+    if(act.type==='build'){
+      const i=island(act.islandId); if(!i||i.sunk||i.owner!==f) return {ok:false,msg:'자신의 섬에만 건설할 수 있습니다.'};
+      const b=act.building;if(!['port','trade','fort'].includes(b)) return {ok:false};
+      if(i.buildings[b]) return {ok:false,msg:'이미 건설되어 있습니다.'};
+      const cost=3;if(state.gold[f]<cost)return{ok:false,msg:'금화 3이 필요합니다.'};
+      state.gold[f]-=cost;i.buildings[b]=true;consumeAction();
+      const bn={port:'항구',trade:'교역소',fort:'방어시설'}[b];logEvent(`${i.name}에 ${bn} 건설`);return{ok:true};
+    }
+
+    if(act.type==='sellToBank'){
+      if(!isMilitary(f))return{ok:false};const i=island(act.islandId);if(!i||i.sunk||i.owner!==f)return{ok:false,msg:'판매할 수 없는 섬입니다.'};
+      const price=2+(i.buildings.trade?1:0);if(state.gold.bank<price)return{ok:false,msg:'은행에 매입 자금이 부족합니다.'};
+      state.gold.bank-=price;state.gold[f]+=price;i.owner='bank';consumeAction();logEvent(`${FACTIONS[f].name}이 ${i.name}을 아라랏 은행에 ${price} 금화로 매각했습니다.`);return{ok:true};
+    }
+
+    if(act.type==='bankSupport'){
+      if(f!=='bank'||!isMilitary(act.target))return{ok:false};state.bankSupport=act.target;consumeAction();logEvent(`아라랏 은행이 ${FACTIONS[act.target].name} 후원을 선언했습니다.`);return{ok:true};
+    }
+
+    if(act.type==='bankLoan'){
+      if(f!=='bank'||!isMilitary(act.target))return{ok:false};
+      if(state.bankSupport&&state.bankSupport!==act.target)return{ok:false,msg:'현재 후원 진영에게만 대출할 수 있습니다. 먼저 후원을 전환하세요.'};
+      const amount=Math.max(1,Math.min(6,Number(act.amount)||0));if(state.gold.bank<amount)return{ok:false,msg:'은행 자금이 부족합니다.'};
+      const col=island(act.collateral);if(!col||col.owner!==act.target||col.sunk)return{ok:false,msg:'유효한 담보 섬이 필요합니다.'};
+      state.bankSupport=act.target;const repay=amount+Math.max(1,Math.ceil(amount*.25));
+      state.gold.bank-=amount;state.gold[act.target]+=amount;state.loans.push({id:state.loanSeq++,target:act.target,principal:amount,repay,dueRound:state.round+3,collateral:col.id,status:'open'});consumeAction();
+      logEvent(`아라랏 은행 → ${FACTIONS[act.target].name} ${amount} 금화 대출 · ${col.name} 담보 · ${state.round+3}R ${repay} 상환`);return{ok:true};
+    }
+
+    if(act.type==='bankSell'){
+      if(f!=='bank')return{ok:false};const i=island(act.islandId);const target=state.bankSupport;if(!target)return{ok:false,msg:'먼저 후원 진영을 선택하세요.'};
+      if(!i||i.sunk||i.owner!=='bank')return{ok:false,msg:'은행 보유 섬을 선택하세요.'};const price=3+(i.buildings.trade?1:0);
+      if(state.gold[target]<price)return{ok:false,msg:`${FACTIONS[target].name}의 매입 자금이 부족합니다.`};
+      state.gold[target]-=price;state.gold.bank+=price;i.owner=target;consumeAction();logEvent(`아라랏 은행이 ${i.name}을 ${FACTIONS[target].name}에 ${price} 금화로 매각했습니다.`);return{ok:true};
+    }
+
+    return {ok:false,msg:'알 수 없는 행동입니다.'};
+  }
+
+  function broadcast(){
+    if(!isHost||!state)return;render();
+    for(const c of connections.values()) if(c.open) c.send({type:'state',state});
+  }
+  function hostHandle(f,act,conn=null){
+    const res=applyAction(f,act); if(!res.ok){ if(conn?.open) conn.send({type:'error',message:res.msg||'행동 실패'}); else showToast(res.msg||'행동 실패'); return; }
+    broadcast();
+  }
+  function dispatch(act){
+    if(!myFaction){showToast('세력을 선택하세요.');return;}
+    if(isHost) hostHandle(myFaction,act); else if(hostConn?.open) hostConn.send({type:'action',action:act}); else showToast('방장과 연결이 끊겼습니다.');
+  }
+
+  function setupHostConnection(conn){
+    connections.set(conn.peer,conn);
+    conn.on('data',msg=>{
+      if(msg?.type==='join'){
+        const f=msg.faction,name=String(msg.name||'선원').slice(0,14);
+        if(!FACTIONS[f]||state.players[f]){conn.send({type:'reject',message:'이미 선택된 세력입니다.'});return;}
+        state.players[f]={name,host:false};conn.__faction=f;conn.send({type:'joined',faction:f,state});
+        logEvent(`${name} · ${FACTIONS[f].name} 참가`);broadcast();
+      } else if(msg?.type==='action' && conn.__faction){ hostHandle(conn.__faction,msg.action,conn); }
+    });
+    conn.on('close',()=>{connections.delete(conn.peer);});
+  }
+
+  function createRoom(){
+    myName=$('playerName').value.trim()||'방장';myFaction=document.querySelector('.faction-card.selected')?.dataset.faction||'remnant';
+    roomCode=roomRand();isHost=true;state=initialState(myFaction,myName);$('entryStatus').textContent='방을 여는 중…';
+    peer=new Peer(`tomob-${roomCode}`);
+    peer.on('open',()=>{
+      $('entryOverlay').classList.remove('open');$('lobbyOverlay').classList.add('open');updateUrl();render();renderLobby();
+    });
+    peer.on('connection',setupHostConnection);
+    peer.on('error',e=>{$('entryStatus').textContent='방 생성 실패: '+(e.type||e.message);});
+  }
+
+  function joinRoom(){
+    myName=$('playerName').value.trim()||'선원';myFaction=document.querySelector('.faction-card.selected')?.dataset.faction||'remnant';
+    roomCode=$('roomCodeInput').value.trim().toUpperCase();if(roomCode.length<4){$('entryStatus').textContent='방 코드를 입력하세요.';return;}
+    isHost=false;$('entryStatus').textContent='방장에게 연결 중…';peer=new Peer();
+    peer.on('open',()=>{
+      hostConn=peer.connect(`tomob-${roomCode}`,{reliable:true});
+      hostConn.on('open',()=>hostConn.send({type:'join',name:myName,faction:myFaction}));
+      hostConn.on('data',msg=>{
+        if(msg?.type==='joined'){myFaction=msg.faction;state=msg.state;$('entryOverlay').classList.remove('open');$('lobbyOverlay').classList.add('open');updateUrl();render();renderLobby();}
+        if(msg?.type==='state'){state=msg.state;render();renderLobby();}
+        if(msg?.type==='error')showToast(msg.message||'행동 실패');
+        if(msg?.type==='reject'){$('entryStatus').textContent=msg.message||'참가 실패';hostConn.close();}
+      });
+      hostConn.on('close',()=>showToast('방장과 연결이 끊겼습니다.'));
+    });
+    peer.on('error',e=>{$('entryStatus').textContent='접속 실패: '+(e.type||e.message);});
+  }
+
+  function updateUrl(){
+    const u=new URL(location.href);u.searchParams.set('room',roomCode);history.replaceState({},'',u);
+  }
+
+  function renderLobby(){
+    if(!state)return;$('lobbyCode').textContent=roomCode;
+    $('lobbySeats').innerHTML=TURN_ORDER.map(f=>{
+      const p=state.players[f];const icon=f==='bank'?'<div class="bank-seal">A</div>':`<img src="${FACTIONS[f].sigil}" alt="">`;
+      return `<div class="lobby-seat ${p?'':'empty'}">${icon}<strong>${FACTIONS[f].name}</strong><span>${p?esc(p.name):'자리 비어 있음'}</span></div>`;
+    }).join('');
+    const ready=TURN_ORDER.every(f=>state.players[f]);$('startGame').disabled=!isHost||!ready||state.started;
+    $('startGame').textContent=state.started?'게임 진행 중':ready?'게임 시작':'3인 준비 후 게임 시작';
+    if(state.started)$('lobbyOverlay').classList.remove('open');
+  }
+
+  function render(){
+    if(!state){renderEmpty();return;}
+    $('roundStat').textContent=state.ended?'종료':`${state.round}/${MAX_ROUNDS}`;$('seaStat').textContent=`${state.seaLevel}m`;$('roomStat').textContent=roomCode||'—';
+    renderPlayers();renderBoard();renderActions();renderHand();renderChat();renderLog();renderLobby();
+    if(state.ended) showEndModal();
+  }
+  function renderEmpty(){ $('playersPanel').innerHTML='<span class="muted">방에 참가하면 세력 정보가 표시됩니다.</span>'; }
+
+  function renderPlayers(){
+    const support=state.bankSupport;
+    $('playersPanel').innerHTML='<div class="panel-kicker">FACTIONS</div>'+TURN_ORDER.map(f=>{
+      const p=state.players[f];const icon=f==='bank'?'<div class="bank-sigil">A</div>':`<img class="sigil" src="${FACTIONS[f].sigil}" alt="">`;
+      const score=f==='bank'?`자산 ${bankAssets()}`:`항로 ${routeScore(f)}`;
+      return `<div class="player-row">${icon}<div><div class="pname">${esc(p?.name||'대기 중')}${support===f?'<span class="support-tag">은행 후원</span>':''}</div><div class="faction-name">${FACTIONS[f].name}</div></div><div class="pstats"><strong>${state.gold[f]}</strong><span>금화</span><div class="route-score">${score}</div></div></div>`;
+    }).join('');
+  }
+
+  function renderBoard(){
+    const byId=Object.fromEntries(state.islands.map(i=>[i.id,i]));
+    $('routeLayer').innerHTML=state.routes.map(r=>{
+      const a=byId[r.a],b=byId[r.b],ctl=routeController(r);const closed=routeClosed(r);
+      const cls=['route',selectedRoute===r.id?'selected':'',closed?'closed':'',ctl?`control-${ctl}`:'',r.pirate?`pirate-${r.pirate}`:''].filter(Boolean).join(' ');
+      const x1=a.x*10,y1=a.y*6.5,x2=b.x*10,y2=b.y*6.5,mx=(x1+x2)/2,my=(y1+y2)/2;
+      return `<line data-route="${r.id}" class="${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>${r.pirate&&!closed?`<text class="pirate-icon" x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="middle">☠</text>`:''}`;
+    }).join('');
+    document.querySelectorAll('[data-route]').forEach(el=>el.addEventListener('click',()=>{selectedRoute=el.dataset.route;selectedIsland=null;renderBoard();renderActions();}));
+    $('islandLayer').innerHTML=state.islands.map(i=>{
+      const owner=i.owner?`owner-${i.owner}`:'',sel=selectedIsland===i.id?'selected':'',sunk=i.sunk?'sunk':'';
+      const builds=(i.buildings.port?'⚓':'')+(i.buildings.trade?'¤':'')+(i.buildings.fort?'◆':'');
+      return `<button class="island ${owner} ${sel} ${sunk}" data-island="${i.id}" style="left:${i.x}%;top:${i.y}%"><span class="rock"></span><span class="alt">${i.alt}m</span><span class="builds">${builds}</span><span class="name">${esc(i.name)}</span></button>`;
+    }).join('');
+    document.querySelectorAll('[data-island]').forEach(el=>el.addEventListener('click',()=>{selectedIsland=el.dataset.island;selectedRoute=null;renderBoard();renderActions();}));
+  }
+
+  function btn(label,act,cls=''){return `<button class="${cls}" data-act='${JSON.stringify(act)}'>${label}</button>`}
+  function wireActionButtons(){document.querySelectorAll('#actionButtons [data-act]').forEach(b=>b.addEventListener('click',()=>{try{const a=JSON.parse(b.dataset.act);if(a.type==='loanModal')openLoanModal();else dispatch(a);}catch(e){}}));}
+
+  function renderActions(){
+    if(!state){return;}const f=currentFaction();const mine=f===myFaction;
+    $('turnBadge').className=`turn-badge ${f}`;$('turnBadge').textContent=state.ended?'게임 종료':`${FACTIONS[f].name}의 턴`;
+    $('actionHeader').textContent=state.started?(mine?`내 턴 · 행동 ${state.actionsLeft}회 남음`:`${FACTIONS[f].name} 행동 중`):'로비 대기 중';
+    let info='섬이나 항로를 선택하면 행동이 표시됩니다.', buttons=[];
+    if(!state.started){$('selectionInfo').textContent=info;$('actionButtons').innerHTML='';return;}
+    if(selectedIsland){
+      const i=island(selectedIsland);const owner=i.owner?FACTIONS[i.owner]?.name||'중립':'중립';
+      info=`${i.name} · 고도 ${i.alt}m · ${i.sunk?'침수':owner} · ${i.buildings.port?'항구 ':''}${i.buildings.trade?'교역소 ':''}${i.buildings.fort?'방어시설':''}`;
+      if(mine&&!i.sunk){
+        if(isMilitary(myFaction)&&i.owner!==myFaction&&i.owner!=='bank') buttons.push(btn('섬 장악', {type:'claim',islandId:i.id},'gold'));
+        if(i.owner===myFaction){
+          if(!i.buildings.port)buttons.push(btn('항구 · 3', {type:'build',islandId:i.id,building:'port'}));
+          if(!i.buildings.trade)buttons.push(btn('교역소 · 3', {type:'build',islandId:i.id,building:'trade'}));
+          if(!i.buildings.fort)buttons.push(btn('방어시설 · 3', {type:'build',islandId:i.id,building:'fort'}));
+          if(isMilitary(myFaction))buttons.push(btn('은행에 매각', {type:'sellToBank',islandId:i.id},'gold'));
+          if(myFaction==='bank')buttons.push(btn('후원 진영에 매각', {type:'bankSell',islandId:i.id},'gold'));
+        }
+      }
+    } else if(selectedRoute){
+      const r=route(selectedRoute),a=island(r.a),b=island(r.b),ctl=routeController(r);
+      info=`${a.name} ↔ ${b.name} · ${routeClosed(r)?'폐쇄':ctl?FACTIONS[ctl].name+' 통제':'미통제'}${r.pirate?` · ${FACTIONS[r.pirate].name} 해적`:''}`;
+      if(mine&&isMilitary(myFaction)&&!routeClosed(r)){
+        if(r.pirate&&r.pirate!==myFaction)buttons.push(btn('적 해적 제거 · 2',{type:'clearPirate',routeId:r.id},'danger'));
+        else if(r.pirate!==myFaction)buttons.push(btn('해적 배치',{type:'pirate',routeId:r.id},'gold'));
+      }
+    }
+    if(mine&&myFaction==='bank'){
+      buttons.push(btn(`후원: 남은 자`,{type:'bankSupport',target:'remnant'}));
+      buttons.push(btn(`후원: 파수꾼`,{type:'bankSupport',target:'watch'}));
+      buttons.push(btn('대출 실행',{type:'loanModal'},'gold wide'));
+    }
+    if(mine)buttons.push(btn('턴 종료',{type:'endTurn'},'wide'));
+    $('selectionInfo').textContent=info;$('actionButtons').innerHTML=buttons.join('');wireActionButtons();
+  }
+
+  function renderHand(){
+    if(!state||!myFaction){$('hand').innerHTML='<span class="muted">—</span>';return;}
+    const h=state.hands[myFaction]||[];
+    $('hand').innerHTML=h.length?h.map(c=>{const d=CARD_DEFS[c.type];return `<div class="card"><strong>${d.name}</strong><small>${d.desc}</small><button data-card="${c.id}" ${currentFaction()!==myFaction||state.ended?'disabled':''}>사용</button></div>`}).join(''):'<span class="muted">보유 카드 없음</span>';
+    document.querySelectorAll('[data-card]').forEach(b=>b.addEventListener('click',()=>dispatch({type:'useCard',cardId:b.dataset.card})));
+  }
+
+  function renderChat(){
+    if(!state)return;$('chatLog').innerHTML=state.chat.map(m=>`<div class="chat-msg"><b>${esc(m.name)}</b> ${esc(m.text)}</div>`).join('');$('chatLog').scrollTop=$('chatLog').scrollHeight;
+  }
+  function renderLog(){if(!state)return;$('eventLog').innerHTML=state.log.slice(0,9).map((l,i)=>`<div class="event"><strong>${i===0?'NOW':'LOG'}</strong> ${esc(l.text)}</div>`).join('')}
+
+  function openLoanModal(){
+    const opts=['remnant','watch'].map(f=>`<option value="${f}" ${state.bankSupport===f?'selected':''}>${FACTIONS[f].name}</option>`).join('');
+    $('modalCard').innerHTML=`<h3>대출 실행</h3><p>한 번에 한 진영만 후원할 수 있습니다. 상환은 3라운드 뒤 자동 처리되며, 미상환 시 담보 섬이 은행으로 넘어갑니다.</p><label>대출 대상<select id="loanTarget">${opts}</select></label><label>대출 금액<input id="loanAmount" type="number" min="1" max="6" value="3"></label><label>담보 섬<select id="loanCollateral"></select></label><div class="modal-actions"><button id="modalCancel">취소</button><button id="loanGo" class="primary">대출</button></div>`;
+    const fill=()=>{const t=$('loanTarget').value;$('loanCollateral').innerHTML=ownedIslands(t).map(i=>`<option value="${i.id}">${i.name} (${i.alt}m)</option>`).join('')||'<option value="">담보 가능 섬 없음</option>';};fill();$('loanTarget').onchange=fill;
+    $('modal').classList.add('open');$('modalCancel').onclick=closeModal;$('loanGo').onclick=()=>{dispatch({type:'bankLoan',target:$('loanTarget').value,amount:Number($('loanAmount').value),collateral:$('loanCollateral').value});closeModal();};
+  }
+  function closeModal(){$('modal').classList.remove('open')}
+  function showEndModal(){
+    if($('modal').dataset.endShown==='1')return;$('modal').dataset.endShown='1';
+    const winner=state.winner==='tie'?'남은 자 · 파수꾼 동률':FACTIONS[state.winner].name;
+    $('modalCard').innerHTML=`<h3>항해 종료</h3><p><strong>${winner}</strong></p><p>남은 자 항로 ${routeScore('remnant')} · 파수꾼 항로 ${routeScore('watch')} · 아라랏 은행 자산 ${bankAssets()}</p><div class="modal-actions"><button id="closeEnd">결과 보기</button></div>`;$('modal').classList.add('open');$('closeEnd').onclick=closeModal;
+  }
+  function showToast(msg){if(!msg)return;$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),2200)}
+
+  document.querySelectorAll('.faction-card').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.faction-card').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');}));
+  $('createRoom').onclick=createRoom;$('joinRoom').onclick=joinRoom;
+  $('startGame').onclick=()=>{if(isHost)hostHandle(myFaction,{type:'start'});};
+  $('copyRoom').onclick=async()=>{const u=new URL(location.href);u.searchParams.set('room',roomCode);u.searchParams.delete('host');try{await navigator.clipboard.writeText(u.toString());showToast('초대 링크를 복사했습니다.');}catch{showToast(`방 코드 ${roomCode}`)}};
+  $('chatForm').addEventListener('submit',e=>{e.preventDefault();const v=$('chatInput').value.trim();if(v){dispatch({type:'chat',text:v});$('chatInput').value='';}});
+  $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal();});
+
+  const preset=new URL(location.href).searchParams.get('room');if(preset){$('roomCodeInput').value=preset.toUpperCase();}
+  renderEmpty();
+})();
+
+</script>
+</body>
+</html>
