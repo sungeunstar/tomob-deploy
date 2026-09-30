@@ -78,7 +78,7 @@ export async function initPatmosHarborV3(ctx){
   const root=new THREE.Group();root.name='PATMOS / hidden harbor handcrafted v3';scene.add(root);
   const G=new Set(),M=new Set(),colliders=[],supports=[],loadedAssets=[],lights=[];
   const mat=(c,o={})=>{const m=new THREE.MeshStandardMaterial({color:c,roughness:.96,flatShading:true,...o});M.add(m);return m;};
-  const cliff=mat('#66716a'),cliffDark=mat('#46534f'),cliffWet=mat('#3f5652'),cliffLight=mat('#808b81');
+  const cliff=mat('#66716a',{side:THREE.DoubleSide}),cliffDark=mat('#46534f',{side:THREE.DoubleSide}),cliffWet=mat('#3f5652',{side:THREE.DoubleSide}),cliffLight=mat('#808b81',{side:THREE.DoubleSide});
   const stone=mat('#858a7d'),stoneDark=mat('#61685f'),wood=mat('#705039'),woodDark=mat('#493529'),iron=mat('#4a5251',{metalness:.22,roughness:.75});
   const cloth=mat('#743a35',{side:THREE.DoubleSide}),moss=mat('#536c47'),sand=mat('#9b8a65');
   const boxG=new THREE.BoxGeometry(1,1,1),rockG=new THREE.DodecahedronGeometry(1,0),cylG=new THREE.CylinderGeometry(1,1,1,7);
@@ -173,10 +173,12 @@ export async function initPatmosHarborV3(ctx){
     const g=await loader.loadAsync(ASSET[k]);
     g.scene.updateMatrixWorld(true);
     const box=new THREE.Box3().setFromObject(g.scene),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
-    g.scene.position.sub(center); // normalize around object center
-    g.scene.position.y+=size.y*.5; // bottom at y=0
+    // Keep normalization on a CHILD scene so placement can move the wrapper without
+    // destroying the bottom-alignment offset.
+    g.scene.position.set(-center.x,-box.min.y,-center.z);
     g.scene.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;o.material=o.material.clone();loadedAssets.push(o.material);}});
-    proto[k]={scene:g.scene,size};return proto[k];
+    const wrap=new THREE.Group();wrap.add(g.scene);
+    proto[k]={scene:wrap,size};return proto[k];
   }
   await Promise.all(Object.keys(ASSET).map(loadProto));
 
@@ -288,10 +290,10 @@ export async function initPatmosHarborV3(ctx){
   // --- 8) QA / PLAYER ---------------------------------------------------------------
   const points=[
     {id:'harbor',name:'숨은 밧모 항구',x:0,y:9,z:218,target:[0,55,45]},
-    {id:'westLower',name:'서쪽 하층 골목',x:-78,y:22,z:145,target:[-125,47,70]},
+    {id:'westLower',name:'서쪽 하층 골목',x:-99,y:22,z:132,target:[-125,47,70]},
     {id:'bridge',name:'항구 중앙 다리',x:0,y:24,z:122,target:[-126,49,67]},
-    {id:'cave',name:'암시장 동굴',x:-143,y:78,z:8,target:[-186,82,8]},
-    {id:'upper',name:'상층 감시지구',x:95,y:86,z:18,target:[25,120,-38]},
+    {id:'cave',name:'암시장 동굴',x:-160,y:78,z:8,target:[-186,82,8]},
+    {id:'upper',name:'상층 감시지구',x:126,y:86,z:8,target:[25,120,-38]},
   ];
   const ray=new THREE.Raycaster(),down=new THREE.Vector3(0,-1,0),org=new THREE.Vector3();
   function groundAt(x,z,fromY=260){
