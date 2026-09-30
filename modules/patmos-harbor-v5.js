@@ -73,6 +73,7 @@ export async function initPatmosHarborV5(ctx){
   function mesh(g,m,x=0,y=0,z=0,s=[1,1,1],ry=0,rx=0,rz=0,walk=false,name=''){
     G.add(g);const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(...s);o.rotation.set(rx,ry,rz);o.castShadow=o.receiveShadow=true;o.name=name;root.add(o);if(walk)solid(o,true);return o;
   }
+  function collideOnly(o){solid(o,false);return o;}
   const box=(x,y,z,s,m=wood,ry=0,walk=false,name='')=>mesh(boxG,m,x,y,z,s,ry,0,0,walk,name);
   function beam(a,b,r=.08,m=woodDark,name=''){
     const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A),len=d.length();
@@ -136,7 +137,7 @@ export async function initPatmosHarborV5(ctx){
     const {side,x,z,baseY,rockW,rockD,rockH,seed,levels=2,frontYaw=0}=cfg;
     // rock mass first
     const rg=rockChunkGeometry(rockW,rockD,rockH,side*6,-5,seed);G.add(rg);
-    mesh(rg,seed%2?rock:rock2,x,baseY,z,[1,1,1],0,0,0,false,'urban cliff mass');
+    collideOnly(mesh(rg,seed%2?rock:rock2,x,baseY,z,[1,1,1],0,0,0,false,'urban cliff mass'));
 
     // authored natural/stone shelf intersecting the rock by 30-40%.
     for(let lv=0;lv<levels;lv++){
@@ -178,7 +179,7 @@ export async function initPatmosHarborV5(ctx){
 
   // rear upper-city rock shoulders, leaving a real open gate/void in the middle.
   const rearL=rockChunkGeometry(48,55,118,4,-4,51),rearR=rockChunkGeometry(48,55,113,-5,-3,57);G.add(rearL);G.add(rearR);
-  mesh(rearL,rock2,-48,-8,-88,[1,1,1],0,0,0,false,'rear left shoulder');mesh(rearR,rock,49,-8,-90,[1,1,1],0,0,0,false,'rear right shoulder');
+  collideOnly(mesh(rearL,rock2,-48,-8,-88,[1,1,1],0,0,0,false,'rear left shoulder'));collideOnly(mesh(rearR,rock,49,-8,-90,[1,1,1],0,0,0,false,'rear right shoulder'));
 
   // rear stone court and old gate read as the distant goal.
   const courtPts=[[-42,-63],[42,-63],[47,-93],[-48,-94]];
