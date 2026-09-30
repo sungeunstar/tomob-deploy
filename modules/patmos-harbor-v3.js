@@ -234,7 +234,7 @@ export async function initPatmosHarborV3(ctx){
 
   // --- 5) CAVE MARKET: real interior shell, not a black rectangle -------------------
   const caveG=makeArchTunnel(46,28,21,11,14);G.add(caveG);
-  const cave=add(caveG,cliffDark,-151,76,7,[1,1,1],-Math.PI/2,0,0,false,'Cave market tunnel');
+  const cave=add(caveG,cliffDark,-145,76,7,[1,1,1],Math.PI,0,0,false,'Cave market tunnel');
   cave.material.side=THREE.DoubleSide;
   // cave floor penetrates west cliff
   box(-173,75.2,7,[45,1.2,21],stoneDark,0,true,'Cave floor');
