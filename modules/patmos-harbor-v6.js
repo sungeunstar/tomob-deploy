@@ -76,6 +76,7 @@ export async function initPatmosHarborV6(ctx){
   function mesh(g,m,x=0,y=0,z=0,s=[1,1,1],ry=0,rx=0,rz=0,walk=false,name=''){
     G.add(g);const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.scale.set(...s);o.rotation.set(rx,ry,rz);o.castShadow=o.receiveShadow=true;o.name=name;root.add(o);if(walk)solid(o,true);return o;
   }
+  function collideOnly(o){solid(o,false);return o;}
   const box=(x,y,z,s,m=wood,ry=0,walk=false,name='')=>mesh(boxG,m,x,y,z,s,ry,0,0,walk,name);
   function collideOnly(o){solid(o,false);return o;}
   function beam(a,b,r=.08,m=woodDark,name=''){
