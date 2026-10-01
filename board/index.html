@@ -129,7 +129,7 @@
           <img src="../assets/sigils/watch.png" alt="" /><span>파수꾼</span><small>항로 수호</small>
         </button>
         <button data-faction="bank" class="faction-card bank-card">
-          <span class="bank-seal">A</span><span>아라랏 은행</span><small>금융 · 담보</small>
+          <img src="../assets/sigils/bank.webp" alt="" /><span>아라랏 은행</span><small>금융 · 담보</small>
         </button>
       </div>
       <div class="entry-actions">
@@ -164,7 +164,7 @@
   const FACTIONS = {
     remnant: { name:'남은 자', color:'#93bd64', sigil:'../assets/sigils/remnant.png' },
     watch: { name:'파수꾼', color:'#6a9fd8', sigil:'../assets/sigils/watch.png' },
-    bank: { name:'아라랏 은행', color:'#d8b86f', sigil:null }
+    bank: { name:'아라랏 은행', color:'#d8b86f', sigil:'../assets/sigils/bank.webp' }
   };
   const TURN_ORDER = ['remnant','watch','bank'];
   const MAX_ROUNDS = 8;
@@ -487,7 +487,7 @@
   function renderLobby(){
     if(!state)return;$('lobbyCode').textContent=roomCode;
     $('lobbySeats').innerHTML=TURN_ORDER.map(f=>{
-      const p=state.players[f];const icon=f==='bank'?'<div class="bank-seal">A</div>':`<img src="${FACTIONS[f].sigil}" alt="">`;
+      const p=state.players[f];const icon=`<img src="${FACTIONS[f].sigil}" alt="">`;
       return `<div class="lobby-seat ${p?'':'empty'}">${icon}<strong>${FACTIONS[f].name}</strong><span>${p?esc(p.name):'자리 비어 있음'}</span></div>`;
     }).join('');
     const ready=TURN_ORDER.every(f=>state.players[f]);$('startGame').disabled=!isHost||!ready||state.started;
